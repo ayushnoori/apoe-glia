@@ -1,0 +1,274 @@
+############################################################
+### E2.3.4 QPCR ANALYSIS
+### Ayush Noori
+############################################################
+
+# load packages
+library(data.table)
+library(stringr)
+library(tidyverse)
+
+# read and write to Excel files
+library(openxlsx)
+
+# statistical analysis
+library(psych)
+
+# plot data
+library(ggplot2)
+library(RColorBrewer)
+library(ggpubr)
+
+# caption text and display significance
+# devtools::install_github("wilkelab/ggtext")
+library(ggtext)
+library(ggsignif)
+
+# heatmap
+library(pheatmap)
+
+
+###################################
+### SETUP
+###################################
+
+# set working directory
+homedir = "" # change to your directory
+apoe_dir = file.path(homedir, "Results", "APOE Plots")
+setwd(homedir)
+
+apoe = read.xlsx("Data/qPCR Data.xlsx", sheet = 2)
+apoe_RQ = read.xlsx("Data/qPCR Data.xlsx", sheet = 4)
+if(file.exists("APOE ANOVA Results.txt")) file.remove("APOE ANOVA Results.txt")
+
+
+###################################
+### FILTER DATA
+###################################
+
+# filter APOE
+rownames(apoe) = apoe$Extract
+apoe_lab = apoe$Label
+colnames(apoe)[1] = "Genotype"
+apoe$Genotype = substr(apoe_lab, 1, 1)
+colnames(apoe)[2] = "Sex"
+apoe$Sex = substr(apoe_lab, 2, 2)
+apoe = apoe[, -3]
+
+# append RQ data
+colnames(apoe_RQ) = paste0(colnames(apoe_RQ), ".RQ")
+apoe = cbind(apoe, apoe_RQ[, 5:16])
+
+# convert to factor
+apoe$Genotype = factor(apoe$Genotype, levels = c("2", "3", "4"))
+apoe$Sex = factor(apoe$Sex, levels = c("M", "F"))
+
+# remap factors
+apoe$Genotype = plyr::revalue(apoe$Genotype, replace = c(`2` = "APOE2", `3` = "APOE3", `4` = "APOE4"))
+apoe$Sex = plyr::revalue(apoe$Sex, replace = c(`M` = "Male", `F` = "Female"))
+
+# get gene indices
+idx = c(4:9, 11:14)
+genes = colnames(apoe)[idx]
+idx_RQ = idx+12
+genes_RQ = colnames(apoe)[idx_RQ]
+
+# initialize plot list
+plots = vector(mode = "list", length = length(genes))
+
+
+for (i in 1:length(idx)) {
+  
+  ###################################
+  ### STATISTICS
+  ###################################
+  
+  # select gene for this iteration
+  gene = genes[i]
+  gene_RQ = genes_RQ[i]
+  cat(paste0("Analysis #", i, ": ", gene, "\n"))
+  
+  # perform one-way ANOVA
+  res_aov = aov(get(gene) ~ Genotype, data = apoe)
+  stat_aov = summary(res_aov)[[1]]
+  
+  # perform Tukey test
+  res_tukey = TukeyHSD(res_aov)
+  stat_tukey = res_tukey$Genotype[, 4]
+  
+  # convert Tukey test to data frame
+  plot_tukey = data.frame(stat_tukey); colnames(plot_tukey) = "label"
+  plot_tukey[["start"]] = c("APOE2", "APOE2", "APOE3")
+  plot_tukey[["end"]] = c("APOE3", "APOE4", "APOE4")
+  
+  # set posthoc test
+  plot_posthoc = plot_tukey
+  
+  # print to output
+  sink(file = "APOE ANOVA Results.txt", append = TRUE)
+  if(i != 1) cat("\n\n")
+  cat(paste0(gene, " ONE-WAY ANOVA:\n"))
+  print(stat_aov)
+  cat(paste0(gene, " TUKEY TEST:\n"))
+  print(stat_tukey)
+  sink()
+  
+  # calculate summary statistics
+  dat = describeBy(apoe[[gene_RQ]], list(apoe$Genotype), mat=TRUE, digits=2)
+  names(dat)[names(dat) == "group1"] = "Genotype"
+  dat$Genotype = factor(dat$Genotype, levels = c("APOE2", "APOE3", "APOE4"))
+  
+  # make sure that error bars don't become negative
+  for (r in 1:nrow(dat)) {
+    if(dat$mean[r] - dat$sd[r] < 0) dat$sd[r] = dat$mean[r]
+  }
+  
+  # define error bar limits
+  limits = aes(ymax = mean + sd, ymin = mean - sd)
+  
+  # set significance bar height
+  plot_posthoc = plot_posthoc[c(1, 3, 2), ]
+  range_RQ = max(apoe_RQ[[gene_RQ]]) - min(apoe_RQ[[gene_RQ]])
+  plot_posthoc[["height"]] = max(dat$mean + 1.3*dat$sd) + range_RQ*c(0, 0.1, 0.2)
+  plot_posthoc[["pValue"]] = plot_posthoc$label
+  plot_posthoc$label = paste0("p = ", round(plot_posthoc$pValue, 4))
+  plot_posthoc = plot_posthoc[-which(plot_posthoc$pValue > 0.1), ]
+
+  
+  ###################################
+  ### PLOT DATA
+  ###################################
+  
+  stat_plot = data.frame(stat_aov$`Pr(>F)`[1])
+  colnames(stat_plot) = c("PValue")
+  
+  stat_plot$PValue = round(stat_plot$PValue, 4)
+  
+  # plot caption
+  caption_labs = stat_plot$PValue
+  
+  # conditional formating for caption label
+  for (k in 1:length(caption_labs)){
+    if(caption_labs[k] == 0) {
+      caption_labs[k]  = "<span style = 'color:#C33C54;'>*p* < 0.0001</span>"
+    } else if (caption_labs[k] < 0.05) {
+      caption_labs[k]  = paste0("<span style = 'color:#C33C54;'>", "*p* = ", caption_labs[k], "</span>")
+    } else if (caption_labs[k] < 0.1) {
+      caption_labs[k]  = paste0("<span style = 'color:#D4AFB9;'>", "*p* = ", caption_labs[k], "</span>")
+    } else if(caption_labs[k] >= 0.1) {
+      caption_labs[k]  = "<span style = 'color:#41414E;'>N.S.</span>"
+    }
+  }
+  
+  # summary caption label
+  plot_caption = paste0("<span style = 'color:#41414E;'>**Genotype:** </span>", caption_labs[1], "<br>")
+  
+  
+  # make barplot
+  p = ggplot(dat, aes(x = Genotype, y = mean, color = Genotype, group = Genotype)) +
+    geom_bar(stat='identity', fill = "white", size = 1, width = 0.5) +
+    scale_color_manual(values = c("#FFB84D", "#785D37", "#62BBA5")) +
+    geom_errorbar(limits, color = "#41414E", width=0.25) +
+    geom_jitter(data = apoe, aes(x = Genotype, y = .data[[gene_RQ]], color = Genotype, shape = Sex),
+                size = 2, width=0.15) +
+    geom_signif(data = plot_posthoc, mapping = aes(xmin = start, xmax = end, annotations = label, y_position = height), inherit.aes = FALSE, manual= TRUE) +
+    ggtitle(gene) +
+    ylab("Expression Fold-Change") +
+    xlab("") +
+    scale_y_continuous(expand = expansion(mult = c(-0.01, .1))) +
+    labs(caption = plot_caption) +
+    theme_linedraw() +
+    guides(fill = FALSE, color = FALSE, shape = FALSE) +
+    theme(plot.title = element_text(size = 20, hjust = 0.5, color = "#41414E", face = "bold.italic"),
+          plot.caption = element_markdown(hjust = 0.5, size = 16),
+          axis.text.x.bottom = element_text(size = 12, face = "bold.italic", color = "#41414E"),
+          axis.title.y = element_text(size = 14, face = "bold", color = "#41414E"),
+          panel.background = element_rect(fill = "#FDF5ED"),
+          axis.ticks.x = element_blank(),
+          panel.grid = element_blank()
+    )
+  
+  # save plot
+  ggsave(file.path(apoe_dir, paste0(gene, " Plot.pdf")), p, width = 5, height = 6)
+  
+  # add plot to total list
+  plots[[i]] = p
+  
+}
+
+p_legend = ggplot(apoe, aes(x = Genotype, y = gene_RQ, color = Genotype, shape = Sex)) +
+  scale_color_manual(values = c("#FFB84D", "#785D37", "#62BBA5")) +
+  geom_jitter(size = 2, width=0.1) + 
+  theme(legend.title = element_text(size = 18, face = "bold", color = "#41414E"),
+        legend.text = element_text(size = 14, color = "#41414E"),
+        legend.position = "top")
+
+my_legend = get_legend(p_legend)
+
+# combine and arrange all plots using NULL values as placeholders to arrange plots
+all_plots = ggarrange(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      plots[[5]], NULL,
+                      plots[[6]] + rremove("ylab"),  NULL,
+                      plots[[2]] + rremove("ylab"),  NULL,
+                      plots[[1]] + rremove("ylab"),  NULL,
+                      plots[[4]] + rremove("ylab"),
+                      plots[[3]],  NULL,
+                      plots[[7]] + rremove("ylab"),  NULL,
+                      plots[[10]] + rremove("ylab"),  NULL,
+                      plots[[8]] + rremove("ylab"),  NULL,
+                      plots[[9]] + rremove("ylab"),
+                      ncol = 9,
+                      nrow = 3,
+                      widths = c(1, 0.1, 1, 0.1, 1, 0.1, 1, 0.1, 1),
+                      heights = c(0.05, 1, 1),
+                      legend.grob = my_legend,
+                      legend = "bottom")
+
+ggsave("M-F e2-e3-e4 qPCR Figure.pdf", all_plots, width = 18, height = 12)
+ggsave("M-F e2-e3-e4 qPCR Figure.png", all_plots, width = 18, height = 12, units = "in", dpi = 900)
+
+
+
+###################################
+### CORRELATION HEATMAPS
+###################################
+
+cor_dat = apoe[, 4:15]
+print(sapply(cor_dat, function(x) agostino.test(as.numeric(x), alternative = "two.sided")$p.value))
+
+apoe_cor = cor(cor_dat, method = "spearman")
+apoe_cor = apoe_cor[-c(7, 12), -c(7, 12)]
+
+newnames = lapply(rownames(apoe_cor),  function(x) bquote(italic(.(x))))
+
+hm = pheatmap(apoe_cor,
+              color = colorRampPalette(c("#313695", "#8FC3DC", "#E3E0DD", "#F88D52", "#A50026"))(100),
+              breaks = seq(from = -1, to = 1, length.out = 101),
+              cellwidth = 25, cellheight = 25,
+              cluster_cols = TRUE, cluster_rows = TRUE,
+              border_color = NA,
+              show_colnames = TRUE,
+              show_rownames = TRUE,
+              silent = TRUE,
+              labels_row = as.expression(newnames), labels_col = as.expression(newnames))
+
+ggsave("M-F e2-e3-e4 qPCR Correlation Heatmap.pdf", hm, width = 7, height = 6.8)
+# ggsave("M-F e2-e3-e4 qPCR Correlation Heatmap.png", hm, width = 7, height = 6.8, units = "in", dpi = 900)
+
+
+###################################
+### CORRELATION MATRIX
+###################################
+
+wb = createWorkbook()
+
+hs = createStyle(fontColour = "#FAF3DD", fgFill = "#5171A5", fontName = "Arial Black",
+                 halign = "left", valign = "center", textDecoration = "Bold",
+                 border = "Bottom", borderStyle = "thick", fontSize = 10)
+
+addWorksheet(wb, sheetName = "M.F-E3.4")
+writeDataTable(wb, "M.F-E3.4", x = data.frame(apoe_cor), tableStyle = "TableStyleMedium15", headerStyle = hs, rowNames = TRUE)
+addStyle(wb, "M.F-E3.4", createStyle(fontColour = "#363635", fgFill = "#FAF3DD", fontName = "Arial", fontSize = 10), rows = 2:13, cols = 2:13, gridExpand = T)
+addStyle(wb, "M.F-E3.4", hs, rows = 2:13, cols = 1, gridExpand = T)
+
+saveWorkbook(wb, "M-F e2-e3-e4 Correlation Matrix.xlsx", overwrite = TRUE)
