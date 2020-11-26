@@ -27,7 +27,7 @@ Our codebase is available at [ayushnoori.github.io/apoe-glia](https://ayushnoori
 * [Models](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/Models.html)
 
 ### qPCR Analysis
-* [APOE Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/APOE%20qPCR%20Analysis.html)
+* [APOE qPCR Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/APOE%20qPCR%20Analysis.html)
 * [LPS qPCR Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/LPS%20qPCR%20Analysis.html)
 <br><br>
 
