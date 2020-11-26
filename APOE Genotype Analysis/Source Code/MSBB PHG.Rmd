@@ -1,0 +1,340 @@
+---
+title: MSBB PHG
+author: Effect of *APOE* Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: yes
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+This script analyzes data from the parahippocampal gyrus (PHG).
+
+# Data Setup
+
+
+```{r}
+rm(list = setdiff(ls(), c("C2.genes")))
+require(limma)
+require(ComplexHeatmap)
+require(data.table)
+require(circlize)
+
+ds = "MSBB-PHG"
+dtype = "TMM"
+brainRegion = "PHG"
+expSet = readRDS("MSBB-PHG-24.Rds")
+cat("\nBrain Region: ", brainRegion, "\n")
+
+# load expression data 
+mData = expSet$mData
+geneIds = rownames(mData)
+samples = colnames(mData)
+```
+
+
+# Microglia Analysis
+
+```{r}
+celltype = "microglia"
+
+# select microglia genes (n = 574) only
+genes = readLines("Data/Microglia Genes.txt")
+
+# after selection (n = 527)
+annot = fread("Data/ENSEMBL GRCh38.p7.csv")
+annot2 = unique(annot[, .(EnsemblID, GeneSymbol, Description)])
+annot = unique(annot[, .(EnsemblID, GeneSymbol)])
+ensemblId_genes = unique(annot$EnsemblID[annot$GeneSymbol %in% genes])
+ensemblIds = intersect(geneIds,ensemblId_genes)
+annot = annot[EnsemblID %in% ensemblIds,]
+annot2 = annot2[EnsemblID %in% ensemblIds,]
+length(ensemblIds)
+```
+
+
+* Model 1: `exp ~ APOE + CERAD | exp ~ APOE + Braak`
+* Model 2 baseline: `C0E4-C0E3, C0E2-C0E3 | B1E4-B1E3, B1E2-B1E3`
+
+```{r}
+# selection
+sel.gen = geneIds %in% ensemblIds 
+mDataG = mData[sel.gen,]         # processed data
+mDataRawG = mDataG   # raw data
+geneIds = geneIds[sel.gen]
+geneSymbols = annot$GeneSymbol[match(geneIds, annot$EnsemblID)]
+# check should be TRUE
+cat("Is gene selection correct: ", all(geneSymbols %in% genes))
+
+
+# normalization
+cat("Data Type: ", dtype, "\n")
+
+C = sapply(colnames(mData)[colnames(mData)!="Gene"], 
+            function(x) expSet$strat[["CERAD"]][match(x, SubjectID)][["CERAD"]])
+B = sapply(colnames(mData)[colnames(mData)!="Gene"], 
+            function(x) expSet$strat[["Braak"]][match(x, SubjectID)][["Braak"]])
+E = sapply(colnames(mData)[colnames(mData)!="Gene"], 
+           function(x) expSet$strat[["APOE"]][match(x, SubjectID)][["APOE"]])
+```
+
+
+# Run Models
+
+```{r}
+source("Models.R")
+
+# run Model 1
+tT_CERAD = run_model1("CERAD", mDataG, C, E, annot, "MSBBPHG", "microglia")  # CERAD (sample n = 215)
+tT_Braak = run_model1("Braak", mDataG, B, E, annot, "MSBBPHG", "microglia")  # Braak (sample b = 201)
+
+nrow(tT_CERAD[E4vsE3_P.Value < 0.05]) ## 55 E4-E3
+nrow(tT_Braak[E4vsE3_P.Value < 0.05]) ## 37 E4-E3
+
+length(intersect(tT_Braak[E4vsE3_P.Value < 0.05]$GeneSymbol,tT_CERAD[E4vsE3_P.Value < 0.05]$GeneSymbol)) # 31 in common
+
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) # 49 up in E4-E3
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol) # 6 down in E4-E3
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) # 30 up in E4-E3
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol) # 7 down in E4-E3
+
+# Table S4
+TableS4 = fread("TableS4.csv")
+TableS4[tT_CERAD, on="EnsemblID",  c("MSBB-PHG_E4vsE3_logFC", "MSBB-PHG_E4vsE3_P.Value", "MSBB-PHG_E2vsE3_logFC", "MSBB-PHG_E2vsE3_P.Value") := .(i.E4vsE3_logFC, i.E4vsE3_P.Value, i.E2vsE3_logFC, i.E2vsE3_P.Value)]
+fwrite(TableS4, "TableS4.csv")
+
+
+# sensitivity analysis
+RawAPOE = sapply(colnames(mData)[colnames(mData)!="Gene"], 
+           function(x) expSet$strat[["RawAPOE"]][match(x, SubjectID)][["RawAPOE"]])
+# run Model 1.5 with E4 and E2 copies as numeric
+E4Num = ifelse(RawAPOE == 44, 2, 
+       ifelse(RawAPOE %in% c(34, 24), 1,
+       ifelse(RawAPOE %in% c(22, 33, 23), 0, NA)))
+E2Num = ifelse(RawAPOE == 22, 2, 
+       ifelse(RawAPOE %in% c(23, 24), 1,
+       ifelse(RawAPOE %in% c(44, 33, 34), 0, NA)))
+# a numeric value of 0, 1, and 2 for 0 copies, 1 copy and 2 copies of E4
+tT_CERAD_ENum = run_model1.5("CERAD", mDataG, C, E4Num, E2Num, annot, "ROSMAP", "microglia")
+tT1.sfE = topTable(tT_CERAD_ENum, sort.by="none", number=Inf, coef=2, confint=TRUE)
+tT2.sfE = topTable(tT_CERAD_ENum, sort.by="none", number=Inf, coef=3, confint=TRUE)
+nrow(tT1.sfE[tT1.sfE$P.Value < 0.05, ])  # E4Num: 55
+nrow(tT2.sfE[tT2.sfE$P.Value < 0.05, ])  # E2Num: 27
+
+E4Coeff = tT_CERAD_ENum$coefficients[,2]
+E2Coeff = tT_CERAD_ENum$coefficients[,3]
+all(names(E4Coeff) == tT1.sfE$EnsemblID)
+
+# 42 in common (with E4 coeff > 0)
+E4.Genes = intersect(tT1.sfE[tT1.sfE$P.Value < 0.05 & E4Coeff > 0, "GeneSymbol"], tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+sort(E4.Genes) 
+# 0 in common (with E2 coeff > 0)
+E2.Genes = intersect(tT2.sfE[tT2.sfE$P.Value < 0.05 & E2Coeff < 0, "GeneSymbol"], tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+sort(E2.Genes) 
+
+E4.Genes.1 = tT1.sfE[tT1.sfE$P.Value < 0.05 & E4Coeff > 0, "GeneSymbol"] # 51
+length(E4.Genes.1)
+E2.Genes.2 = tT2.sfE[tT2.sfE$P.Value < 0.05 & E2Coeff < 0, "GeneSymbol"] # 7
+length(E2.Genes.2)
+intersect(E4.Genes.1, E2.Genes.2) # 0
+
+tT1.sfE$coefficients = E4Coeff
+tT2.sfE$coefficients = E2Coeff
+fwrite(tT1.sfE, "../Data/limmaResult/MSBB-PHG-model1.5-E4Num.csv")
+fwrite(tT2.sfE, "../Data/limmaResult/MSBB-PHG-model1.5-E2Num.csv")
+
+# Table S5
+setDT(tT1.sfE)
+setDT(tT2.sfE)
+TableS5 = fread("TableS5.csv")
+TableS5 = TableS5[tT1.sfE, on = .(EnsemblID, GeneSymbol), c("MSBB-PHG_e4_dosage_logFC", "MSBB-PHG_e4_dosage_P.Value", "MSBB-PHG_e4_dosage_coefficients") := .(i.logFC, i.P.Value, i.coefficients)]
+TableS5 = TableS5[tT2.sfE, on = .(EnsemblID, GeneSymbol), c("MSBB-PHG_e2_dosage_logFC", "MSBB-PHG_e2_dosage_P.Value", "MSBB-PHG_e2_dosage_coefficients") := .(i.logFC, i.P.Value, i.coefficients)]
+fwrite(TableS5, "TableS5.csv")
+
+
+# run Model 2
+tT2_CERAD = run_model2("CERAD", mDataG, C, E, annot, "MSBBPHG", "microglia") 
+tT2_Braak = run_model2("Braak", mDataG, B, E, annot, "MSBBPHG", "microglia")
+
+nrow(tT2_CERAD[E4vsE3_P.Value < 0.05]) # 2 E4-E3
+nrow(tT2_Braak[E4vsE3_P.Value < 0.05]) # 45 E4-E3
+
+length(intersect(tT2_Braak[E4vsE3_P.Value < 0.05]$GeneSymbol,tT2_CERAD[E4vsE3_P.Value < 0.05]$GeneSymbol)) # 2 in common
+
+length(tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) # 2 up in E4-E3
+length(tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol) # 0 down in E4-E3
+length(tT2_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) # 45 up in E4-E3
+length(tT2_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol) # 0 down in E4-E3
+
+
+# add to Table S2
+TableS2 = fread("TableS2.csv")
+TableS2[tT2_CERAD, on="EnsemblID",  c("MSBB.PHG_E4vsE3_logFC", "MSBB.PHG_E4vsE3_P.Value", "MSBB.PHG_E2vsE3_logFC", "MSBB.PHG_E2vsE3_P.Value") := .(i.E4vsE3_logFC, i.E4vsE3_P.Value, i.E2vsE3_logFC, i.E2vsE3_P.Value)]
+fwrite(TableS2, "TableS2.csv")
+
+
+# add to Table S3
+TableS3 = fread("TableS3.csv")
+TableS3[tT_CERAD, on="EnsemblID",  c("MSBB.PHG_E4vsE3_logFC", "MSBB.PHG_E4vsE3_P.Value", "MSBB.PHG_E2vsE3_logFC", "MSBB.PHG_E2vsE3_P.Value") := .(i.E4vsE3_logFC, i.E4vsE3_P.Value, i.E2vsE3_logFC, i.E2vsE3_P.Value)]
+fwrite(TableS3, "TableS3.csv")
+```
+
+
+# Z-Score Analysis
+
+```{r}
+# z-scores for C0 subjects only
+mDataG1 = mDataG
+rownames(mDataG1) = annot$GeneSymbol[match(rownames(mDataG1), annot$EnsemblID)]
+
+# select only the C0 subjects and remove the subject wih APOE NA
+mDataG1 = mDataG1[, which(C == 0)]
+E.C0 = E[which(C == 0)]
+
+means = rowMeans(mDataG1)
+sds = apply(mDataG1, 1, sd)
+zscore = function(x) return((x - means)/sds)
+mDataZscore = apply(mDataG1, 2, zscore)
+
+# check
+cat("Is Z-score correct? ", all(mDataZscore[99,] == (mDataG1[99,] - means[99])/sds[99]), "\n")
+
+
+# ROSMAP Cluster 2 genes
+TableS2 = fread("TableS2.csv")
+C2.genes = TableS2$GeneSymbol
+mDataZscore.c2 = mDataZscore[rownames(mDataZscore) %in% C2.genes,]
+mDataZscore.c2.e2 = mDataZscore.c2[,E.C0 == "E2"]
+mDataZscore.c2.e3 = mDataZscore.c2[,E.C0 == "E3"]
+mDataZscore.c2.e4 = mDataZscore.c2[,E.C0 == "E4"]
+
+# check dimension
+table(E.C0) == data.frame(E2 = ncol(mDataZscore.c2.e2), E4 = ncol(mDataZscore.c2.e4), E3 = ncol(mDataZscore.c2.e3))
+```
+
+
+# Figure S1 (PHG)
+
+Plots for C0 subjects where each dot represents a gene.
+
+
+### Violin Plot
+
+```{r}
+my.dat = list(`2` = rowMeans(mDataZscore.c2.e2), `3` = rowMeans(mDataZscore.c2.e3), `4` = rowMeans(mDataZscore.c2.e4))
+my.df = reshape2::melt(my.dat)
+my.df$L1 = as.numeric(my.df$L1)
+colnames(my.df) = c("z-score", "APOE")
+my.df$Genes = unlist(lapply(my.dat, function(x) names(x)))
+my.df
+
+table(my.df$APOE)
+#   2   3   4 
+# 143 143 143 
+
+ggthemr('greyscale')
+colnames(my.df) = c("z-score", "APOE.num", "Genes")
+my.df$APOE = as.factor(my.df$APOE.num)
+  
+to_swap = c("#62bba5", # E4
+            "#785d37", # E3
+            "#ffb84d") # E2
+  
+# violin plot
+figs1.phg.1 = ggplot(my.df, aes(x=APOE.num, y=`z-score`, group=APOE, fill = APOE)) + 
+  geom_violin(trim=FALSE) +
+  scale_fill_manual(values = rev(to_swap)) +
+  theme(legend.position = "none") +
+  ylab("Ave z-score") +
+  xlab("APOE") + 
+  # plot the points
+  geom_point(size=1, 
+             colour="black", 
+             alpha = 0.2,
+             position=position_jitter(width=0.025)) +
+  # plot the lines 
+  geom_line(aes(group=Genes), 
+            alpha = 0.1,
+            color = "black")
+  
+# boxplot
+figs1.phg.2 = ggplot(data = my.df, aes(x=APOE, y=`z-score`, group=APOE, fill = APOE)) +
+  geom_boxplot(outlier.colour="black", outlier.shape=16,
+               outlier.size=2, notch=FALSE) +
+  scale_fill_manual(values = rev(to_swap)) +
+  ylab("Ave z-score")
+  
+figs1.phg = figs1.phg.1 + figs1.phg.2 +
+  plot_annotation(title = 'C', theme = theme(plot.title = element_text(face = "plain", size = 20)))
+ggsave("../TablesFigures/FigureS1-violin-PHG.pdf", figs1.phg, width = 5, height = 4, dpi = 300)
+```
+
+
+### Box Plot
+
+```{r}
+# metadata
+Braakdf = data.frame(subId=colnames(mDataG), sfactor=sapply(colnames(mDataG), function(x) expSet$strat[["Braak"]][SubjectID == x][["Braak"]]))
+CERADdf = data.frame(subId=colnames(mDataG), sfactor=sapply(colnames(mDataG), function(x) expSet$strat[["CERAD"]][SubjectID == x][["CERAD"]]))
+Edf = data.frame(subId=colnames(mDataG), APOE4=sapply(colnames(mDataG), function(x) expSet$strat[["APOE"]][SubjectID == x][["APOE"]]))
+RawAPOEdf = data.frame(subId=colnames(mDataG), APOE4=sapply(colnames(mDataG), function(x) expSet$strat[["RawAPOE"]][SubjectID == x][["RawAPOE"]]))
+
+# data for boxplot
+mDataG2 = mDataG
+rownames(mDataG2) = annot$GeneSymbol[match(rownames(mDataG2), annot$EnsemblID)]
+adat = reshape2::melt(mDataG2, id.vars = "geneSymbols", variable.name = "subId", value.name = "exp")
+colnames(adat) = c("geneSymbols", "subId", "exp")
+adat = as.data.table(adat)
+
+adat$Braak = Braakdf[match(adat$subId,Braakdf$subId),"sfactor"]
+adat$CERAD = CERADdf[match(adat$subId,CERADdf$subId),"sfactor"]
+adat$RawAPOE = RawAPOEdf[match(adat$subId,RawAPOEdf$subId),"APOE4"]
+adat$APOE = Edf[match(adat$subId,Edf$subId),"APOE4"]
+adat$C_APOE = paste(paste0("C",adat$CERAD), adat$APOE, sep = ".")
+adat$B_APOE = paste(paste0("B",adat$Braak), adat$APOE, sep = ".")
+
+# boxplot
+ggthemr("fresh")
+to_swap = c("#65ADC2", "#E84646")
+my.boxplot = function(adat, gene){
+  adat = adat[!is.na(CERAD) & !is.na(APOE),]
+  adat2 = adat[geneSymbols == gene & APOE %in% c("E3", "E4"),]
+  p = ggplot(data = adat2, aes(x = C_APOE, y = exp)) +
+    geom_boxplot(fill = "white", outlier.color = "white") +
+    geom_jitter(position=position_jitter(0.2), aes(color = APOE), size = 0.7) +
+    ylab("log2(exp)") +
+    xlab("") +
+    ggtitle(gene) +
+    scale_color_manual(values = rev(to_swap)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+          plot.title = element_text(hjust = 0.5)) + 
+    theme(legend.position="none")  +
+    theme(plot.title = element_text(size=9, face = "plain"))
+  return(p)
+}
+
+# row annotation
+row2 = ggplot() + annotate(geom = 'text', x=1, y=1, label="pro-inflammatory", angle = 90) + theme_void() 
+row1 = ggplot() + annotate(geom = 'text', x=1, y=1, label="phagocytosis", angle = 90) + theme_void() 
+
+# boxplot for same genes as in figure 2A
+fig2a.genes = c("C1QB",  "TYROBP", "CTSC", "MSR1", "TLR1", "ALOX5", "IL1B", "IRF8")
+plist = lapply(fig2a.genes, function(x) my.boxplot(adat, x))
+names(plist) = letters[3:10]
+plist[["a"]] = row1
+plist[["b"]] = row2
+layoutplot = "
+acccdddeeefff
+acccdddeeefff
+bggghhhiiijjj
+bggghhhiiijjj
+"
+
+pic = wrap_plots(grobs = plist, guides = 'collect', design = layoutplot) +
+  plot_annotation(title = 'D', theme = theme(plot.title = element_text(face = "plain", size = 15)))
+ggsave("../TablesFigures/FigureS1-box-PHG.pdf", pic, width = 12, height =8)
+```
