@@ -1,8 +1,22 @@
-############################################################
-### E2.3.4 QPCR ANALYSIS
-### Ayush Noori
-############################################################
+---
+title: E2/E3/E4 qPCR Analysis
+author: Effect of *APOE* Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: yes
+---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Setup
+
+Load packages and define reference directories.
+
+```{r}
 # load packages
 library(data.table)
 library(stringr)
@@ -40,12 +54,12 @@ setwd(homedir)
 apoe = read.xlsx("Data/qPCR Data.xlsx", sheet = 2)
 apoe_RQ = read.xlsx("Data/qPCR Data.xlsx", sheet = 4)
 if(file.exists("APOE ANOVA Results.txt")) file.remove("APOE ANOVA Results.txt")
+```
 
 
-###################################
-### FILTER DATA
-###################################
+# Filter Data
 
+```{r}
 # filter APOE
 rownames(apoe) = apoe$Extract
 apoe_lab = apoe$Label
@@ -72,10 +86,14 @@ idx = c(4:9, 11:14)
 genes = colnames(apoe)[idx]
 idx_RQ = idx+12
 genes_RQ = colnames(apoe)[idx_RQ]
+```
 
+
+# Individual Plots
+
+```{r}
 # initialize plot list
 plots = vector(mode = "list", length = length(genes))
-
 
 for (i in 1:length(idx)) {
   
@@ -195,7 +213,12 @@ for (i in 1:length(idx)) {
   plots[[i]] = p
   
 }
+```
 
+
+# Aggregate Plots
+
+```{r}
 p_legend = ggplot(apoe, aes(x = Genotype, y = gene_RQ, color = Genotype, shape = Sex)) +
   scale_color_manual(values = c("#FFB84D", "#785D37", "#62BBA5")) +
   geom_jitter(size = 2, width=0.1) + 
@@ -226,13 +249,12 @@ all_plots = ggarrange(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 
 ggsave("M-F e2-e3-e4 qPCR Figure.pdf", all_plots, width = 18, height = 12)
 # ggsave("M-F e2-e3-e4 qPCR Figure.png", all_plots, width = 18, height = 12, units = "in", dpi = 900)
+```
 
 
+# Correlation Heatmaps
 
-###################################
-### CORRELATION HEATMAPS
-###################################
-
+```{r}
 cor_dat = apoe[, 4:15]
 print(sapply(cor_dat, function(x) agostino.test(as.numeric(x), alternative = "two.sided")$p.value))
 
@@ -254,12 +276,12 @@ hm = pheatmap(apoe_cor,
 
 ggsave("M-F e2-e3-e4 qPCR Correlation Heatmap.pdf", hm, width = 7, height = 6.8)
 # ggsave("M-F e2-e3-e4 qPCR Correlation Heatmap.png", hm, width = 7, height = 6.8, units = "in", dpi = 900)
+```
 
 
-###################################
-### CORRELATION MATRIX
-###################################
+# Correlation Matrix
 
+```{r}
 wb = createWorkbook()
 
 hs = createStyle(fontColour = "#FAF3DD", fgFill = "#5171A5", fontName = "Arial Black",
@@ -272,3 +294,4 @@ addStyle(wb, "M.F-E3.4", createStyle(fontColour = "#363635", fgFill = "#FAF3DD",
 addStyle(wb, "M.F-E3.4", hs, rows = 2:13, cols = 1, gridExpand = T)
 
 saveWorkbook(wb, "M-F e2-e3-e4 Correlation Matrix.xlsx", overwrite = TRUE)
+```
