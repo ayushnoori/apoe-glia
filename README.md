@@ -1,11 +1,14 @@
-We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice.
+# About
+> ## Effect of *APOE* Alleles on the Glial Transcriptome in Normal Aging and Alzheimer's Disease
+> We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice.
 
+<br><br>
 
-# **Setup**
+# Setup
 Install [R](https://www.r-project.org/) to run our code.
+<br><br>
 
-
-# **Website**
+# Website
 Our codebase is available at [ayushnoori.github.io/apoe-glia](https://ayushnoori.github.io/apoe-glia/) and below:
 
 ## APOE Genotype Analysis
@@ -26,9 +29,9 @@ Our codebase is available at [ayushnoori.github.io/apoe-glia](https://ayushnoori
 ## qPCR Analysis
 * [APOE Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/APOE%20qPCR%20Analysis.html)
 * [LPS qPCR Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/LPS%20qPCR%20Analysis.html)
+<br><br>
 
-
-# **Citation**
+# Citation
 Alberto Serrano-Pozo, MD PhD<sup>1,2,3</sup>, Zhaozhi Li, MS<sup>1,2</sup>, Ayush Noori<sup>1,2</sup>, Aziz Mezlini, PhD<sup>1,2,3</sup>, Liang Li, BS<sup>1,2</sup>, Huong N. Nguyen, BS<sup>1,2</sup>, Rosemary J. Jackson, PhD<sup>1,2,3</sup>, Bradley T. Hyman, MD PhD<sup>1,2,3</sup>, Sudeshna Das, PhD<sup>1,2,3</sup>. Effect of *APOE* Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease.
 
 ## Affiliations:
