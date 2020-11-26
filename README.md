@@ -6,8 +6,8 @@ We investigated the differential effects of *APOE* alleles on the microglia and 
 Install [R](https://www.r-project.org/) to run our code.
 
 
-## **View**
-The HTML files in this repository can be viewed via [raw.githack.com](https://raw.githack.com/). See below:
+## **Website**
+Our codebase is available at [ayushnoori.github.io/apoe-glia](https://ayushnoori.github.io/apoe-glia/) and below:
 
 ### APOE Genotype Analysis
 
