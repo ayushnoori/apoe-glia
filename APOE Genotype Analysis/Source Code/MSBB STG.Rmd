@@ -316,13 +316,13 @@ ggsave("../TablesFigures/Figure2D.pdf", fig2d, width = 5, height = 4)
 ### Box Plot
 
 ```{r}
-# meta Data
+# metdata
 Braakdf = data.frame(subId=colnames(mDataG), sfactor=sapply(colnames(mDataG), function(x) expSet$strat[["Braak"]][SubjectID == x][["Braak"]]))
 CERADdf = data.frame(subId=colnames(mDataG), sfactor=sapply(colnames(mDataG), function(x) expSet$strat[["CERAD"]][SubjectID == x][["CERAD"]]))
 Edf = data.frame(subId=colnames(mDataG), APOE4=sapply(colnames(mDataG), function(x) expSet$strat[["APOE"]][SubjectID == x][["APOE"]]))
 RawAPOEdf = data.frame(subId=colnames(mDataG), APOE4=sapply(colnames(mDataG), function(x) expSet$strat[["RawAPOE"]][SubjectID == x][["RawAPOE"]]))
 
-# Data for boxplot
+# data for boxplot
 mDataG2 = mDataG
 rownames(mDataG2) = annot$GeneSymbol[match(rownames(mDataG2), annot$EnsemblID)]
 adat = reshape2::melt(mDataG2, id.vars = "geneSymbols", variable.name = "subId", value.name = "exp")
@@ -336,7 +336,7 @@ adat$APOE = Edf[match(adat$subId,Edf$subId),"APOE4"]
 adat$C_APOE = paste(paste0("C",adat$CERAD), adat$APOE, sep = ".")
 adat$B_APOE = paste(paste0("B",adat$Braak), adat$APOE, sep = ".")
 
-# Figure1A: boxplot
+# boxplot
 ggthemr("fresh")
 to_swap = c("#65ADC2", "#E84646")
 my.boxplot = function(adat, gene){
@@ -360,7 +360,7 @@ my.boxplot = function(adat, gene){
 row2 = ggplot() + annotate(geom = 'text', x=1, y=1, label="pro-inflammatory", angle = 90) + theme_void() 
 row1 = ggplot() + annotate(geom = 'text', x=1, y=1, label="phagocytosis", angle = 90) + theme_void() 
 
-# boxplot for same genes as in figure 2a
+# boxplot for same genes as in figure 2A
 fig2a.genes = c("C1QB",  "TYROBP", "CTSC", "MSR1", "TLR1", "ALOX5", "IL1B", "IRF8")
 plist = lapply(fig2a.genes, function(x) my.boxplot(adat, x))
 names(plist) = letters[3:10]

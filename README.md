@@ -12,21 +12,21 @@ The HTML files in this repository can be viewed via [raw.githack.com](https://ra
 ### APOE Genotype Analysis
 
 **ROSMAP Analysis**
-* [ROSMAP Microglia](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/ROSMAP%20Microglia.html)
-* [ROSMAP Astrocyte](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/ROSMAP%20Astrocyte.html)
+* [ROSMAP Microglia](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/ROSMAP%20Microglia.html)
+* [ROSMAP Astrocyte](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/ROSMAP%20Astrocyte.html)
 
 **MSBB Analysis**
-* [MSBB FP](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/MSBB%20FP.html)
-* [MSBB IFG](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/MSBB%20IFG.html)
-* [MSBB PHG](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/MSBB%20PHG.html)
-* [MSBB STG](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/MSBB%20STG.html)
+* [MSBB FP](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/MSBB%20FP.html)
+* [MSBB IFG](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/MSBB%20IFG.html)
+* [MSBB PHG](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/MSBB%20PHG.html)
+* [MSBB STG](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/MSBB%20STG.html)
 
 **Models**
-* [Models](https://raw.githack.com/ayushnoori/apoe-glia/main/APOE%20Genotype%20Analysis/Models.html)
+* [Models](https://ayushnoori.github.io/apoe-glia/APOE%20Genotype%20Analysis/Models.html)
 
 ### qPCR Analysis
-* [APOE Analysis](https://raw.githack.com/ayushnoori/apoe-glia/main/qPCR%20Analysis/APOE%20qPCR%20Analysis.html)
-* [LPS qPCR Analysis](https://raw.githack.com/ayushnoori/apoe-glia/main/qPCR%20Analysis/LPS%20qPCR%20Analysis.html)
+* [APOE Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/APOE%20qPCR%20Analysis.html)
+* [LPS qPCR Analysis](https://ayushnoori.github.io/apoe-glia/qPCR%20Analysis/LPS%20qPCR%20Analysis.html)
 
 
 ## **Citation**
