@@ -7,7 +7,7 @@ Install [R](https://www.r-project.org/) to run our code.
 
 
 ## **View**
-The HTML files in this repository can be viewed via [raw.githack.com](https://raw.githack.com/). See below
+The HTML files in this repository can be viewed via [raw.githack.com](https://raw.githack.com/). See below:
 
 ### APOE Genotype Analysis
 
