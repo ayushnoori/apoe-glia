@@ -13,7 +13,7 @@
 <meta name="author" content="Effect of APOE Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease" />
 
 
-<title>MSBB STG</title>
+<title>MSBB STG Analysis</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -148,7 +148,7 @@ code span.ot { color: #007020; }
 
 
 <section class="page-header">
-<h1 class="title toc-ignore project-name">MSBB STG</h1>
+<h1 class="title toc-ignore project-name">MSBB STG Analysis</h1>
 <h4 class="author project-author">Effect of <em>APOE</em> Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease</h4>
 </section>
 
@@ -158,13 +158,10 @@ code span.ot { color: #007020; }
 <ul>
 <li><a href="#data-setup">Data Setup</a></li>
 <li><a href="#microglia-analysis">Microglia Analysis</a></li>
+<li><a href="#pre-processing">Pre-Processing</a></li>
 <li><a href="#run-models">Run Models</a></li>
 <li><a href="#z-score-analysis">Z-Score Analysis</a></li>
-<li><a href="#figure-s1-stg">Figure S1 (STG)</a>
-<ul>
-<li><a href="#violin-plot">Violin Plot</a></li>
-<li><a href="#box-plot">Box Plot</a></li>
-</ul></li>
+<li><a href="#figure-s1-stg">Figure S1 (STG)</a></li>
 </ul>
 </div>
 </div>
@@ -197,158 +194,137 @@ code span.ot { color: #007020; }
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co"># select microglia genes (n = 574) only</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>genes =<span class="st"> </span><span class="kw">readLines</span>(<span class="st">&quot;Data/Microglia Genes.txt&quot;</span>)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co"># after selection (n = 527)</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>annot =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;Data/ENSEMBL GRCh38.p7.csv&quot;</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>annot2 =<span class="st"> </span><span class="kw">unique</span>(annot[, .(EnsemblID, GeneSymbol, Description)])</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>annot =<span class="st"> </span><span class="kw">unique</span>(annot[, .(EnsemblID, GeneSymbol)])</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>ensemblId_genes =<span class="st"> </span><span class="kw">unique</span>(annot<span class="op">$</span>EnsemblID[annot<span class="op">$</span>GeneSymbol <span class="op">%in%</span><span class="st"> </span>genes])</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>ensemblIds =<span class="st"> </span><span class="kw">intersect</span>(geneIds,ensemblId_genes)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>annot =<span class="st"> </span>annot[EnsemblID <span class="op">%in%</span><span class="st"> </span>ensemblIds,]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co"># select microglia genes that exist in MSBB</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co"># after selection (n = 527)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>annot =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;Data/ENSEMBL GRCh38.p7.csv&quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>ensemblId_genes =<span class="st"> </span><span class="kw">unique</span>(annot<span class="op">$</span>EnsemblID[annot<span class="op">$</span>GeneSymbol <span class="op">%in%</span><span class="st"> </span>genes])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>ensemblIds =<span class="st"> </span><span class="kw">intersect</span>(geneIds,ensemblId_genes)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>annot2 =<span class="st"> </span><span class="kw">unique</span>(annot[, .(EnsemblID, GeneSymbol, Description)])</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>annot =<span class="st"> </span><span class="kw">unique</span>(annot[, .(EnsemblID, GeneSymbol)])</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>annot2 =<span class="st"> </span>annot2[EnsemblID <span class="op">%in%</span><span class="st"> </span>ensemblIds,]</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="kw">length</span>(ensemblIds)</span></code></pre></div>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>annot =<span class="st"> </span>annot[EnsemblID <span class="op">%in%</span><span class="st"> </span>ensemblIds,]</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="kw">length</span>(ensemblIds)</span></code></pre></div>
+</div>
+<div id="pre-processing" class="section level1">
+<h1>Pre-Processing</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># data selection</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>sel.gen =<span class="st"> </span>geneIds <span class="op">%in%</span><span class="st"> </span>ensemblIds </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>mDataG =<span class="st"> </span>mData[sel.gen,]  <span class="co"># processed data</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>mDataRawG =<span class="st"> </span>mDataG  <span class="co"># raw data</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>geneIds =<span class="st"> </span>geneIds[sel.gen]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>geneSymbols =<span class="st"> </span>annot<span class="op">$</span>GeneSymbol[<span class="kw">match</span>(geneIds, annot<span class="op">$</span>EnsemblID)]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co"># normalization</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co"># we use normalized data</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="kw">cat</span>(<span class="st">&quot;Data Type: &quot;</span>, dtype, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co"># metadata</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>C =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>            <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;CERAD&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;CERAD&quot;</span>]])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>B =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>            <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;Braak&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;Braak&quot;</span>]])</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>E =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>           <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;APOE&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;APOE&quot;</span>]])</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>RawAPOE =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>           <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;RawAPOE&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;RawAPOE&quot;</span>]])</span></code></pre></div>
+</div>
+<div id="run-models" class="section level1">
+<h1>Run Models</h1>
 <ul>
 <li>Model 1: <code>exp ~ APOE + CERAD | exp ~ APOE +  Braak</code></li>
 <li>Model 2 baseline: <code>C0E4-C0E3, C0E2-C0E3 | B1E4-B1E3, B1E2-B1E3</code></li>
 <li>Model 3: <code>C3E4-C3E3, C3E2-C3E3 | B3E4-B3E3, B3E2-B3E3</code></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co"># selection</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>sel.gen =<span class="st"> </span>geneIds <span class="op">%in%</span><span class="st"> </span>ensemblIds </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>mDataG =<span class="st"> </span>mData[sel.gen,]         <span class="co"># processed data</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>mDataRawG =<span class="st"> </span>mDataG   <span class="co"># Raw data</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>geneIds =<span class="st"> </span>geneIds[sel.gen]</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>geneSymbols =<span class="st"> </span>annot<span class="op">$</span>GeneSymbol[<span class="kw">match</span>(geneIds, annot<span class="op">$</span>EnsemblID)]</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co"># check should be TRUE</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="kw">cat</span>(<span class="st">&quot;Is gene selection correct: &quot;</span>, <span class="kw">all</span>(geneSymbols <span class="op">%in%</span><span class="st"> </span>genes), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co"># normalization</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="kw">cat</span>(<span class="st">&quot;Data Type: &quot;</span>, dtype, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>C =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>            <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;CERAD&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;CERAD&quot;</span>]])</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>B =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>            <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;Braak&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;Braak&quot;</span>]])</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>E =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>           <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;APOE&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;APOE&quot;</span>]])</span></code></pre></div>
-</div>
-<div id="run-models" class="section level1">
-<h1>Run Models</h1>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">source</span>(<span class="st">&quot;Models.R&quot;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># run Model 1</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>tT_CERAD =<span class="st"> </span><span class="kw">run_model1</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)  <span class="co"># CERAD (sample n = 240)</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>tT_Braak =<span class="st"> </span><span class="kw">run_model1</span>(<span class="st">&quot;Braak&quot;</span>, mDataG, B, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>) <span class="co"># Braak (sample b = 229)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>tT_CERAD =<span class="st"> </span><span class="kw">run_model1</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>tT_Braak =<span class="st"> </span><span class="kw">run_model1</span>(<span class="st">&quot;Braak&quot;</span>, mDataG, B, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="kw">nrow</span>(tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]) <span class="co">## 1 E4-E3</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="kw">nrow</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]) <span class="co">## 2 E4-E3</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="kw">nrow</span>(tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>])</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="kw">nrow</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>])</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="kw">intersect</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]<span class="op">$</span>GeneSymbol,tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]<span class="op">$</span>GeneSymbol) <span class="co"># 0 in common</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="kw">intersect</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]<span class="op">$</span>GeneSymbol,tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]<span class="op">$</span>GeneSymbol)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="kw">length</span>(tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 1 up in E4-E3</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="kw">length</span>(tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 0 down in E4-E3</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="kw">length</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 2 up in E4-E3</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="kw">length</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 0 down in E4-E3</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="kw">length</span>(tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="kw">length</span>(tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="kw">length</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="kw">length</span>(tT_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a></span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co"># Table S4</span></span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>TableS4 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS4.csv&quot;</span>)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>TableS4[tT_CERAD, on=<span class="st">&quot;EnsemblID&quot;</span>,  <span class="kw">c</span>(<span class="st">&quot;MSBB-STG_E4vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_E4vsE3_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_E2vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_E2vsE3_P.Value&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(i.E4vsE3_logFC, i.E4vsE3_P.Value, i.E2vsE3_logFC, i.E2vsE3_P.Value)]</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS4, <span class="st">&quot;TableS4.csv&quot;</span>)</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co"># sensitivity analysis</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>RawAPOE =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mData)[<span class="kw">colnames</span>(mData)<span class="op">!=</span><span class="st">&quot;Gene&quot;</span>], </span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>           <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;RawAPOE&quot;</span>]][<span class="kw">match</span>(x, SubjectID)][[<span class="st">&quot;RawAPOE&quot;</span>]])</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co"># run Model 1.5 with E4 &amp; E2 copies as numeric</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>E4Num =<span class="st"> </span><span class="kw">ifelse</span>(RawAPOE <span class="op">==</span><span class="st"> </span><span class="dv">44</span>, <span class="dv">2</span>, </span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a>       <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">34</span>, <span class="dv">24</span>), <span class="dv">1</span>,</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a>       <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">22</span>, <span class="dv">33</span>, <span class="dv">23</span>), <span class="dv">0</span>, <span class="ot">NA</span>)))</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a>E2Num =<span class="st"> </span><span class="kw">ifelse</span>(RawAPOE <span class="op">==</span><span class="st"> </span><span class="dv">22</span>, <span class="dv">2</span>, </span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a>       <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">23</span>, <span class="dv">24</span>), <span class="dv">1</span>,</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a>       <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">44</span>, <span class="dv">33</span>, <span class="dv">34</span>), <span class="dv">0</span>, <span class="ot">NA</span>)))</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="co"># a numeric value of 0, 1, and 2 for 0 copies, 1 copy and 2 copies of E4</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a>tT_CERAD_ENum =<span class="st"> </span><span class="kw">run_model1.5</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E4Num, E2Num, annot, <span class="st">&quot;ROSMAP&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a>tT1.sfE =<span class="st"> </span><span class="kw">topTable</span>(tT_CERAD_ENum, <span class="dt">sort.by=</span><span class="st">&quot;none&quot;</span>, <span class="dt">number=</span><span class="ot">Inf</span>, <span class="dt">coef=</span><span class="dv">2</span>, <span class="dt">confint=</span><span class="ot">TRUE</span>)</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a>tT2.sfE =<span class="st"> </span><span class="kw">topTable</span>(tT_CERAD_ENum, <span class="dt">sort.by=</span><span class="st">&quot;none&quot;</span>, <span class="dt">number=</span><span class="ot">Inf</span>, <span class="dt">coef=</span><span class="dv">3</span>, <span class="dt">confint=</span><span class="ot">TRUE</span>)</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a><span class="kw">nrow</span>(tT1.sfE[tT1.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>, ])  <span class="co"># E4Num: 17</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a><span class="kw">nrow</span>(tT2.sfE[tT2.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>, ])  <span class="co"># E2Num: 33</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a>E4Coeff =<span class="st"> </span>tT_CERAD_ENum<span class="op">$</span>coefficients[,<span class="dv">2</span>]</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a>E2Coeff =<span class="st"> </span>tT_CERAD_ENum<span class="op">$</span>coefficients[,<span class="dv">3</span>]</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a><span class="kw">all</span>(<span class="kw">names</span>(E4Coeff) <span class="op">==</span><span class="st"> </span>tT1.sfE<span class="op">$</span>EnsemblID)</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a><span class="co"># 0 in common (with E4 coeff &gt; 0)</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a>E4.Genes =<span class="st"> </span><span class="kw">intersect</span>(tT1.sfE[tT1.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4Coeff <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>], tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a><span class="kw">sort</span>(E4.Genes) </span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a><span class="co"># 0 in common (with E2 coeff &gt; 0)</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a>E2.Genes =<span class="st"> </span><span class="kw">intersect</span>(tT2.sfE[tT2.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E2Coeff <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>], tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a><span class="kw">sort</span>(E2.Genes) </span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true"></a></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true"></a>E4.Genes<span class="fl">.1</span> =<span class="st"> </span>tT1.sfE[tT1.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4Coeff <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>] <span class="co"># 17</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true"></a>E2.Genes<span class="fl">.2</span> =<span class="st"> </span>tT2.sfE[tT2.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E2Coeff <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>] <span class="co"># 21</span></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true"></a><span class="kw">intersect</span>(E4.Genes<span class="fl">.1</span>, E2.Genes<span class="fl">.2</span>) <span class="co"># 0</span></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true"></a></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true"></a>tT1.sfE<span class="op">$</span>coefficients =<span class="st"> </span>E4Coeff</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true"></a>tT2.sfE<span class="op">$</span>coefficients =<span class="st"> </span>E2Coeff</span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true"></a><span class="kw">fwrite</span>(tT1.sfE, <span class="st">&quot;../Data/limmaResult/MSBB-STG-model1.5-E4Num.csv&quot;</span>)</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true"></a><span class="kw">fwrite</span>(tT2.sfE, <span class="st">&quot;../Data/limmaResult/MSBB-STG-model1.5-E2Num.csv&quot;</span>)</span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true"></a></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true"></a><span class="co"># Table S5</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true"></a><span class="kw">setDT</span>(tT1.sfE)</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true"></a><span class="kw">setDT</span>(tT2.sfE)</span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true"></a>TableS5 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS5.csv&quot;</span>)</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true"></a>TableS5 =<span class="st"> </span>TableS5[tT1.sfE, on =<span class="st"> </span>.(EnsemblID, GeneSymbol), <span class="kw">c</span>(<span class="st">&quot;MSBB-STG_e4_dosage_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_e4_dosage_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_e4_dosage_coefficients&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(i.logFC, i.P.Value, i.coefficients)]</span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true"></a>TableS5 =<span class="st"> </span>TableS5[tT2.sfE, on =<span class="st"> </span>.(EnsemblID, GeneSymbol), <span class="kw">c</span>(<span class="st">&quot;MSBB-STG_e2_dosage_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_e2_dosage_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_e2_dosage_coefficients&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(i.logFC, i.P.Value, i.coefficients)]</span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS5, <span class="st">&quot;TableS5.csv&quot;</span>)</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true"></a></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true"></a></span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true"></a><span class="co"># run Model 2</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true"></a>tT2_CERAD =<span class="st"> </span><span class="kw">run_model2</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>) </span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true"></a>tT2_Braak =<span class="st"> </span><span class="kw">run_model2</span>(<span class="st">&quot;Braak&quot;</span>, mDataG, B, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true"></a></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true"></a><span class="kw">nrow</span>(tT2_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]) <span class="co"># 33 E4-E3</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true"></a><span class="kw">nrow</span>(tT2_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]) <span class="co"># 188 E4-E3</span></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true"></a></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true"></a><span class="kw">length</span>(<span class="kw">intersect</span>(tT2_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]<span class="op">$</span>GeneSymbol,tT2_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>]<span class="op">$</span>GeneSymbol)) <span class="co"># 22 in common</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>TableS4[tT_CERAD, on=<span class="st">&quot;EnsemblID&quot;</span>,  </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>        <span class="kw">c</span>(<span class="st">&quot;MSBB-STG_E4vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_E4vsE3_CI.L&quot;</span>, <span class="st">&quot;MSBB-STG_E4vsE3_CI.R&quot;</span>, </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>          <span class="st">&quot;MSBB-STG_E4vsE3_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_E4vsE3_adj.P.Val&quot;</span>, </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>          <span class="st">&quot;MSBB-STG_E2vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_E2vsE3_CI.L&quot;</span>, <span class="st">&quot;MSBB-STG_E2vsE3_CI.R&quot;</span>, </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a>          <span class="st">&quot;MSBB-STG_E2vsE3_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_E2vsE3_adj.P.Val&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>           i.E4vsE3_logFC, i.E4vsE3_CI.L, i.E4vsE3_CI.R,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>           i.E4vsE3_P.Value, i.E4vsE3_adj.P.Val,  </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a>           i.E2vsE3_logFC, i.E2vsE3_CI.L, i.E2vsE3_CI.R, </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>           i.E2vsE3_P.Value, i.E2vsE3_adj.P.Val)]</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS4, <span class="st">&quot;TableS4.csv&quot;</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co"># run Model 1.5 with E4 and E2 copies as numeric</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co"># sensitivity analysis</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a>E4Num =<span class="st"> </span><span class="kw">ifelse</span>(RawAPOE <span class="op">==</span><span class="st"> </span><span class="dv">44</span>, <span class="dv">2</span>, </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a>        <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">34</span>, <span class="dv">24</span>), <span class="dv">1</span>,</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a>        <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">22</span>, <span class="dv">33</span>, <span class="dv">23</span>), <span class="dv">0</span>, <span class="ot">NA</span>)))</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a>E2Num =<span class="st"> </span><span class="kw">ifelse</span>(RawAPOE <span class="op">==</span><span class="st"> </span><span class="dv">22</span>, <span class="dv">2</span>, </span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a>        <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">23</span>, <span class="dv">24</span>), <span class="dv">1</span>,</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a>        <span class="kw">ifelse</span>(RawAPOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">44</span>, <span class="dv">33</span>, <span class="dv">34</span>), <span class="dv">0</span>, <span class="ot">NA</span>)))</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a><span class="co"># numeric value of 0, 1, and 2 for 0, 1, and 2 copies of E4</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a>tT_CERAD_ENum =<span class="st"> </span><span class="kw">run_model1.5</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E4Num, E2Num, annot, <span class="st">&quot;ROSMAP&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a>tT1.sfE =<span class="st"> </span><span class="kw">topTable</span>(tT_CERAD_ENum, <span class="dt">sort.by=</span><span class="st">&quot;none&quot;</span>, <span class="dt">number=</span><span class="ot">Inf</span>, <span class="dt">coef=</span><span class="dv">2</span>, <span class="dt">confint=</span><span class="ot">TRUE</span>)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a>tT2.sfE =<span class="st"> </span><span class="kw">topTable</span>(tT_CERAD_ENum, <span class="dt">sort.by=</span><span class="st">&quot;none&quot;</span>, <span class="dt">number=</span><span class="ot">Inf</span>, <span class="dt">coef=</span><span class="dv">3</span>, <span class="dt">confint=</span><span class="ot">TRUE</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a><span class="kw">nrow</span>(tT1.sfE[tT1.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>, ])</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a><span class="kw">nrow</span>(tT2.sfE[tT2.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>, ])</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a>E4Coeff =<span class="st"> </span>tT_CERAD_ENum<span class="op">$</span>coefficients[,<span class="dv">2</span>]</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a>E2Coeff =<span class="st"> </span>tT_CERAD_ENum<span class="op">$</span>coefficients[,<span class="dv">3</span>]</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a><span class="kw">all</span>(<span class="kw">names</span>(E4Coeff) <span class="op">==</span><span class="st"> </span>tT1.sfE<span class="op">$</span>EnsemblID)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true"></a>E4.Genes =<span class="st"> </span><span class="kw">intersect</span>(tT1.sfE[tT1.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4Coeff <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>], tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true"></a>E2.Genes =<span class="st"> </span><span class="kw">intersect</span>(tT2.sfE[tT2.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E2Coeff <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>], tT_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true"></a>E4.Genes<span class="fl">.1</span> =<span class="st"> </span>tT1.sfE[tT1.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4Coeff <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>]</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true"></a>E2.Genes<span class="fl">.2</span> =<span class="st"> </span>tT2.sfE[tT2.sfE<span class="op">$</span>P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E2Coeff <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;GeneSymbol&quot;</span>]</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true"></a><span class="kw">intersect</span>(E4.Genes<span class="fl">.1</span>, E2.Genes<span class="fl">.2</span>)</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true"></a></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true"></a><span class="co"># Table S5</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true"></a><span class="kw">setDT</span>(tT1.sfE)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true"></a><span class="kw">setDT</span>(tT2.sfE)</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true"></a>TableS5 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS5.csv&quot;</span>)</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true"></a>TableS5 =<span class="st"> </span>TableS5[tT1.sfE, on =<span class="st"> </span>.(EnsemblID, GeneSymbol), </span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true"></a>                  <span class="kw">c</span>(<span class="st">&quot;MSBB-STG_e4_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_e4_CI.L&quot;</span>, <span class="st">&quot;MSBB-STG_e4_CI.R&quot;</span>,</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true"></a>                    <span class="st">&quot;MSBB-STG_e4_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_e4_adj.P.Val&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true"></a>                    i.logFC, i.CI.L, i.CI.R, i.P.Value, i.adj.P.Val)]</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true"></a>TableS5 =<span class="st"> </span>TableS5[tT2.sfE, on =<span class="st"> </span>.(EnsemblID, GeneSymbol), </span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true"></a>                  <span class="kw">c</span>(<span class="st">&quot;MSBB-STG_e2_logFC&quot;</span>, <span class="st">&quot;MSBB-STG_e2_CI.L&quot;</span>, <span class="st">&quot;MSBB-STG_e2_CI.R&quot;</span>,</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true"></a>                    <span class="st">&quot;MSBB-STG_e2_P.Value&quot;</span>, <span class="st">&quot;MSBB-STG_e2_adj.P.Val&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true"></a>                    i.logFC, i.CI.L, i.CI.R, i.P.Value, i.adj.P.Val)]</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS5, <span class="st">&quot;TableS5.csv&quot;</span>)</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true"></a></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true"></a><span class="co"># run Model 2</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true"></a>tT2_CERAD =<span class="st"> </span><span class="kw">run_model2</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>) </span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true"></a>tT2_Braak =<span class="st"> </span><span class="kw">run_model2</span>(<span class="st">&quot;Braak&quot;</span>, mDataG, B, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true"></a></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true"></a><span class="kw">nrow</span>(tT2_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>])</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true"></a><span class="kw">nrow</span>(tT2_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>])</span>
 <span id="cb4-77"><a href="#cb4-77" aria-hidden="true"></a></span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true"></a><span class="kw">length</span>(tT2_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 33 up in E4-E3</span></span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true"></a><span class="kw">length</span>(tT2_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 0 down in E4-E3</span></span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true"></a><span class="kw">length</span>(tT2_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 186 up in E4-E3</span></span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true"></a><span class="kw">length</span>(tT2_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 2 down in E4-E3</span></span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true"></a></span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true"></a></span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true"></a><span class="co"># add to Table S2</span></span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true"></a>TableS2 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS2.csv&quot;</span>)</span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true"></a>TableS2[tT2_CERAD, on=<span class="st">&quot;EnsemblID&quot;</span>,  <span class="kw">c</span>(<span class="st">&quot;MSBB.STG_E4vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB.STG_E4vsE3_P.Value&quot;</span>, <span class="st">&quot;MSBB.STG_E2vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB.STG_E2vsE3_P.Value&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(i.E4vsE3_logFC, i.E4vsE3_P.Value, i.E2vsE3_logFC, i.E2vsE3_P.Value)]</span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS2, <span class="st">&quot;TableS2.csv&quot;</span>)</span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true"></a></span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true"></a></span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true"></a><span class="co"># add to Table S3</span></span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true"></a>TableS3 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS3.csv&quot;</span>)</span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true"></a>TableS3[tT_CERAD, on=<span class="st">&quot;EnsemblID&quot;</span>,  <span class="kw">c</span>(<span class="st">&quot;MSBB.STG_E4vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB.STG_E4vsE3_P.Value&quot;</span>, <span class="st">&quot;MSBB.STG_E2vsE3_logFC&quot;</span>, <span class="st">&quot;MSBB.STG_E2vsE3_P.Value&quot;</span>) <span class="op">:</span><span class="er">=</span><span class="st"> </span>.(i.E4vsE3_logFC, i.E4vsE3_P.Value, i.E2vsE3_logFC, i.E2vsE3_P.Value)]</span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS3, <span class="st">&quot;TableS3.csv&quot;</span>)</span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true"></a></span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true"></a></span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true"></a><span class="kw">table</span>(C) </span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true"></a><span class="co"># 0   1   2   3 </span></span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true"></a><span class="co"># 65  37  36 102 </span></span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true"></a><span class="kw">table</span>(B)</span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true"></a><span class="co">#  1  2  3 </span></span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true"></a><span class="co"># 59 78 92 </span></span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true"></a></span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true"></a></span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true"></a><span class="co"># run Model 3</span></span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true"></a>tT3_CERAD =<span class="st"> </span><span class="kw">run_model3</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>) </span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true"></a>tT3_Braak =<span class="st"> </span><span class="kw">run_model3</span>(<span class="st">&quot;Braak&quot;</span>, mDataG, B, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true"></a></span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true"></a><span class="kw">nrow</span>(tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,]) <span class="co"># 8</span></span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true"></a><span class="kw">nrow</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,]) <span class="co"># 6</span></span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true"></a></span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true"></a><span class="kw">intersect</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,]<span class="op">$</span>GeneSymbol,tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 2 in common</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true"></a></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true"></a><span class="kw">length</span>(tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 7 up in E4-E3</span></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true"></a><span class="kw">length</span>(tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 1 down in E4-E3</span></span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true"></a><span class="kw">length</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 3 up in E4-E3</span></span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true"></a><span class="kw">length</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol) <span class="co"># 3 down in E4-E3</span></span></code></pre></div>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true"></a><span class="co"># run Model 3</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true"></a>tT3_CERAD =<span class="st"> </span><span class="kw">run_model3</span>(<span class="st">&quot;CERAD&quot;</span>, mDataG, C, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>) </span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true"></a>tT3_Braak =<span class="st"> </span><span class="kw">run_model3</span>(<span class="st">&quot;Braak&quot;</span>, mDataG, B, E, annot, <span class="st">&quot;MSBBSTG&quot;</span>, <span class="st">&quot;microglia&quot;</span>)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true"></a></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true"></a><span class="kw">nrow</span>(tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,])</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true"></a><span class="kw">nrow</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,])</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true"></a></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true"></a><span class="kw">intersect</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,]<span class="op">$</span>GeneSymbol,tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true"></a></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true"></a><span class="kw">length</span>(tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true"></a><span class="kw">length</span>(tT3_CERAD[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true"></a><span class="kw">length</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true"></a><span class="kw">length</span>(tT3_Braak[E4vsE3_P.Value <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span> <span class="op">&amp;</span><span class="st"> </span>E4vsE3_logFC <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>,]<span class="op">$</span>GeneSymbol)</span></code></pre></div>
 </div>
 <div id="z-score-analysis" class="section level1">
 <h1>Z-Score Analysis</h1>
@@ -356,7 +332,7 @@ code span.ot { color: #007020; }
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>mDataG1 =<span class="st"> </span>mDataG</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">rownames</span>(mDataG1) =<span class="st"> </span>annot<span class="op">$</span>GeneSymbol[<span class="kw">match</span>(<span class="kw">rownames</span>(mDataG1), annot<span class="op">$</span>EnsemblID)]</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co"># select only the C0 subjects and Remove the subject wih APOE NA</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co"># select only the C0 subjects and remove the subject with APOE NA</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>mDataG1 =<span class="st"> </span>mDataG1[, <span class="kw">which</span>(C <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)]</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>E.C0 =<span class="st"> </span>E[<span class="kw">which</span>(C <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)]</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a></span>
@@ -368,153 +344,59 @@ code span.ot { color: #007020; }
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co"># check</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="kw">cat</span>(<span class="st">&quot;Is Z-score correct? &quot;</span>, <span class="kw">all</span>(mDataZscore[<span class="dv">99</span>,] <span class="op">==</span><span class="st"> </span>(mDataG1[<span class="dv">99</span>,] <span class="op">-</span><span class="st"> </span>means[<span class="dv">99</span>])<span class="op">/</span>sds[<span class="dv">99</span>]), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co"># ROSMAP cluster 2 genes</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>TableS2 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS2.csv&quot;</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>C2.genes =<span class="st"> </span>TableS2<span class="op">$</span>GeneSymbol</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>mDataZscore.c2 =<span class="st"> </span>mDataZscore[<span class="kw">rownames</span>(mDataZscore) <span class="op">%in%</span><span class="st"> </span>C2.genes,]</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>mDataZscore.c2.e2 =<span class="st"> </span>mDataZscore.c2[,E.C0 <span class="op">==</span><span class="st"> &quot;E2&quot;</span>]</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>mDataZscore.c2.e3 =<span class="st"> </span>mDataZscore.c2[,E.C0 <span class="op">==</span><span class="st"> &quot;E3&quot;</span>]</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a>mDataZscore.c2.e4 =<span class="st"> </span>mDataZscore.c2[,E.C0 <span class="op">==</span><span class="st"> &quot;E4&quot;</span>]</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a><span class="co"># check dimension</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a><span class="kw">table</span>(E.C0) <span class="op">==</span><span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">E2 =</span> <span class="kw">ncol</span>(mDataZscore.c2.e2), <span class="dt">E4 =</span> <span class="kw">ncol</span>(mDataZscore.c2.e4), <span class="dt">E3 =</span> <span class="kw">ncol</span>(mDataZscore.c2.e3))</span></code></pre></div>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co"># ROSMAP cluster 2 genes</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>TableS3 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS3.csv&quot;</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>C2.genes =<span class="st"> </span>TableS3<span class="op">$</span>GeneSymbol</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>mDataZscore.c2 =<span class="st"> </span>mDataZscore[<span class="kw">rownames</span>(mDataZscore) <span class="op">%in%</span><span class="st"> </span>C2.genes,]</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>mDataZscore.c2.e2 =<span class="st"> </span>mDataZscore.c2[,E.C0 <span class="op">==</span><span class="st"> &quot;E2&quot;</span>]</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>mDataZscore.c2.e3 =<span class="st"> </span>mDataZscore.c2[,E.C0 <span class="op">==</span><span class="st"> &quot;E3&quot;</span>]</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a>mDataZscore.c2.e4 =<span class="st"> </span>mDataZscore.c2[,E.C0 <span class="op">==</span><span class="st"> &quot;E4&quot;</span>]</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="co"># check dimension</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a><span class="kw">table</span>(E.C0) <span class="op">==</span><span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">E2 =</span> <span class="kw">ncol</span>(mDataZscore.c2.e2), <span class="dt">E4 =</span> <span class="kw">ncol</span>(mDataZscore.c2.e4), <span class="dt">E3 =</span> <span class="kw">ncol</span>(mDataZscore.c2.e3))</span></code></pre></div>
 </div>
 <div id="figure-s1-stg" class="section level1">
 <h1>Figure S1 (STG)</h1>
 <p>Plots for C0 subjects where each dot represents a gene.</p>
-<div id="violin-plot" class="section level3">
-<h3>Violin Plot</h3>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>my.dat =<span class="st"> </span><span class="kw">list</span>(<span class="st">`</span><span class="dt">2</span><span class="st">`</span> =<span class="st"> </span><span class="kw">rowMeans</span>(mDataZscore.c2.e2), <span class="st">`</span><span class="dt">3</span><span class="st">`</span> =<span class="st"> </span><span class="kw">rowMeans</span>(mDataZscore.c2.e3), <span class="st">`</span><span class="dt">4</span><span class="st">`</span> =<span class="st"> </span><span class="kw">rowMeans</span>(mDataZscore.c2.e4))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>TableS2<span class="fl">.2</span> =<span class="st"> </span><span class="kw">do.call</span>(cbind, my.dat)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="kw">colnames</span>(TableS2<span class="fl">.2</span>) =<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;MSBB.STG_E&quot;</span>, <span class="kw">colnames</span>(TableS2<span class="fl">.2</span>))</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="kw">colnames</span>(TableS2<span class="fl">.2</span>) =<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">colnames</span>(TableS2<span class="fl">.2</span>), <span class="st">&quot;AveZ&quot;</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>TableS2<span class="fl">.2</span> =<span class="st"> </span><span class="kw">as.data.frame</span>(TableS2<span class="fl">.2</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>TableS2<span class="fl">.2</span><span class="op">$</span>GeneSymbol =<span class="st"> </span><span class="kw">rownames</span>(TableS2<span class="fl">.2</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">setDT</span>(TableS2<span class="fl">.2</span>)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>TableS2 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS2.csv&quot;</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>TableS2 =<span class="st"> </span>TableS2<span class="fl">.2</span>[TableS2, on =<span class="st"> </span>.(GeneSymbol)]</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>TableS2 =<span class="st"> </span>TableS2[<span class="kw">order</span>(GeneSymbol), ]</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>TableS2 =<span class="st"> </span>TableS2[, .(EnsemblID, GeneSymbol, Description, ROSMAP_E2AveZ, ROSMAP_E3AveZ, ROSMAP_E4AveZ, MSBB.STG_E2AveZ, MSBB.STG_E3AveZ, MSBB.STG_E4AveZ)]</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="kw">fwrite</span>(TableS2, <span class="st">&quot;TableS2.csv&quot;</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>my.df =<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(my.dat)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>my.df<span class="op">$</span>L1 =<span class="st"> </span><span class="kw">as.numeric</span>(my.df<span class="op">$</span>L1)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="kw">colnames</span>(my.df) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;z-score&quot;</span>, <span class="st">&quot;APOE&quot;</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>my.df<span class="op">$</span>Genes =<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(my.dat, <span class="cf">function</span>(x) <span class="kw">names</span>(x)))</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>my.df</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a><span class="kw">table</span>(my.df<span class="op">$</span>APOE)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a><span class="co">#   2   3   4 </span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a><span class="co"># 143 143 143 </span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a><span class="kw">ggthemr</span>(<span class="st">&#39;greyscale&#39;</span>)</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a><span class="kw">colnames</span>(my.df) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;z-score&quot;</span>, <span class="st">&quot;APOE.num&quot;</span>, <span class="st">&quot;Genes&quot;</span>)</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a>my.df<span class="op">$</span>APOE =<span class="st"> </span><span class="kw">as.factor</span>(my.df<span class="op">$</span>APOE.num)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>my.df =<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(my.dat)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>my.df<span class="op">$</span>L1 =<span class="st"> </span><span class="kw">as.numeric</span>(my.df<span class="op">$</span>L1)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="kw">colnames</span>(my.df) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;z-score&quot;</span>, <span class="st">&quot;APOE&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>my.df<span class="op">$</span>Genes =<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(my.dat, <span class="cf">function</span>(x) <span class="kw">names</span>(x)))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="kw">ggthemr</span>(<span class="st">&#39;greyscale&#39;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">colnames</span>(my.df) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;z-score&quot;</span>, <span class="st">&quot;APOE.num&quot;</span>, <span class="st">&quot;Genes&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>my.df<span class="op">$</span>APOE =<span class="st"> </span><span class="kw">as.factor</span>(my.df<span class="op">$</span>APOE.num)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>  </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>to_swap =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;#62bba5&quot;</span>, <span class="co"># E4</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>            <span class="st">&quot;#785d37&quot;</span>, <span class="co"># E3</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>            <span class="st">&quot;#ffb84d&quot;</span>) <span class="co"># E2</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>  </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="co"># violin plot</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>fig2d.stg<span class="fl">.1</span> =<span class="st"> </span><span class="kw">ggplot</span>(my.df, <span class="kw">aes</span>(<span class="dt">x=</span>APOE.num, <span class="dt">y=</span><span class="st">`</span><span class="dt">z-score</span><span class="st">`</span>, <span class="dt">group=</span>APOE, <span class="dt">fill =</span> APOE)) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_violin</span>(<span class="dt">trim=</span><span class="ot">FALSE</span>) <span class="op">+</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">rev</span>(to_swap)) <span class="op">+</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Ave z-score&quot;</span>) <span class="op">+</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;APOE&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">1</span>, </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a>             <span class="dt">colour=</span><span class="st">&quot;black&quot;</span>, </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a>             <span class="dt">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a>             <span class="dt">position=</span><span class="kw">position_jitter</span>(<span class="dt">width=</span><span class="fl">0.025</span>)) <span class="op">+</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">group=</span>Genes), </span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a>            <span class="dt">alpha =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a>            <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true"></a>  </span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true"></a>to_swap =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;#62bba5&quot;</span>, <span class="co"># E4</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true"></a>            <span class="st">&quot;#785d37&quot;</span>, <span class="co"># E3</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true"></a>            <span class="st">&quot;#ffb84d&quot;</span>) <span class="co"># E2</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true"></a>  </span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true"></a><span class="co"># violin plot</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true"></a>figs1.stg<span class="fl">.1</span> =<span class="st"> </span><span class="kw">ggplot</span>(my.df, <span class="kw">aes</span>(<span class="dt">x=</span>APOE.num, <span class="dt">y=</span><span class="st">`</span><span class="dt">z-score</span><span class="st">`</span>, <span class="dt">group=</span>APOE, <span class="dt">fill =</span> APOE)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_violin</span>(<span class="dt">trim=</span><span class="ot">FALSE</span>) <span class="op">+</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">rev</span>(to_swap)) <span class="op">+</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Ave z-score&quot;</span>) <span class="op">+</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;APOE&quot;</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true"></a><span class="st">  </span><span class="co"># plot the points</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">1</span>, </span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true"></a>             <span class="dt">colour=</span><span class="st">&quot;black&quot;</span>, </span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true"></a>             <span class="dt">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true"></a>             <span class="dt">position=</span><span class="kw">position_jitter</span>(<span class="dt">width=</span><span class="fl">0.025</span>)) <span class="op">+</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true"></a><span class="st">  </span><span class="co"># plot the lines </span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">group=</span>Genes), </span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true"></a>            <span class="dt">alpha =</span> <span class="fl">0.1</span>,</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true"></a>            <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true"></a>  </span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true"></a><span class="co"># boxplot</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true"></a>figs1.stg<span class="fl">.2</span> =<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> my.df, <span class="kw">aes</span>(<span class="dt">x=</span>APOE, <span class="dt">y=</span><span class="st">`</span><span class="dt">z-score</span><span class="st">`</span>, <span class="dt">group=</span>APOE, <span class="dt">fill =</span> APOE)) <span class="op">+</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">outlier.colour=</span><span class="st">&quot;black&quot;</span>, <span class="dt">outlier.shape=</span><span class="dv">16</span>,</span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true"></a>               <span class="dt">outlier.size=</span><span class="dv">2</span>, <span class="dt">notch=</span><span class="ot">FALSE</span>) <span class="op">+</span></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">rev</span>(to_swap)) <span class="op">+</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Ave z-score&quot;</span>)</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true"></a>  </span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true"></a>figs1.stg =<span class="st"> </span>figs1.stg<span class="fl">.1</span> <span class="op">+</span><span class="st"> </span>figs1.stg<span class="fl">.2</span> <span class="op">+</span></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true"></a><span class="st">  </span><span class="kw">plot_annotation</span>(<span class="dt">title =</span> <span class="st">&#39;B&#39;</span>, <span class="dt">theme =</span> <span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">face =</span> <span class="st">&quot;plain&quot;</span>, <span class="dt">size =</span> <span class="dv">15</span>)))</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true"></a><span class="kw">ggsave</span>(<span class="st">&quot;../TablesFigures/FigureS1-violin-STG.pdf&quot;</span>, figs1.stg, <span class="dt">width =</span> <span class="dv">5</span>, <span class="dt">height =</span> <span class="dv">4</span>, <span class="dt">dpi =</span> <span class="dv">300</span>)</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true"></a></span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true"></a>fig2d =<span class="st"> </span><span class="kw">arrangeGrob</span>(figs1.stg<span class="fl">.1</span>, figs1.stg<span class="fl">.2</span>, <span class="dt">nrow=</span><span class="dv">1</span>, <span class="dt">top =</span> </span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true"></a>  <span class="kw">textGrob</span>(<span class="st">&quot;MSBB-STG&quot;</span>,<span class="dt">gp=</span><span class="kw">gpar</span>(<span class="dt">fontsize=</span><span class="dv">15</span>,<span class="dt">font=</span><span class="dv">1</span>)))</span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true"></a><span class="kw">ggsave</span>(<span class="st">&quot;../TablesFigures/Figure2D.pdf&quot;</span>, fig2d, <span class="dt">width =</span> <span class="dv">5</span>, <span class="dt">height =</span> <span class="dv">4</span>)</span></code></pre></div>
-</div>
-<div id="box-plot" class="section level3">
-<h3>Box Plot</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co"># metdata</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>Braakdf =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">subId=</span><span class="kw">colnames</span>(mDataG), <span class="dt">sfactor=</span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mDataG), <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;Braak&quot;</span>]][SubjectID <span class="op">==</span><span class="st"> </span>x][[<span class="st">&quot;Braak&quot;</span>]]))</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>CERADdf =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">subId=</span><span class="kw">colnames</span>(mDataG), <span class="dt">sfactor=</span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mDataG), <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;CERAD&quot;</span>]][SubjectID <span class="op">==</span><span class="st"> </span>x][[<span class="st">&quot;CERAD&quot;</span>]]))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>Edf =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">subId=</span><span class="kw">colnames</span>(mDataG), <span class="dt">APOE4=</span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mDataG), <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;APOE&quot;</span>]][SubjectID <span class="op">==</span><span class="st"> </span>x][[<span class="st">&quot;APOE&quot;</span>]]))</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>RawAPOEdf =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">subId=</span><span class="kw">colnames</span>(mDataG), <span class="dt">APOE4=</span><span class="kw">sapply</span>(<span class="kw">colnames</span>(mDataG), <span class="cf">function</span>(x) expSet<span class="op">$</span>strat[[<span class="st">&quot;RawAPOE&quot;</span>]][SubjectID <span class="op">==</span><span class="st"> </span>x][[<span class="st">&quot;RawAPOE&quot;</span>]]))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="co"># data for boxplot</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>mDataG2 =<span class="st"> </span>mDataG</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="kw">rownames</span>(mDataG2) =<span class="st"> </span>annot<span class="op">$</span>GeneSymbol[<span class="kw">match</span>(<span class="kw">rownames</span>(mDataG2), annot<span class="op">$</span>EnsemblID)]</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>adat =<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(mDataG2, <span class="dt">id.vars =</span> <span class="st">&quot;geneSymbols&quot;</span>, <span class="dt">variable.name =</span> <span class="st">&quot;subId&quot;</span>, <span class="dt">value.name =</span> <span class="st">&quot;exp&quot;</span>)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="kw">colnames</span>(adat) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;geneSymbols&quot;</span>, <span class="st">&quot;subId&quot;</span>, <span class="st">&quot;exp&quot;</span>)</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a>adat =<span class="st"> </span><span class="kw">as.data.table</span>(adat)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>adat<span class="op">$</span>Braak =<span class="st"> </span>Braakdf[<span class="kw">match</span>(adat<span class="op">$</span>subId,Braakdf<span class="op">$</span>subId),<span class="st">&quot;sfactor&quot;</span>]</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>adat<span class="op">$</span>CERAD =<span class="st"> </span>CERADdf[<span class="kw">match</span>(adat<span class="op">$</span>subId,CERADdf<span class="op">$</span>subId),<span class="st">&quot;sfactor&quot;</span>]</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>adat<span class="op">$</span>RawAPOE =<span class="st"> </span>RawAPOEdf[<span class="kw">match</span>(adat<span class="op">$</span>subId,RawAPOEdf<span class="op">$</span>subId),<span class="st">&quot;APOE4&quot;</span>]</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>adat<span class="op">$</span>APOE =<span class="st"> </span>Edf[<span class="kw">match</span>(adat<span class="op">$</span>subId,Edf<span class="op">$</span>subId),<span class="st">&quot;APOE4&quot;</span>]</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>adat<span class="op">$</span>C_APOE =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">paste0</span>(<span class="st">&quot;C&quot;</span>,adat<span class="op">$</span>CERAD), adat<span class="op">$</span>APOE, <span class="dt">sep =</span> <span class="st">&quot;.&quot;</span>)</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a>adat<span class="op">$</span>B_APOE =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">paste0</span>(<span class="st">&quot;B&quot;</span>,adat<span class="op">$</span>Braak), adat<span class="op">$</span>APOE, <span class="dt">sep =</span> <span class="st">&quot;.&quot;</span>)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a><span class="co"># boxplot</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a><span class="kw">ggthemr</span>(<span class="st">&quot;fresh&quot;</span>)</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a>to_swap =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;#65ADC2&quot;</span>, <span class="st">&quot;#E84646&quot;</span>)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a>my.boxplot =<span class="st"> </span><span class="cf">function</span>(adat, gene){</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a>  adat =<span class="st"> </span>adat[<span class="op">!</span><span class="kw">is.na</span>(CERAD) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(APOE),]</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true"></a>  adat2 =<span class="st"> </span>adat[geneSymbols <span class="op">==</span><span class="st"> </span>gene <span class="op">&amp;</span><span class="st"> </span>APOE <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;E3&quot;</span>, <span class="st">&quot;E4&quot;</span>),]</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true"></a>  p =<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> adat2, <span class="kw">aes</span>(<span class="dt">x =</span> C_APOE, <span class="dt">y =</span> exp)) <span class="op">+</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true"></a><span class="st">    </span><span class="kw">geom_boxplot</span>(<span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>, <span class="dt">outlier.color =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true"></a><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">position=</span><span class="kw">position_jitter</span>(<span class="fl">0.2</span>), <span class="kw">aes</span>(<span class="dt">color =</span> APOE), <span class="dt">size =</span> <span class="fl">0.7</span>) <span class="op">+</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true"></a><span class="st">    </span><span class="kw">ylab</span>(<span class="st">&quot;log2(exp)&quot;</span>) <span class="op">+</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true"></a><span class="st">    </span><span class="kw">xlab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true"></a><span class="st">    </span><span class="kw">ggtitle</span>(gene) <span class="op">+</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true"></a><span class="st">    </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> <span class="kw">rev</span>(to_swap)) <span class="op">+</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true"></a><span class="st">    </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">vjust =</span> <span class="fl">0.5</span>, <span class="dt">hjust=</span><span class="dv">1</span>), </span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true"></a>          <span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>)) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true"></a><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&quot;none&quot;</span>)  <span class="op">+</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true"></a><span class="st">    </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">9</span>, <span class="dt">face =</span> <span class="st">&quot;plain&quot;</span>))</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true"></a>  <span class="kw">return</span>(p)</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true"></a>}</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true"></a></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true"></a><span class="co"># row annotation</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true"></a>row2 =<span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">annotate</span>(<span class="dt">geom =</span> <span class="st">&#39;text&#39;</span>, <span class="dt">x=</span><span class="dv">1</span>, <span class="dt">y=</span><span class="dv">1</span>, <span class="dt">label=</span><span class="st">&quot;pro-inflammatory&quot;</span>, <span class="dt">angle =</span> <span class="dv">90</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_void</span>() </span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true"></a>row1 =<span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">annotate</span>(<span class="dt">geom =</span> <span class="st">&#39;text&#39;</span>, <span class="dt">x=</span><span class="dv">1</span>, <span class="dt">y=</span><span class="dv">1</span>, <span class="dt">label=</span><span class="st">&quot;phagocytosis&quot;</span>, <span class="dt">angle =</span> <span class="dv">90</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_void</span>() </span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true"></a></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true"></a><span class="co"># boxplot for same genes as in figure 2A</span></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true"></a>fig2a.genes =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;C1QB&quot;</span>,  <span class="st">&quot;TYROBP&quot;</span>, <span class="st">&quot;CTSC&quot;</span>, <span class="st">&quot;MSR1&quot;</span>, <span class="st">&quot;TLR1&quot;</span>, <span class="st">&quot;ALOX5&quot;</span>, <span class="st">&quot;IL1B&quot;</span>, <span class="st">&quot;IRF8&quot;</span>)</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true"></a>plist =<span class="st"> </span><span class="kw">lapply</span>(fig2a.genes, <span class="cf">function</span>(x) <span class="kw">my.boxplot</span>(adat, x))</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true"></a><span class="kw">names</span>(plist) =<span class="st"> </span>letters[<span class="dv">3</span><span class="op">:</span><span class="dv">10</span>]</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true"></a>plist[[<span class="st">&quot;a&quot;</span>]] =<span class="st"> </span>row1</span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true"></a>plist[[<span class="st">&quot;b&quot;</span>]] =<span class="st"> </span>row2</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true"></a>layoutplot =<span class="st"> &quot;</span></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true"></a><span class="st">acccdddeeefff</span></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true"></a><span class="st">acccdddeeefff</span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true"></a><span class="st">bggghhhiiijjj</span></span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true"></a><span class="st">bggghhhiiijjj</span></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true"></a><span class="st">&quot;</span></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true"></a></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true"></a>pic =<span class="st"> </span><span class="kw">wrap_plots</span>(<span class="dt">grobs =</span> plist, <span class="dt">guides =</span> <span class="st">&#39;collect&#39;</span>, <span class="dt">design =</span> layoutplot) <span class="op">+</span></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true"></a><span class="st">  </span><span class="kw">plot_annotation</span>(<span class="dt">title =</span> <span class="st">&#39;B&#39;</span>, <span class="dt">theme =</span> <span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">face =</span> <span class="st">&quot;plain&quot;</span>, <span class="dt">size =</span> <span class="dv">15</span>)))</span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true"></a><span class="kw">ggsave</span>(<span class="st">&quot;../TablesFigures/FigureS1-box-STG.pdf&quot;</span>, pic, <span class="dt">width =</span> <span class="dv">12</span>, <span class="dt">height =</span><span class="dv">8</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>TableS2 =<span class="st"> </span><span class="kw">fread</span>(<span class="st">&quot;TableS2.csv&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>TableS2</span></code></pre></div>
-</div>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true"></a><span class="co"># box plot</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true"></a>figs2d.stg<span class="fl">.2</span> =<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> my.df, <span class="kw">aes</span>(<span class="dt">x=</span>APOE, <span class="dt">y=</span><span class="st">`</span><span class="dt">z-score</span><span class="st">`</span>, <span class="dt">group=</span>APOE, <span class="dt">fill =</span> APOE)) <span class="op">+</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">outlier.colour=</span><span class="st">&quot;black&quot;</span>, <span class="dt">outlier.shape=</span><span class="dv">16</span>,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true"></a>               <span class="dt">outlier.size=</span><span class="dv">2</span>, <span class="dt">notch=</span><span class="ot">FALSE</span>) <span class="op">+</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">rev</span>(to_swap)) <span class="op">+</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Ave z-score&quot;</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true"></a>  </span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true"></a>fig2d =<span class="st"> </span><span class="kw">arrangeGrob</span>(fig2d.stg<span class="fl">.1</span>, figs2d.stg<span class="fl">.2</span>, <span class="dt">nrow=</span><span class="dv">1</span>, <span class="dt">top =</span> </span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true"></a>  <span class="kw">textGrob</span>(<span class="st">&quot;MSBB-STG&quot;</span>,<span class="dt">gp=</span><span class="kw">gpar</span>(<span class="dt">fontsize=</span><span class="dv">15</span>,<span class="dt">font=</span><span class="dv">1</span>)))</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true"></a><span class="kw">ggsave</span>(<span class="st">&quot;../TablesFigures/Figure2D.pdf&quot;</span>, fig2d, <span class="dt">width =</span> <span class="dv">5</span>, <span class="dt">height =</span> <span class="dv">4</span>)</span></code></pre></div>
 </div>
 </section>
 

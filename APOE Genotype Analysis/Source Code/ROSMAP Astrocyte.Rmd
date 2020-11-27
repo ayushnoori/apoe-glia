@@ -65,11 +65,10 @@ length(ensemblIds)
 ```{r}
 # data selection
 sel.gen = geneIds %in% ensemblIds 
-mDataG = mData[sel.gen,] # processed data
+mDataG = mData[sel.gen,]  # processed data
 mDataRawG = mDataG   # raw data
 geneIdsG = geneIds[sel.gen]
 geneSymbols = annot$GeneSymbol[match(geneIdsG, annot$EnsemblID)]
-
 
 # normalization
 cat("Data Type: ", dtype, "\n")
@@ -93,6 +92,7 @@ E = sapply(colnames(mData)[colnames(mData)!="Gene"],
 ```{r}
 source("Models.R")
 
+
 # run Model 1
 tT_CERAD = run_model1("CERAD", mDataG, C, E, annot, "ROSMAP", "astro")
 tT_Braak = run_model1("Braak", mDataG, B, E, annot, "ROSMAP", "astro")
@@ -100,14 +100,14 @@ tT_Braak = run_model1("Braak", mDataG, B, E, annot, "ROSMAP", "astro")
 nrow(tT_CERAD[E4vsE3_P.Value < 0.05,])
 nrow(tT_Braak[E4vsE3_P.Value < 0.05,])
 
-intersect(tT_Braak[E4vsE3_P.Value < 0.05]$GeneSymbol,tT_CERAD[E4vsE3_P.Value < 0.05]$GeneSymbol) # 4 in common
+intersect(tT_Braak[E4vsE3_P.Value < 0.05]$GeneSymbol,tT_CERAD[E4vsE3_P.Value < 0.05]$GeneSymbol)
 
 length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
 length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
 length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
 length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
 
-TableS6 = tT_CERAD[, .(EnsemblID, GeneSymbol, E4vsE3_logFC, E4vsE3_P.Value, E2vsE3_logFC, E2vsE3_P.Value)]
+TableS2.astro = tT_CERAD[, .(EnsemblID, GeneSymbol, E4vsE3_logFC, E4vsE3_P.Value, E2vsE3_logFC, E2vsE3_P.Value)]
 
 
 # run Model 2
@@ -132,17 +132,18 @@ tT3_Braak = run_model3("Braak", mDataG, B, E, annot, "ROSMAP", "astro")
 nrow(tT3_CERAD[E4vsE3_P.Value < 0.05,])
 nrow(tT3_Braak[E4vsE3_P.Value < 0.05,])
 
-intersect(tT3_Braak[E4vsE3_P.Value < 0.05,]$GeneSymbol,tT3_CERAD[E4vsE3_P.Value < 0.05,]$GeneSymbol) # 5 in common
+intersect(tT3_Braak[E4vsE3_P.Value < 0.05,]$GeneSymbol,tT3_CERAD[E4vsE3_P.Value < 0.05,]$GeneSymbol)
 
 length(tT3_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) 
 length(tT3_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
 length(tT3_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
 length(tT3_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
 
+
 # run Model 4
 tT4_CERAD = run_model4("CERAD", mDataG, C, E, annot, "ROSMAP", "microglia") 
 
-nrow(tT4_CERAD[E4vsE3_P.Value < 0.05,]) ## 107
+nrow(tT4_CERAD[E4vsE3_P.Value < 0.05,])
 
 length(tT4_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
 length(tT4_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
@@ -169,7 +170,7 @@ colnames(tT2_CERAD2) = gsub("E2vsE3", "C0E2vsC0E3",colnames(tT2_CERAD2))
 # Z-Score Analysis and Spectral Clustering
 
 ```{r}
-# z-score for C0 subjects only
+# z-scores for C0 subjects only
 cSubject = 0
 
 # remove the 3 low-expressed genes: ENSG00000124091, ENSG00000252798, ENSG00000204345
@@ -224,20 +225,12 @@ simMatrix = 1-as.matrix(dissMatrix)/max(dissMatrix)
 # where kVal is the number of clusters you would like to partition
 clust = SNFtool::spectralClustering(simMatrix, K = k)
 clustLab = as.factor(clust)
-
-
-# Table S6
-Cluster = clustLab
-TableS6 = as.data.frame(cbind(Cluster, zMtx))
-setDT(TableS6)
-TableS6[, GeneSymbol := z$Genes]
-TableS6 = annot2[GeneSymbol %in% TableS6$GeneSymbol][TableS6, on = .(GeneSymbol)]
-TableS6 = TableS6[clustLab %in% c(1,4),]
-TableS6 = TableS6[order(Cluster, GeneSymbol),]
-fwrite(TableS6, "TableS6.csv")
 ```
 
 
+# Figure 4A and 4B
+
+Individual z-score heatmap for ROSMAP C0 subjects.
 
 ```{r}
 # prepare data
@@ -329,9 +322,9 @@ pd = packLegend(lgd.h, lgd.have,
                 direction = "horizontal")
 
 
-# Figure 5
+# Figure 4
 # heatmap for average z-scores of cluster 1
-pdf("../TablesFigures/Figure5-1.cluster1.pdf", width = 11)
+pdf("../TablesFigures/Figure4-1.cluster1.pdf", width = 11)
 Heatmap(zMtx[order(clustLab),], 
         col = colFun1,
         cluster_columns = FALSE,
@@ -353,9 +346,9 @@ grid.text("A", x = unit(0.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=20)
 grid.text("B", x = unit(8.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=20))
 dev.off()
 
-# Figure 5
+# Figure 4
 # heatmap for average z-scores of cluster 4
-pdf("../TablesFigures/Figure5-1.cluster4.pdf", width = 11)
+pdf("../TablesFigures/Figure4-1.cluster4.pdf", width = 11)
 Heatmap(zMtx[order(clustLab),], 
         col = colFun1,
         cluster_columns = FALSE,
@@ -379,7 +372,7 @@ dev.off()
 ```
 
 
-# Figure 4B
+# Figure 4C and 4D
 
 Violin plots where each dot represents a gene.
 
@@ -407,44 +400,42 @@ my_violin = function(c, TableS2.astro){
                     "#ffb84d") # E2
   
         # violin plot
-        fig4b.1 = ggplot(my.df, aes(x=APOE.num, y=`z-score`, group=APOE, fill = APOE)) + 
+        fig4c.1 = ggplot(my.df, aes(x=APOE.num, y=`z-score`, group=APOE, fill = APOE)) + 
           geom_violin(trim=FALSE) +
-         scale_fill_manual(values = rev(to_swap)) +
-        theme(legend.position = "none") +
-         ylab("Ave z-score") +
-         xlab("APOE") + 
-         # plot the points
+          scale_fill_manual(values = rev(to_swap)) +
+          theme(legend.position = "none") +
+          ylab("Ave z-score") +
+          xlab("APOE") + 
         geom_point(size=1, 
                    colour="black", 
                    alpha = 0.2,
                    position=position_jitter(width=0.025)) +
-        # plot the lines 
         geom_line(aes(group=Genes), 
                   alpha = 0.1,
                   color = "black")
   
         # box plot
-        fig4b.2 = ggplot(data = my.df, aes(x=APOE, y=`z-score`, group=APOE, fill = APOE)) +
+        fig4c.2 = ggplot(data = my.df, aes(x=APOE, y=`z-score`, group=APOE, fill = APOE)) +
         geom_boxplot(outlier.colour="black", outlier.shape=16,
                outlier.size=2, notch=FALSE) +
         scale_fill_manual(values = rev(to_swap)) +
         ylab("Ave z-score")
 
-        return(list(fig4b.1, fig4b.2))
+        return(list(fig4c.1, fig4c.2))
 }
 
-fig4b.c1 = my_violin(1, TableS2.astro)
-fig4b.c4 = my_violin(4, TableS2.astro)
+fig4c.c1 = my_violin(1, TableS2.astro)
+fig4c.c4 = my_violin(4, TableS2.astro)
 
-fig4b.c1.p = ggarrange(plotlist = fig4b.c1, ncol = 2)
-fig4b.c4.p = ggarrange(plotlist = fig4b.c4, ncol = 2)
-fig4b.c1.p = annotate_figure(fig4b.c1.p, fig.lab = "C",
+fig4c.c1.p = ggarrange(plotlist = fig4c.c1, ncol = 2)
+fig4c.c4.p = ggarrange(plotlist = fig4c.c4, ncol = 2)
+fig4c.c1.p = annotate_figure(fig4c.c1.p, fig.lab = "C",
                              fig.lab.size = 20)
-fig4b.c4.p = annotate_figure(fig4b.c4.p, fig.lab = "D", 
+fig4c.c4.p = annotate_figure(fig4c.c4.p, fig.lab = "D", 
                              fig.lab.size = 20)
 
-ggsave("../TablesFigures/Figure4B-c1.pdf", fig4b.c1.p, width = 5.5, height = 4)
-ggsave("../TablesFigures/Figure4B-c4.pdf", fig4b.c4.p, width = 5.5, height = 4)
+ggsave("../TablesFigures/Figure4C.pdf", fig4c.c1.p, width = 5.5, height = 4)
+ggsave("../TablesFigures/Figure4D.pdf", fig4c.c4.p, width = 5.5, height = 4)
 ```
 
 
@@ -453,17 +444,16 @@ ggsave("../TablesFigures/Figure4B-c4.pdf", fig4b.c4.p, width = 5.5, height = 4)
 E4 vs. E3 average Z-score line plot from C0 to C3.
 
 ```{r}
-# Cluster 4 genes:
-tbS2 = fread("TableS2-astro.csv")
-C4.genes = tbS2[clustLab == 4, GeneSymbol]
-C1.genes = tbS2[clustLab == 1, GeneSymbol]
+# cluster 4 genes
+C4.genes = TableS2.astro[clustLab == 4, GeneSymbol]
+C1.genes = TableS2.astro[clustLab == 1, GeneSymbol]
 
 
-## Remove the 3 low-expressed genes: ENSG00000124091, ENSG00000252798, ENSG00000204345
+# remove the 3 low-expressed genes: ENSG00000124091, ENSG00000252798, ENSG00000204345
 mDataG1 = mDataG[!rownames(mDataG) %in% c("ENSG00000124091","ENSG00000252798","ENSG00000204345"),]
   
 
-# Remove subjects has no APOE or CERAD record
+# remove subjects which have no APOE or CERAD record
 sel = (!is.na(E)) & (!is.na(C))
 mDataG1 = mDataG1[, sel]
 
@@ -472,11 +462,11 @@ sds = apply(mDataG1, 1, sd)
 zscore = function(x) return((x - means)/sds)
 mDataZscore = apply(mDataG1, 2, zscore)
   
-# * Check: [should be TRUE]
+# check should be TRUE
 cat("Is Z-score correct? ", all(mDataZscore[99,] == (mDataG1[99,] - means[99])/sds[99]), "\n")
 
 EC = paste(paste0("C", C[sel]), E[sel], sep = ":")
-# * Average z-score
+# average z-score
 aveZ = data.table(Genes = annot$GeneSymbol[match(rownames(mDataZscore), annot$EnsemblID)],
                         
                         C0E2 = rowMeans(mDataZscore[, EC == "C0:E2"]),
