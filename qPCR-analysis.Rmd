@@ -1,0 +1,521 @@
+---
+title: "qPCR Analysis"
+description: |
+  The script below performs analysis of RT-qPCR data.
+output:
+  distill::distill_article:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Dependencies
+
+Load requisite packages. Note that the package [`wilkelab/ggtext`](https://github.com/wilkelab/ggtext) hosted on GitHub is used to annotate the plots. This package can be downloaded via `devtools::install_github("wilkelab/ggtext")`.
+
+```{r load-packages}
+
+# data manipulation
+library(data.table)
+library(purrr)
+library(magrittr)
+library(stringr)
+
+# file manipulation
+library(fs)
+
+# read and write to Excel files
+library(openxlsx)
+
+# statistical analysis
+library(psych)
+library(moments)
+
+# plot data
+library(ggplot2)
+library(RColorBrewer)
+library(ggpubr)
+
+# caption text and display significance
+library(ggtext)
+library(ggsignif)
+
+# heatmap
+library(pheatmap)
+
+```
+
+Define reference directories.
+
+```{r define-directories, warning = FALSE}
+
+# define analysis name as APOE OR APPPS1 OR LPS
+opt = c("APOE", "APPPS1", "LPS") %>% purrr::set_names(.)
+nm = opt[menu(opt, title = "Please select the desired analysis.")]
+
+# define directories
+bdir = getwd()
+ddir = file.path(bdir, "Data")
+rdir = file.path(bdir, "Results", nm)
+logd = file.path(rdir, paste(nm, "Log.txt"))
+
+# source utilities script
+source(file.path(bdir, "Code", "Utilities", "Utilities.R"))
+
+# overwrite log file
+if(file_exists(logd)) file_delete(logd)
+
+# clear existing analyses
+if(dir_exists(rdir)) { 
+  dir_delete(rdir)
+  dir_create(rdir)
+  dir_create(file.path(rdir, "Gene Plots"))
+}
+
+```
+
+
+# Read Data
+
+Read qPCR results from `.xlsx` data file. Read $\Delta Ct$ values.
+
+```{r read-data}
+
+# define function to read data
+read_data = function(sheet_number) {
+  read.xlsx(file.path(ddir, "qPCR Data.xlsx"), sheet = sheet_number) %>%
+    as.data.table() %>%
+    return()
+}
+
+# read data
+dCT = c(1, 4, 7) %>% purrr::set_names(opt) %>%
+  .[[nm]] %>% read_data()
+
+# reorder APOE factor
+if(nm == "LPS") dCT[, Treatment := factor(Treatment, levels = c("PBS", "LPS"))]
+
+```
+
+
+# Process Data
+
+Generate both $\Delta \Delta Ct$, and relative quantification (i.e., RQ where $RQ = 2^{-\Delta \Delta Ct}$) values.
+
+```{r process-data}
+
+# create factor variable
+fac = list("Genotype", "Genotype", c("Genotype", "Treatment")) %>% purrr::set_names(opt) %>% .[[nm]]
+  
+# extract gene names
+lab = dCT[, !c("Mouse", "Sex", ..fac)] %>% colnames() %>% .[order(.)]
+
+# calculate average of reference group (i.e., APOE3 OR APOE3/PBS)
+ctrl = dCT[, map(.SD, ~mean(.x, na.rm = TRUE)), .SDcols = lab, by = fac]
+
+# select appropriate reference group
+ctrl = if(nm == "LPS") ctrl[Genotype == "APOE3" & Treatment == "PBS", ..lab] else ctrl[Genotype == "APOE3", ..lab]
+
+# calculate ddCT
+ddCT = copy(dCT)[, (lab) := map2(.SD, ctrl, ~.x-.y), .SDcols = lab]
+
+# calculate RQ
+RQ = copy(ddCT)[, (lab) := 2^-.SD, .SDcols = lab]
+
+```
+
+
+# Statistical Analysis
+
+Functions to generate caption labels.
+
+```{r generate-caption}
+
+generate_label = function(p) {
+  
+  p = if(p <= 0.0001) signif(p, digits = 2) else round(p, 4)
+  
+  if(p <= 0.0001) {
+    return(paste0("<span style = 'color:#C33C54;'>*p* = ", p, "</span>"))
+  } else if (p < 0.05) {
+    return(paste0("<span style = 'color:#C33C54;'>*p* = ", p, "</span>"))
+  } else if (p < 0.1) {
+    return(paste0("<span style = 'color:#D4AFB9;'>*p* = ", p, "</span>"))
+  } else if(p >= 0.1) {
+    return("<span style = 'color:#41414E;'>N.S.</span>")
+  }
+  
+}
+
+generate_caption = function(comparison, label) {
+  
+  paste0("<span style = 'color:#41414E;'>**", comparison, ":** </span>", label, "<br>")
+  
+}
+
+# set colors
+colors = if(nm == "APOE") c("#62BBA5", "#785D37", "#FFB84D") else c("#785D37", "#FFB84D")
+
+```
+
+Function to perform statistical analysis for each gene and create the respective plots. Note that we compute the mean and standard deviation on ddCT then transform by $2^{-x}$ for mean and $2^{x}$ standard deviation (i.e., SD is independent of mean).
+
+```{r gene-analysis}
+
+gene_analysis = function(gene) {
+  
+  # write output message
+  cat(paste0("- ", gene, "\n"))
+  
+  # perform one-way ANOVA on dCT values
+  res_aov = if(nm == "LPS") aov(get(gene) ~ Genotype * Treatment, data = dCT) else aov(get(gene) ~ Genotype, data = dCT)
+  stat_aov = summary(res_aov)[[1]]
+  rownames(stat_aov) = trimws(rownames(stat_aov), "both")
+  
+  # perform posthoc Tukey test on dCT values
+  res_tukey = TukeyHSD(res_aov)
+  stat_tukey = if(nm == "LPS") res_tukey %>%
+    .[["Genotype:Treatment"]] %>%
+    .[c("APOE4:LPS-APOE3:LPS", "APOE4:PBS-APOE3:PBS"), ] else res_tukey[["Genotype"]]
+  
+  # print to log file
+  sink(file = logd, append = TRUE)
+  cat(paste0(gene, " ANOVA:\n")); print(stat_aov)
+  cat(paste0("\n", gene, " TUKEY:\n")); print(stat_tukey)
+  cat("\n\n")
+  sink()
+  
+  # create posthoc table
+  posthoc =  stat_tukey %>%
+    as.data.table(keep.rownames = TRUE) %>%
+    setnames(c("Comparison", "Difference", "Lower CI", "Upper CI", "p")) %>%
+    .[, c("Start", "End") := strsplit(Comparison, "-") %>% { .(map_chr(., 2), map_chr(., 1)) }]
+  
+  # reorder for APOE
+  if(nm == "APOE") { posthoc = posthoc[c(1, 3, 2), ] } # E2/E3, E3/E4, E2/E4 
+  
+  # rename for LPS
+  if(nm == "LPS") {
+    posthoc = posthoc %>% 
+      .[, Treatment := map_chr(strsplit(Start, ":"), 2)] %>%
+      .[, Treatment := factor(Treatment, levels = c("PBS", "LPS"))] %>%
+      .[, Start := map_chr(strsplit(Start, ":"), 1)] %>%
+      .[, End := map_chr(strsplit(End, ":"), 1)]
+  }
+  
+  # create output table
+  comps = if(nm == "LPS") posthoc[, paste0( Treatment, " ", Start, "/", End)] else posthoc[, paste(Start, End, sep = "/")]
+  output = data.table(Gene = gene)
+  
+  # function to add columns by reference
+  create_anova_col = function(cn) { output[, paste("ANOVA", cn, c("p", "p adj.")) := .(stat_aov[cn, "Pr(>F)"], stat_aov[cn, "Pr(>F)"])] }
+  create_tukey_col = function(cn) { output[, paste(comps, cn) := as.list(posthoc[[cn]])] }
+  
+  # create ANOVA columns
+  { if(nm == "LPS") c("Genotype", "Treatment", "Genotype:Treatment") else c("Genotype") } %>%
+    walk(create_anova_col)
+  
+  # create Tukey columns
+  if(nm == "APOE") walk(c("Difference", "Lower CI", "Upper CI", "p"), create_tukey_col)
+  
+  # reorder columns to group by comparison
+  unlist(map(comps, ~grep(.x, colnames(output)))) %>%
+    c(1:(ncol(output)-length(.)), .) %>%
+    setcolorder(output, .)
+  
+  # calculate mean and SD of RQ values, then ensure error bars are not negative
+  desc = describeBy(RQ[, ..gene], RQ[, ..fac], mat = TRUE, digits = 4) %>%
+    as.data.table() %>%
+    setnames(c("group1", "group2"), c("Genotype", "Treatment"), skip_absent = TRUE) %>%
+    .[, .SD, .SDcols = c(fac, "mean", "sd", "se")] %>%
+    .[, c("maxY", "minY") := .(mean + se, mean - se)] %>%
+    .[minY < 0, minY := 0]
+  
+  # refactor order for LPS/PBS only
+  if(nm == "LPS") desc[, Treatment := factor(Treatment, levels = c("PBS", "LPS"))]
+  
+  # calculate range of RQ values
+  range_RQ = RQ[, max(.SD, na.rm = T) - min(.SD, na.rm = T), .SDcols = gene]
+  
+  # set significance bar height
+  posthoc = posthoc %>%
+    .[, Height := desc[, max(mean + 1.3*sd)] + range_RQ*seq(0, 0.2, length.out = nrow(.))] %>%
+    .[, Label := paste("p =", round(p, 4))] %>%
+    .[!(p > 0.1), ]
+  
+  # adjust bar height for PBS/LPS
+  if(nrow(posthoc) > 0 & nm == "LPS") {
+    posthoc = posthoc %>% 
+      merge(desc[, max(mean + 1.3*sd), by = "Treatment"], by = "Treatment", all = TRUE) %>%
+      setnames("V1", "GroupHeight")
+  }
+  
+  # create caption labels
+  caption_labels = stat_aov %>%
+    .[!(rownames(.) == "Residuals"), ] %>%
+    { data.table(Comparison = rownames(.), pVal = .[, "Pr(>F)"]) } %>%
+    .[Comparison == "Genotype:Treatment", Comparison := "Interaction"] %>%
+    .[, Label := map_chr(pVal, generate_label)]
+  
+  # create caption
+  caption = paste0(pmap_chr(caption_labels[, .(Comparison, Label)], ~generate_caption(.x, .y)), collapse = "")
+  
+  # add dummy facet variable
+  if(nm == "APOE") { desc[, Treatment := ""] }
+  if(nm == "APPPS1") { desc[, Treatment := ""] }
+  
+  # create barplot
+  bp = ggplot(desc, aes(x = Genotype, y = mean, color = Genotype, group = Genotype)) +
+    geom_bar(stat = "identity", fill = "white", size = 1, width = 0.5) +
+    scale_color_manual(values = colors) +
+    geom_errorbar(aes(ymax = maxY, ymin = minY), color = "#41414E", width = 0.25) +
+    geom_jitter(data = RQ, aes(x = Genotype, y = .data[[gene]], color = Genotype, shape = Sex),
+                size = 2, width = 0.15) +
+    ggtitle(gene) + xlab("") + labs(caption = caption) +
+    ylab(bquote(bold('Expression Fold-Change ('*2^{-Delta*Delta*bolditalic(Ct)}*')'))) +
+    scale_y_continuous(expand = expansion(mult = c(-0.01, .1))) +
+    theme_linedraw() +
+    guides(fill = FALSE, color = FALSE, shape = FALSE) +
+    theme(plot.title = element_text(size = 20, hjust = 0.5, color = "#41414E", face = "bold.italic"),
+          plot.caption = element_markdown(hjust = 0.5, size = 16),
+          axis.text.x.bottom = element_text(size = 12, face = "bold.italic", color = "#41414E"),
+          axis.title.y = element_text(size = 14, face = "bold", color = "#41414E"),
+          strip.background = element_rect(fill = "#5D5D6F"),
+          strip.text = element_text(size=14, color = "white", face = "bold"),
+          panel.background = element_rect(fill = "#FDF5ED"),
+          axis.text.x = element_text(size=12, color = "#41414E", face = "italic"),
+          axis.ticks.x = element_blank(),
+          panel.grid = element_blank()
+    )
+  
+  # add facet
+  bp = bp + facet_wrap(~ Treatment)
+  
+  # save plot
+  ggsave(file.path(rdir, "Gene Plots", paste(gene, nm, "Plot.pdf")), bp, width = 5, height = 6)
+  
+  # return plot
+  return(list(bp + theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm")), output))
+  
+}
+
+```
+
+
+# Plot Data
+
+Map `gene_analysis` function over list of genes to create individual plots.
+
+```{r create-plots, warning = FALSE}
+
+# run analysis
+cat(paste(nm, "ANALYSIS:\n"))
+plots = map(lab, gene_analysis) %>%
+  purrr::set_names(lab)
+
+# separate output
+output = map_dfr(plots, 2)
+plots = map(plots, 1)
+
+# fix column names
+if(nm == "LPS") colnames(output) = gsub("Genotype:Treatment", "Interaction", colnames(output))
+
+# adjust p-values for multiple comparisons
+adj = colnames(output) %>% .[grep("adj.", ., fixed = TRUE)]
+output[, (adj) := map(.SD, ~p.adjust(.x, method = "BH")), .SDcols = adj]
+
+# save output
+fwrite(output, file.path(rdir, paste(nm, "Statistical Results.csv")))
+
+```
+
+Aggregate individual plots to create composite figure. First create the shared legend and define a function to create the shared y-axes.
+
+```{r create-legend}
+
+# create legend
+leg = { ggplot(RQ, aes(x = Genotype, y = Gfap, color = Genotype, shape = Sex)) +
+    scale_color_manual(values = colors) +
+    geom_jitter(size = 2, width = 0.1) + 
+    theme(legend.title = element_text(size = 18, face = "bold", color = "#41414E"),
+          legend.text = element_text(size = 14, color = "#41414E"),
+          legend.position = "top") } %>%
+  get_legend()
+
+# create shared y-axis per row
+shared_y = function(p, idx, nwidth) {if((idx - 1) %% nwidth == 0) return(p) else return(p + rremove("ylab"))}
+
+```
+
+Function to aggregate plots.
+
+```{r aggregate-plots}
+
+# function to aggregate plots
+aggregate_plots = function(plist, pcol, plab) {
+  
+  # subset markers and create shared axis
+  plist = plots[plist] %>%
+    map2(seq_along(.), ~shared_y(.x, .y, pcol))
+  
+  # get number of rows
+  prow = ceiling(length(plist)/pcol)
+  
+  # join plots together
+  composite = ggarrange(plotlist = plist, ncol = pcol, nrow = prow,
+                        legend.grob = leg, legend = "bottom",
+                        widths = c(1.117, rep(1, pcol - 1)))
+  
+  # save figure
+  ggsave(file.path(rdir, paste(nm, plab, "qPCR Plots.pdf")), composite,
+         width = 3.6*pcol, height = 6*prow)
+  
+}
+
+```
+
+Create the composite figures.
+
+```{r create-composite}
+
+# define main and supplemental markers
+mks = list(Main = c('Trem2', 'Tyrobp', 'C1qa', 'Cd68', 'P2ry12', 'C3', 'Cd74', 'Spp1', 'Msr1', 'Tgfbr1'), Supplemental = c('Cx3cr1', 'Gfap', 'Clu', 'huAPOE'))
+
+# adjust for extra LPS genes
+if(nm == "LPS") { mks$Supplemental = c('Tnfa', 'Il1b', mks$Supplemental); rc = c(5, 4) } else rc = c(5, 4)
+
+# create composite figures
+pwalk(list(mks, rc, names(mks)), ~aggregate_plots(...))
+
+```
+
+
+# Correlation Heatmaps
+
+Compute Spearman correlations and visualize the correlation matrix in a heatmap.
+
+```{r correlation-heatmaps}
+
+# subset dCT data
+cor_dat = dCT[, ..lab]
+print(sapply(cor_dat, function(x) agostino.test(as.numeric(x), alternative = "two.sided")$p.value))
+
+# calculate correlation, define new names
+cor_dat = corr.test(cor_dat, method = "spearman", use = "pairwise")$r
+newnames = map(rownames(cor_dat), ~bquote(italic(.(.x))))
+
+# plot heatmap
+hm = pheatmap(cor_dat,
+              color = colorRampPalette(c("#313695", "#8FC3DC", "#E3E0DD", "#F88D52", "#A50026"))(100),
+              breaks = seq(from = -1, to = 1, length.out = 101),
+              cellwidth = 25, cellheight = 25,
+              cluster_cols = TRUE, cluster_rows = TRUE,
+              border_color = NA,
+              show_colnames = TRUE,
+              show_rownames = TRUE,
+              silent = TRUE,
+              labels_row = as.expression(newnames),
+              labels_col = as.expression(newnames))
+
+# save figure
+if(nm == "LPS") ggsave(file.path(rdir, paste(nm, "Correlation Heatmap.pdf")), hm, width = 8, height = 7.77) else ggsave(file.path(rdir, paste(nm, "Correlation Heatmap.pdf")), hm, width = 7, height = 6.8)
+
+```
+
+
+# Save Results
+
+Save statistical results and correlation matrix as worksheets in an Excel workbook.
+
+```{r correlation-matrix}
+
+# create workbook object
+wb = createWorkbook()
+
+# add statistical sheet
+s1 = paste(nm, "Statistical Results")
+addWorksheet(wb, sheetName = s1)
+idx1 = 2:(nrow(output) + 1)
+
+# add correlation sheet
+s2 = paste(nm, "Correlation Matrix")
+addWorksheet(wb, sheetName = s2)
+idx2 = 2:(nrow(cor_dat) + 1)
+
+# define header style
+hs = createStyle(fontColour = "#FFFFFF", fgFill = "#1A1B41", fontName = "Arial Black",
+                 halign = "center", valign = "center", textDecoration = "bold",
+                 border = "bottom", borderStyle = "thick", fontSize = 10)
+
+# define row styles
+r1 = createStyle(fontColour = "#363635", fgFill = "#FFFFFF", fontName = "Arial",
+                 fontSize = 10, halign = "center", valign = "center", border = "TopBottomLeftRight")
+r2 = createStyle(fontColour = "#363635", fgFill = "#F6F4F4", fontName = "Arial",
+                 fontSize = 10, halign = "center", valign = "center", border = "TopBottomLeftRight")
+
+# write output
+writeData(wb, s1, x = output, headerStyle = hs)
+
+# write correlation matrix
+hm$tree_row %>%
+  {.$labels[.$order]} %>%
+  cor_dat[., .] %>%
+  as.data.table(keep.rownames = "") %>%
+  writeData(wb, s2, x = ., headerStyle = hs)
+
+# set column widths and row heights for statistical results
+setColWidths(wb, s1, idx1, 30)
+setRowHeights(wb, s1, idx2, 20)
+
+# set column widths and row heights for correlation matrix
+setColWidths(wb, s2, idx2, 10)
+setColWidths(wb, s2, 1, 10/6)
+setRowHeights(wb, s2, idx2, 60)
+
+# add row styling for statistical results
+addStyle(wb, s1, r1, rows = idx1, cols = 1:ncol(output), gridExpand = T)
+freezePane(wb, s1, firstRow = TRUE, firstCol = TRUE)
+
+# add striped header styling for statistical results
+if(nm == "APOE") {
+  addStyle(wb, s1, createStyle(fgFill = "#CEEAE3"),
+           cols = grep("APOE2/APOE3", colnames(output)), rows = idx1, stack = TRUE, gridExpand = T)
+  addStyle(wb, s1, createStyle(fgFill = "#DECEB8"),
+           cols = grep("APOE3/APOE4", colnames(output)), rows = idx1, stack = TRUE, gridExpand = T)
+  addStyle(wb, s1, createStyle(fgFill = "#FFE9C8"),
+           cols = grep("APOE2/APOE4", colnames(output)), rows = idx1, stack = TRUE, gridExpand = T)
+# } else if(nm == "LPS") {
+#   addStyle(wb, s1, createStyle(fgFill = "#DECEB8"),
+#            cols = grep("PBS", colnames(output)), rows = idx1, stack = TRUE, gridExpand = T)
+#   addStyle(wb, s1, createStyle(fgFill = "#FFE9C8"),
+#            cols = grep("LPS", colnames(output)), rows = idx1, stack = TRUE, gridExpand = T)
+} else {
+  idx1[which(idx1 %% 2 == 0)] %>% addStyle(wb, s1, r2, rows = ., cols = 1:ncol(output), gridExpand = T)
+}
+
+# add header styling for statistical results
+addStyle(wb, s1, createStyle(textDecoration = "italic"), rows = idx1, cols = 1, stack = TRUE)
+addStyle(wb, s1, createStyle(textDecoration = "bold", fgFill = "#ECD6D5"),
+         rows = idx1, cols = 1, stack = TRUE)
+
+# add row styling for correlation matrix
+addStyle(wb, s2, r2, rows = idx2, cols = idx2, gridExpand = T)
+idx2[which(idx2 %% 2 == 0)] %>% { 
+  addStyle(wb, s2, r2, rows = ., cols = ., gridExpand = T)
+  addStyle(wb, s2, r2, rows = ., cols = ., gridExpand = T)
+}
+
+# add header style for correlation matrix
+addStyle(wb, s2, hs, rows = idx2, cols = 1, gridExpand = T)
+addStyle(wb, s2, createStyle(textRotation = 90), rows = idx2, cols = 1, stack = TRUE)
+
+# add conditional formatting
+conditionalFormatting(wb, s2, idx2, idx2, type = "colourScale",
+                      style = c("#5A8AC6", "#FCFCFF", "#F8696B"))
+
+# save workbook
+saveWorkbook(wb, file.path(rdir, paste(nm, "Supplementary Table.xlsx")), overwrite = TRUE)
+
+```
