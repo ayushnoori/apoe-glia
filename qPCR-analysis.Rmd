@@ -1,7 +1,7 @@
 ---
 title: "qPCR Analysis"
 description: |
-  The script below performs analysis of RT-qPCR data.
+ This script performs analysis of RT-qPCR data.
 output:
   distill::distill_article:
     toc: true
