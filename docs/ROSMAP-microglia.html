@@ -2223,7 +2223,7 @@ MSBB
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
-<a href="https://github.com/ayushnoori/apoe-glia" aria-label="Link to source">
+<a href="https://github.com/mindds/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
@@ -2267,10 +2267,7 @@ MSBB
 <li><a href="#c3">C3</a></li>
 <li><a href="#b1">B1</a></li>
 <li><a href="#b3">B3</a></li>
-<li><a href="#overlap">Overlap</a>
-<ul>
-<li><a href="#qpcr-genes">qPCR Genes</a></li>
-</ul></li>
+<li><a href="#overlap">Overlap</a></li>
 </ul></li>
 <li><a href="#statistical-testing">Statistical Testing</a></li>
 <li><a href="#figure-2a-and-2b">Figure 2A and 2B</a></li>
@@ -2314,7 +2311,7 @@ MSBB
 </div>
 </div>
 <h1 id="select-microglia-genes">Select Microglia Genes</h1>
-<p>First, select only microglia genes (n = 574). Of the microglial genes, select only those that exist in ROSMAP (n = 519).</p>
+<p>First, select only microglia genes. Of the microglial genes, select only those that exist in ROSMAP.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>celltype</span> <span class='op'>=</span> <span class='st'>"microglia"</span>
@@ -2554,7 +2551,6 @@ MSBB
 <ul>
 <li>Number of Clusters: 3</li>
 <li>Index of Cluster of Interest: 3</li>
-<li>Number of C0 Genes: 172</li>
 </ul>
 <p>After running spectral clustering, generate Table S1, which is a detailed list of microglia-<em>APOE</em> cluster genes in ROSMAP DLPFC and MSBB STG CERAD 0 subjects.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -2594,7 +2590,6 @@ MSBB
 <ul>
 <li>Number of Clusters: 3</li>
 <li>Index of Cluster of Interest: 3</li>
-<li>Number of C3 Genes: 181</li>
 </ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2620,7 +2615,6 @@ MSBB
 <ul>
 <li>Number of Clusters: 3</li>
 <li>Index of Cluster of Interest: 3</li>
-<li>Number of B1 Genes: 200</li>
 </ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2647,7 +2641,6 @@ MSBB
 <ul>
 <li>Number of Clusters: 3</li>
 <li>Index of Cluster of Interest: 2</li>
-<li>Number of B3 Genes: 174</li>
 </ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2672,15 +2665,6 @@ MSBB
 </div>
 </div>
 <h2 id="overlap">Overlap</h2>
-<p>Intersection of C0 and C3 genes: 87. Intersection of B1 and B3 genes: 69.</p>
-<h3 id="qpcr-genes">qPCR Genes</h3>
-<ul>
-<li>Non-microglial and low-expressed genes: <em>CLU</em>, <em>GFAP</em>, <em>TNF</em>.</li>
-<li>Intersect with C0 genes: <em>TREM2</em>, <em>TYROBP</em>, <em>P2RY12</em>, <em>C1QA</em>, <em>C3</em>, <em>CD68</em>.</li>
-<li>Not in C0 genes: <em>CX3CR1</em>, <em>IL1B</em>.</li>
-<li>Intersect with C3 genes: <em>TREM2</em>, <em>TYROBP</em>.</li>
-<li>Not in C3 genes: <em>P2RY12</em>, <em>CX3CR1</em>, <em>C1QA</em>, <em>C3</em>, <em>CD68</em>, <em>IL1B</em>, <em>TNF</em>.</li>
-</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># hypergeometric tests</span>

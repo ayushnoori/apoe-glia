@@ -2223,7 +2223,7 @@ MSBB
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
-<a href="https://github.com/ayushnoori/apoe-glia" aria-label="Link to source">
+<a href="https://github.com/mindds/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
@@ -2341,8 +2341,20 @@ MSBB
 </div>
 <h1 id="define-clinical-variables">Define Clinical Variables</h1>
 <h2 id="braak">Braak</h2>
-<p>Group levels into 3 categories: * <code>1</code> = <code>Normal/I/II</code> * <code>2</code> = <code>III/IV</code> * <code>3</code> = <code>V/VI</code></p>
-<p>Number of <code>NA</code> values in Braak: 0. Proportion of <code>NA</code> values: 0.</p>
+<p>
+Group levels into three categories:
+</p>
+<ul>
+<li>
+<code>1</code> = <code>Normal/I/II</code>
+</li>
+<li>
+<code>2</code> = <code>III/IV</code>
+</li>
+<li>
+<code>3</code> = <code>V/VI</code>
+</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
@@ -2357,9 +2369,40 @@ MSBB
 </div>
 </div>
 <h2 id="cerad">CERAD</h2>
-<p>Old ROSMAP levels: * <code>1</code> = <code>Definite</code> * <code>2</code> = <code>Probable</code> * <code>3</code> = <code>Possible</code> * <code>4</code> = <code>Normal</code></p>
-<p>Define new levels: * <code>1</code> = <code>Normal</code> * <code>2</code> = <code>Possible</code> * <code>3</code> = <code>Probable</code> * <code>4</code> = <code>Definite</code></p>
-<p>Number of <code>NA</code> values in CERAD: 0. Proportion of <code>NA</code> values: 0.</p>
+<p>
+Old ROSMAP levels:
+</p>
+<ul>
+<li>
+<code>1</code> = <code>Definite</code>
+</li>
+<li>
+<code>2</code> = <code>Probable</code>
+</li>
+<li>
+<code>3</code> = <code>Possible</code>
+</li>
+<li>
+<code>4</code> = <code>Normal</code>
+</li>
+</ul>
+<p>
+Define new levels:
+</p>
+<ul>
+<li>
+<code>1</code> = <code>Normal</code>
+</li>
+<li>
+<code>2</code> = <code>Possible</code>
+</li>
+<li>
+<code>3</code> = <code>Probable</code>
+</li>
+<li>
+<code>4</code> = <code>Definite</code>
+</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
@@ -2374,8 +2417,20 @@ MSBB
 </div>
 </div>
 <h2 id="apoe">APOE</h2>
-<p>Group levels into 3 categories: * <code>E2</code> = <code>E2/E2</code> and <code>E2/E3</code> * <code>E3</code> = <code>E3/E3</code> * <code>E4</code> = <code>E2/E4</code>, <code>E3/E4</code>, and <code>E4/E4</code></p>
-<p>Number of <code>NA</code> values in APOE: 1. Proportion of <code>NA</code> values: 0.002.</p>
+<p>
+Group levels into three categories:
+</p>
+<ul>
+<li>
+<code>E2</code> = <code>E2/E2</code> and <code>E2/E3</code>
+</li>
+<li>
+<code>E3</code> = <code>E3/E3</code>
+</li>
+<li>
+<code>E4</code> = <code>E2/E4</code>, <code>E3/E4</code>, and <code>E4/E4</code>
+</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
@@ -2390,7 +2445,20 @@ MSBB
 </div>
 </div>
 <h2 id="e4-count">E4 Count</h2>
-<p>Group levels into 3 categories: * <code>0</code> = <code>E2/E2</code>, <code>E3/E3</code>, and <code>E2/E3</code> * <code>1</code> = <code>E2/E4</code> and <code>E3/E4</code> * <code>2</code> = <code>E4/E4</code></p>
+<p>
+Group levels into three categories:
+</p>
+<ul>
+<li>
+<code>0</code> = <code>E2/E2</code>, <code>E3/E3</code>, and <code>E2/E3</code>
+</li>
+<li>
+<code>1</code> = <code>E2/E4</code> and <code>E3/E4</code>
+</li>
+<li>
+<code>2</code> = <code>E4/E4</code>
+</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
@@ -2404,7 +2472,20 @@ MSBB
 </div>
 </div>
 <h2 id="e2-count">E2 Count</h2>
-<p>Group levels into 3 categories: * <code>0</code> = <code>E4/E4</code>, <code>E3/E3</code>, and <code>E3/E4</code> * <code>1</code> = <code>E2/E4</code> and <code>E2/E3</code> * <code>2</code> = <code>E2/E2</code></p>
+<p>
+Group levels into three categories:
+</p>
+<ul>
+<li>
+<code>0</code> = <code>E4/E4</code>, <code>E3/E3</code>, and <code>E3/E4</code>
+</li>
+<li>
+<code>1</code> = <code>E2/E4</code> and <code>E2/E3</code>
+</li>
+<li>
+<code>2</code> = <code>E2/E2</code>
+</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>

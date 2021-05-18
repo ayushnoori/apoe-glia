@@ -49,7 +49,7 @@ mData = expSet$mData
 
 # Select Microglia Genes
 
-First, select only microglia genes (n = 574). Of the microglial genes, select only those that exist in ROSMAP (n = 519).
+First, select only microglia genes. Of the microglial genes, select only those that exist in ROSMAP.
 
 ```{r select-microglia}
 
@@ -311,7 +311,6 @@ avez.B3 = to_ave_z(z.B3)
 ## C0
 * Number of Clusters: 3
 * Index of Cluster of Interest: 3
-* Number of C0 Genes: 172
 
 After running spectral clustering, generate Table S1, which is a detailed list of microglia-*APOE* cluster genes in ROSMAP DLPFC and MSBB STG CERAD 0 subjects.
 
@@ -351,7 +350,6 @@ fwrite(TableS1, "../results/TableS1.csv", row.names = F)
 ## C3
 * Number of Clusters: 3
 * Index of Cluster of Interest: 3
-* Number of C3 Genes: 181
 
 ```{r c3-clustering}
 
@@ -376,7 +374,6 @@ length(C3.genes)
 ## B1
 * Number of Clusters: 3
 * Index of Cluster of Interest: 3
-* Number of B1 Genes: 200
 
 ```{r b1-clustering}
 
@@ -402,7 +399,6 @@ length(B1.genes)
 ## B3
 * Number of Clusters: 3
 * Index of Cluster of Interest: 2
-* Number of B3 Genes: 174
 
 ```{r b3-clustering}
 
@@ -426,16 +422,7 @@ length(B3.genes)
 
 ```
 
-
 ## Overlap
-Intersection of C0 and C3 genes: 87. Intersection of B1 and B3 genes: 69.
-
-### qPCR Genes
-* Non-microglial and low-expressed genes: *CLU*, *GFAP*, *TNF*.
-* Intersect with C0 genes: *TREM2*, *TYROBP*, *P2RY12*, *C1QA*, *C3*, *CD68*.
-* Not in C0 genes: *CX3CR1*, *IL1B*.
-* Intersect with C3 genes: *TREM2*, *TYROBP*.
-* Not in C3 genes: *P2RY12*, *CX3CR1*, *C1QA*, *C3*, *CD68*, *IL1B*, *TNF*.
 
 ```{r hypergeometric-tests}
 

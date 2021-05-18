@@ -4,12 +4,12 @@ description: |
   APOE Glia
 theme: theme.css
 favicon: images/favicon.ico
-base_url: https://ayushnoori.github.io/apoe-glia
+base_url: https://mindds.github.io/apoe-glia
 repository_url: https://github.com/ayushnoori/apoe-glia
 output_dir: "docs"
 navbar:
   search: false
-  source_url: https://github.com/ayushnoori/apoe-glia
+  source_url: https://github.com/mindds/apoe-glia
   right:
     - text: "Home"
       href: index.html

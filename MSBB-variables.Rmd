@@ -140,10 +140,12 @@ all(cov$individualIdentifier == colnames(msbb))
 
 ## Braak
 
-Group levels into 3 categories:
-* `1` = `Normal/I/II`
-* `2` = `III/IV`
-* `3` = `V/VI`
+<p>Group levels into three categories:</p>
+<ul>
+  <li>`1` = `Normal/I/II`</li>
+  <li>`2` = `III/IV`</li>
+  <li>`3` = `V/VI`</li>
+</ul>
 
 ```{r braak}
 
@@ -159,17 +161,21 @@ table(cov$C, cov$Braak)
 
 ## CERAD
 
-Old MSBB levels:
-* `1` = `Normal`
-* `2` = `Definite`
-* `3` = `Probable`
-* `4` = `Possible`
+<p>Old MSBB levels:</p>
+<ul>
+  <li>`1` = `Normal`</li>
+  <li>`2` = `Definite`</li>
+  <li>`3` = `Probable`</li>
+  <li>`4` = `Possible`</li>
+</ul>
 
-Define new levels:
-* `1` = `Normal`
-* `2` = `Possible`
-* `3` = `Probable`
-* `4` = `Definite`
+<p>Define new levels:</p>
+<ul>
+  <li>`1` = `Normal`</li>
+  <li>`2` = `Possible`</li>
+  <li>`3` = `Probable`</li>
+  <li>`4` = `Definite`</li>
+</ul>
 
 ```{r cerad}
 
@@ -185,9 +191,11 @@ table(cov$C, cov$CERAD)
 
 ## Raw APOE
 
-Define 2 categories:
-* `1` = `E2/E2` and `E3/E3`
-* `2` = `E3/E4`, `E2/E4`, and `E4/E4`
+<p>Define three categories:</p>
+<ul>
+  <li>`1` = `E2/E2` and `E3/E3`</li>
+  <li>`2` = `E3/E4`, `E2/E4`, and `E4/E4`</li>
+</ul>
 
 `NA` values will be treated as `E3/E3`.
 
@@ -204,13 +212,12 @@ cov[is.na(RawAPOE), RawAPOE := "33"]
 
 ## APOE
 
-Group levels into 3 categories:
-* `E2` = `E2/E2` and `E2/E3`
-* `E3` = `E3/E3`
-* `E4` = `E2/E4`, `E3/E4`, and `E4/E4`
-
-Number of `NA` values in APOE: 1.
-Proportion of `NA` values: 0.002.
+<p>Group levels into three categories:</p>
+<ul>
+  <li>`E2` = `E2/E2` and `E2/E3`</li>
+  <li>`E3` = `E3/E3`</li>
+  <li>`E4` = `E2/E4`, `E3/E4`, and `E4/E4`</li>
+</ul>
 
 ```{r apoe}
 
@@ -225,10 +232,12 @@ table(cov$E, cov$RawAPOE)
 
 ## E4 Count
 
-Group levels into 3 categories:
-* `0` = `E2/E2`, `E3/E3`, and `E2/E3`
-* `1` = `E2/E4` and `E3/E4`
-* `2` = `E4/E4`
+<p>Group levels into three categories:</p>
+<ul>
+  <li>`0` = `E2/E2`, `E3/E3`, and `E2/E3`</li>
+  <li>`1` = `E2/E4` and `E3/E4`</li>
+  <li>`2` = `E4/E4`</li>
+</ul>
 
 ```{r e4-count}
 
@@ -244,10 +253,12 @@ table(cov$E4num, cov$RawAPOE)
 
 ## E2 Count
 
-Group levels into 3 categories:
-* `0` = `E4/E4`, `E3/E3`, and `E3/E4`
-* `1` = `E2/E4` and `E2/E3`
-* `2` = `E2/E2`
+<p>Group levels into three categories:</p>
+<ul>
+  <li>`0` = `E4/E4`, `E3/E3`, and `E3/E4`</li>
+  <li>`1` = `E2/E4` and `E2/E3`</li>
+  <li>`2` = `E2/E2`</li>
+</ul>
 
 ```{r e2-count}
 

@@ -50,7 +50,7 @@ mData = expSet$mData
 
 # Select Astrocyte Genes
 
-First, select only astrocyte genes (n = 405). Of the microglial genes, select only those that exist in ROSMAP (n = 397).
+First, select only astrocyte genes. Of the microglial genes, select only those that exist in ROSMAP.
 
 ```{r select-astrocyte}
 
@@ -187,7 +187,6 @@ avez.B3 = to_ave_z(z.B3)
 ## C0
 * Number of Clusters: 5
 * Index of Cluster of Interest: 4 and 1
-* Number of C0 Genes: 69 in Cluster #4, 75 in Cluster #1
 
 Note that Cluster #4 above was originally Cluster #3; they are switched for convenience.
 
@@ -221,7 +220,6 @@ length(C0_c1.genes)
 ## C3
 * Number of Clusters: 5
 * Index of Cluster of Interest: 5
-* Number of C3 Genes: 68
 
 ```{r c3-clustering}
 
@@ -246,7 +244,6 @@ length(C3.genes)
 ## B1
 * Number of Clusters: 5
 * Index of Cluster of Interest: 6
-* Number of B1 Genes: 70
 
 ```{r b1-clustering}
 
@@ -271,7 +268,6 @@ length(B1.genes)
 ## B3
 * Number of Clusters: 5
 * Index of Cluster of Interest: 1
-* Number of B3 Genes: 76
 
 ```{r b4-clustering}
 

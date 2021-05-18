@@ -12,13 +12,13 @@ Our codebase is available on GitHub at [mindds.github.io/apoe-glia](https://mind
 * [Models](https://mindds.github.io/apoe-glia/models.html)
 * [Spectral Clustering](https://mindds.github.io/apoe-glia/spectral-clustering.html)
 
-### Religious Orders Study and Memory and Aging Project (ROSMAP)
+### ROSMAP
 * [Define Variables](https://mindds.github.io/apoe-glia/ROSMAP-variables.html)
 * [Pre-Process Data](https://mindds.github.io/apoe-glia/ROSMAP-preprocess.html)
 * [Microglia Analysis](https://mindds.github.io/apoe-glia/ROSMAP-microglia.html)
 * [Astrocyte Analysis](https://mindds.github.io/apoe-glia/ROSMAP-astrocyte.html)
 
-### Mount Sinai Brain Bank (MSBB)
+### MSBB
 * [Define Variables](https://mindds.github.io/apoe-glia/MSBB-variables.html)
 * [Merge Data](https://mindds.github.io/apoe-glia/MSBB-merge.html)
 * [Microglia Analysis](https://mindds.github.io/apoe-glia/MSBB-microglia.html)
@@ -27,7 +27,7 @@ Our codebase is available on GitHub at [mindds.github.io/apoe-glia](https://mind
 * [qPCR Analysis](https://mindds.github.io/apoe-glia/qPCR-analysis.html)
 
 # Data Availability
-The ROSMAP and MSBB RNA-seq datasets are available from the AMP-AD Knowledge Portal (DOI: [10.7303/syn3388564](https://doi.org/10.7303/syn3388564) and [10.7303/syn3157743](https://doi.org/10.7303/syn3157743), respectively). Data from the knock-in mice are available from our [GitHub repository](https://github.com/mindds/apoe-glia).
+The Religious Orders Study and Memory and Aging Project (ROSMAP) and Mount Sinai Brain Bank (MSBB) RNA-seq datasets are available from the AMP-AD Knowledge Portal (DOI: [10.7303/syn3388564](https://doi.org/10.7303/syn3388564) and [10.7303/syn3157743](https://doi.org/10.7303/syn3157743), respectively). Data from the knock-in mice are available from our [GitHub repository](https://github.com/mindds/apoe-glia).
 
 # Citation
 Alberto Serrano-Pozo, MD PhD<sup>1,2,3</sup>, Zhaozhi Li, MS<sup>1,2</sup>, Ayush Noori<sup>1,2</sup>, Aziz Mezlini, PhD<sup>1,2,3</sup>, Liang Li, BS<sup>1,2</sup>, Huong N. Nguyen, BS<sup>1,2</sup>, Rosemary J. Jackson, PhD<sup>1,2,3</sup>, Bradley T. Hyman, MD PhD<sup>1,2,3</sup>, Sudeshna Das, PhD<sup>1,2,3</sup>. Effect of *APOE* Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease.
