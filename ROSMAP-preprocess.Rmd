@@ -1,0 +1,96 @@
+---
+title: "Pre-Process ROSMAP Data"
+description: |
+ This script removes low-expressed ROSMAP genes and adjusts by age, sex, and post-mortem interval (PMI).
+output:
+  distill::distill_article:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Dependencies
+
+Load requisite packages.
+
+```{r load-packages}
+
+library(data.table)
+
+```
+
+
+# Load Data
+
+Load `.Rdata` object saved by prior script.
+
+```{r load-data}
+
+# load data
+load("../Data/ROSMAP-24.Rdata")
+rosmap_fpkm = rosmap$fpkm
+cov = rosmap$cov
+
+```
+
+
+# Filter Genes
+
+Remove low-expressed genes.
+
+```{r filter-genes}
+
+# remove low expressed genes
+gene_sel = rowMeans(rosmap_fpkm) > 0.1
+rosmap_fpkm = rosmap_fpkm[gene_sel, ]
+
+```
+
+
+# Adjust and Transform
+
+Adjust by age, sex, and post-mortem interval (PMI), then log-transform data.
+
+```{r adjust-covariates}
+
+# create empty matrix to populate
+adj_exp = matrix(NA, ncol = ncol(rosmap_fpkm), nrow = nrow(rosmap_fpkm))
+colnames(adj_exp) = cov$projid
+rownames(adj_exp) = rownames(rosmap_fpkm)
+
+# adjust by age, sex, and PMI
+msex = cov$msex
+age_at_death = cov$age_at_death
+pmi = cov$pmi
+
+# impute missing values with mean
+pmi[is.na(pmi)] = mean(pmi, na.rm = T)
+
+```
+
+Log-transform data.
+
+```{r log-transform}
+
+# log2(fpkm + 0.0001) adjusted by age, sex, and PMI
+for(gene in rownames(rosmap_fpkm)){
+  exp = log2(as.numeric(rosmap_fpkm[gene,]) + 0.1^4)
+  lm_fit = lm(exp ~ msex + age_at_death + pmi)
+  adj_exp[gene, ] = lm_fit$residuals
+}
+
+```
+
+
+# Save Data
+
+```{r save-data}
+
+# save data
+expSet = list(mData = adj_exp,
+              cov = cov)
+save(expSet, file = "../Data/ROSMAP-24-adj-low.expr.genes.removed.Rdata")
+
+```

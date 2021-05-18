@@ -1,0 +1,694 @@
+---
+title: "ROSMAP Astrocyte Analysis"
+description: |
+ This script performs analysis of ROSMAP astrocyte data.
+output:
+  distill::distill_article:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Dependencies
+
+Load requisite packages.
+
+Load requisite packages. Note that package [`cttobin/ggthemr`](https://github.com/cttobin/ggthemr) hosted on GitHub is used to provide `ggplot2` themes. This package can be downloaded via `devtools::install_github("cttobin/ggthemr")`.
+
+```{r load-packages}
+
+rm(list = ls())
+require(ggVennDiagram)
+require(limma)
+require(latex2exp)
+require(ComplexHeatmap)
+require(data.table)
+require(pheatmap)
+require(ggplot2)
+require(gridExtra)
+require(ggthemr)
+require(SNFtool)
+require(circlize)
+require(patchwork)
+require(cowplot)
+require(ggpubr)
+
+ds = "ROSMAP"
+dtype = "log2FPKM"
+load("../Data/ROSMAP-24-adj-low.expr.genes.removed.Rdata")
+
+source("models.R")
+source("spectral-clustering.R")
+
+# load expression data 
+mData = expSet$mData
+
+```
+
+
+# Select Astrocyte Genes
+
+First, select only astrocyte genes (n = 405). Of the microglial genes, select only those that exist in ROSMAP (n = 397).
+
+```{r select-astrocyte}
+
+celltype = "astro"
+
+# select only astrocyte genes
+genes = readLines("../Data/Astrocyte Genes.txt")
+
+# select astrocyte genes that exist in ROSMAP
+annot = fread("../Data/ENSEMBL GRCh38.p7.csv")
+annot = unique(annot[GeneSymbol %in% genes,])
+ensembl_ids = intersect(rownames(mData), annot$EnsemblID)
+
+annot = unique(annot[EnsemblID %in% ensembl_ids,])
+# remove duplicated genes
+annot = annot[!duplicated(GeneSymbol), ]
+ensembl_ids = annot$EnsemblID
+
+any(duplicated(ensembl_ids)) # no duplicated ids
+any(is.na(ensembl_ids))      # no NA
+length(ensembl_ids)
+
+```
+
+
+# Pre-Processing
+
+```{r pre-processing}
+
+# select interesting genes
+mData = mData[annot$EnsemblID, ]
+all(rownames(mData) == annot$EnsemblID)
+rownames(mData) = annot$GeneSymbol
+
+# set metadata
+cov = expSet$cov
+
+```
+
+
+# Run Models
+* Model 1: `exp ~ APOE + CERAD | exp ~ APOE + Braak`
+* Model 2 baseline: `C0E4-C0E3, C0E2-C0E3 | B1E4-B1E3, B1E2-B1E3`
+* Model 3: `C3E4-C3E3, C3E2-C3E3 | B3E4-B3E3, B3E2-B3E3`
+
+## Model 1
+
+Run Model 1, which is `exp ~ APOE + CERAD | exp ~ APOE + Braak`. 
+
+```{r model-1}
+
+# run Model 1
+tT_CERAD = run_model1(mData, cov$C, cov$E, annot)
+tT_Braak = run_model1(mData, cov$B, cov$E, annot)
+
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol) 
+
+TableS2.astro = tT_CERAD[, .(EnsemblID, GeneSymbol, E4vsE3_logFC, E4vsE3_P.Value, E2vsE3_logFC, E2vsE3_P.Value)]
+
+```
+
+## Model 2
+
+Run Model 2 baseline, which is `C0E4-C0E3, C0E2-C0E3 | B1E4-B1E3, B1E2-B1E3`. 
+
+```{r model-2}
+
+# run Model 2
+tT2_CERAD = run_model2("CERAD", mData, cov$C, cov$E, annot) 
+tT2_Braak = run_model2("Braak", mData, cov$B, cov$E, annot)
+
+length(tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) 
+length(tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+length(tT2_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+length(tT2_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+```
+
+## Model 3
+
+Run Model 3, which is `C3E4-C3E3, C3E2-C3E3 | B3E4-B3E3, B3E2-B3E3`.
+
+```{r model-3}
+
+# run Model 3
+tT3_CERAD = run_model3("CERAD", mData, cov$C, cov$E, annot) 
+tT3_Braak = run_model3("Braak", mData, cov$B, cov$E, annot)
+
+length(tT3_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol) 
+length(tT3_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+length(tT3_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+length(tT3_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+```
+
+
+# Z-Score Analysis
+
+Compute z-scores.
+
+```{r compute-z}
+
+z.C0 = to_z_score("C", 0, mData, cov)
+z.C3 = to_z_score("C", 3, mData, cov)
+z.B1 = to_z_score("B", 1, mData, cov)
+z.B3 = to_z_score("B", 3, mData, cov)
+
+```
+
+Calculate average z-scores.
+
+```{r average-z}
+
+avez.C0 = to_ave_z(z.C0)
+avez.C3 = to_ave_z(z.C3)
+avez.B1 = to_ave_z(z.B1)
+avez.B3 = to_ave_z(z.B3)
+
+```
+
+
+# Spectral Clustering
+
+## C0
+* Number of Clusters: 5
+* Index of Cluster of Interest: 4 and 1
+* Number of C0 Genes: 69 in Cluster #4, 75 in Cluster #1
+
+Note that Cluster #4 above was originally Cluster #3; they are switched for convenience.
+
+```{r c0-clustering}
+
+# spectral clustering
+c = 4; k = 5
+clust.C0 = spectral_clustering(avez.C0, k)
+clust.C0$clustA = as.factor(clust.C0$clustA)
+
+# switch clusters 3 and 4 for convenience
+levels(clust.C0$clustA) = c("1", "2", "4", "3", "5")
+clust.C0$clustA = as.numeric(as.character(clust.C0$clustA))
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.C0$clustA))
+rownames(annot_row) = rownames(clust.C0$zMtx)
+pheatmap(clust.C0$zMtx[order(clust.C0$clustA),],
+         annotation_row = annot_row[order(clust.C0$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+C0_c4.genes = sort(rownames(clust.C0$zMtx)[clust.C0$clustA == c])
+length(C0_c4.genes)
+C0_c1.genes = sort(rownames(clust.C0$zMtx)[clust.C0$clustA == 1])
+length(C0_c1.genes)
+
+```
+
+## C3
+* Number of Clusters: 5
+* Index of Cluster of Interest: 5
+* Number of C3 Genes: 68
+
+```{r c3-clustering}
+
+# spectral clustering
+c = 5; k = 5
+clust.C3 = spectral_clustering(avez.C3, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.C3$clustA))
+rownames(annot_row) = rownames(clust.C3$zMtx)
+pheatmap(clust.C3$zMtx[order(clust.C3$clustA),],
+         annotation_row = annot_row[order(clust.C3$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+C3.genes = sort(rownames(clust.C3$zMtx)[clust.C3$clustA == c])
+length(C3.genes)
+
+```
+
+## B1
+* Number of Clusters: 5
+* Index of Cluster of Interest: 6
+* Number of B1 Genes: 70
+
+```{r b1-clustering}
+
+# spectral clustering
+k = 5; c = 5
+clust.B1 = spectral_clustering(avez.B1, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.B1$clustA))
+rownames(annot_row) = rownames(clust.B1$zMtx)
+pheatmap(clust.B1$zMtx[order(clust.B1$clustA),],
+         annotation_row = annot_row[order(clust.B1$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+B1.genes = sort(rownames(clust.B1$zMtx)[clust.B1$clustA == c])
+length(B1.genes)
+
+```
+
+## B3
+* Number of Clusters: 5
+* Index of Cluster of Interest: 1
+* Number of B3 Genes: 76
+
+```{r b4-clustering}
+
+# spectral clustering
+k = 5; c = 1
+clust.B3 = spectral_clustering(avez.B3, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.B3$clustA))
+rownames(annot_row) = rownames(clust.B3$zMtx)
+pheatmap(clust.B3$zMtx[order(clust.B3$clustA),],
+         annotation_row = annot_row[order(clust.B3$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+B3.genes = sort(rownames(clust.B3$zMtx)[clust.B3$clustA == c])
+length(B3.genes)
+
+```
+
+## Overlap
+
+```{r hypergeometric-tests}
+
+# hypergeometric tests
+phyper_test(C0_c4.genes, B1.genes)
+phyper_test(C3.genes, B3.genes)
+phyper_test(C0_c4.genes, C3.genes)
+phyper_test(B1.genes, B3.genes)
+
+```
+
+
+# Save Results
+
+Save results to Excel files.
+
+```{r save-results}
+
+# CERAD genes
+xlsx::write.xlsx(C0_c4.genes, 
+    "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+                 sheetName = "C0_clust4(k=5)", append = TRUE, row.names = F, 
+                 col.names = F)
+xlsx::write.xlsx(C0_c1.genes, 
+    "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+                 sheetName = "C0_clust1(k=5)", append = TRUE, row.names = F, 
+                 col.names = F)
+
+xlsx::write.xlsx(C3.genes, 
+    "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+                 sheetName = "C3_clust1(k=5)", append = TRUE, row.names = F, 
+                 col.names = F)
+
+length(intersect(C0_c4.genes, C3.genes)) 
+xlsx::write.xlsx(intersect(C0_c4.genes, C3.genes), 
+      "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+      sheetName = "intersect C0_cluster3&C4", append = TRUE, row.names = F, col.names = F)
+
+# Braak genes
+xlsx::write.xlsx(B1.genes, 
+    "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+                 sheetName = "B1_clust5(k=5)", append = TRUE, row.names = F, 
+                 col.names = F)
+
+xlsx::write.xlsx(B3.genes, 
+    "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+                 sheetName = "B3_clust1(k=5)", append = TRUE, row.names = F, 
+                 col.names = F)
+
+length(intersect(B1.genes, B3.genes)) 
+xlsx::write.xlsx(intersect(B1.genes, B3.genes), 
+      "../results/ROSMAP_astrocyte_new_cluster_remove.low.expressed.genes.xlsx", 
+      sheetName = "intersect B1&B3", append = TRUE, row.names = F, col.names = F)
+
+```
+
+# Venn Diagram
+
+Prepare Venn diagram.
+
+```{r venn-diagram}
+
+rosmap_genes = list(
+  `C0 clust4` = C0_c4.genes,
+  C3 = C3.genes,
+  B1 = B1.genes,
+  B3 = B3.genes
+)
+ggVennDiagram(rosmap_genes, label_alpha=0)
+ggsave("../results/venn_rosmap_astrocyte.pdf")
+
+ggVennDiagram(rosmap_genes[c("C0 clust4", "C3")], label_alpha=0)
+ggsave("../results/venn_rosmap_astrocyte_C0_c4&C3.pdf")
+ggVennDiagram(rosmap_genes[c("B1", "B3")], label_alpha=0)
+ggsave("../results/venn_rosmap_astrocyte_B1&B3.pdf")
+
+```
+
+
+# Statistical Testing
+
+Statistical testing of astrocyte-APOE genes across *APOE* genotypes. Average of Z-scores for interested genes for each individual as outcome, with *APOE* genotype as a covariate. Use *APOE* `E3/E3` as the baseline.
+
+```{r statistical-testing}
+
+# C0 test
+cov_C0 = cov[C == 0,]
+all(cov_C0$individualIdentifier == colnames(z.C0$z))
+test_avez(z.C0$z, C0_c4.genes, cov_C0)
+
+# C3 test
+cov_C3 = cov[C == 3,]
+all(cov_C3$individualIdentifier == colnames(z.C3$z))
+test_avez(z.C3$z, C3.genes, cov_C3)
+
+# B1 test
+cov_B1 = cov[B == 1,]
+all(cov_B1$individualIdentifier == colnames(z.B1$z))
+test_avez(z.B1$z, B1.genes, cov_B1)
+
+# B3 test
+cov_B3 = cov[B == 3,]
+all(cov_B1$individualIdentifier == colnames(z.B1$z))
+test_avez(z.B3$z, B3.genes, cov_B3)
+
+```
+
+
+# Figure 4A and 4B
+* Figure 4A: Individual z-score heatmap for ROSMAP C0 subjects for Cluster #1.
+* Figure 4B: Individual z-score heatmap for ROSMAP C0 subjects for Cluster #4.
+
+```{r figure-4ab}
+
+# prepare data
+zC0 = z.C0$z
+zC0 = zC0[order(clust.C0$clustA),]
+zC0.genes = zC0[rownames(zC0) %in% C0_c4.genes,]
+
+# color function
+colFun1 = colorRamp2(c(-1, -0.5, 0, 0.5, 1), 
+            c("#4575b4", "#74add1", "white", "#f46d43", "#d73027"))
+colFun2 = colorRamp2(c(-4, -2, 0, 2, 4), 
+            c("#0000FFFF", "#7C50FDFF", "#EEEEEEFF", "#FF6545FF", "#FF0000FF"))
+clusters = c(1,4)
+
+# Figure 4
+panel_fun = function(index, nm) {
+  if(index %in% which(sort(clust.C0$clustA) %in% clusters)){
+    pushViewport(viewport())
+    grid.rect(gp = gpar(fill = "white", col = "white"))
+    grid.lines(c(0, 1, 1, 0), c(0, 0, 1, 1), gp = gpar(col = "#AAAAAA"), 
+               default.units = "npc")
+    hD = zC0
+    topAnnot = HeatmapAnnotation(z = anno_barplot(colMeans(hD[index,]), 
+                smooth = TRUE, axis_param = list(gp = gpar(fontsize = 5))),
+                annotation_height = unit(0.7, "cm"))
+    h = Heatmap(hD[index,], 
+              name = "z-score",
+              col = colFun2,
+              show_row_names = FALSE,
+              show_column_names = FALSE,
+              cluster_rows = TRUE,
+              show_heatmap_legend = FALSE,
+              column_split = factor(z.C0$E, levels = c("E2", "E3", "E4")),
+              cluster_column_slices = FALSE,
+              column_title_gp =  gpar(col = "black", fontsize = 12),
+              show_column_dend = TRUE,
+              show_row_dend = TRUE,
+              border = "#AAAAAA",
+              row_dend_side = "right",
+              height = unit(4.2, "cm"),
+              column_dend_height = unit(0.7, "cm"),
+              row_dend_width = unit(0.7, "cm"),
+              width = unit(18, "cm"),
+              top_annotation = topAnnot
+              )
+    draw(h, newpage = FALSE)
+    popViewport()       
+  }
+}
+
+# box for Figure 4
+zoom_idx1 = which(rownames(zC0) %in% C0_c1.genes)
+zoom_idx2 = which(rownames(zC0) %in% C0_c4.genes)
+layer_fun = function(j, i, x, y, width, height, fill) {
+  v = pindex(zC0, i, j)
+  if(i %in% zoom_idx2) {
+    grid.rect(gp = gpar(lwd = 2, col = "black"))
+  }
+  if(i %in% zoom_idx1) {
+    grid.rect(gp = gpar(lwd = 2, col = "black"))
+  }
+}
+
+anno = function(c, clust){
+ return(anno_zoom(align_to = which(clust %in% c), 
+                 which = "row", 
+                 panel_fun = panel_fun, 
+                 width = unit(21.5, "cm"), 
+                 gap = unit(5, "cm"),
+                 size = unit(7, "cm"),
+                 link_width = unit(2, "cm"),
+                 link_height = unit(5, "cm"),
+                 link_gp = gpar(fill = "white", col = "#AAAAAA"), internal_line = FALSE)) 
+}
+
+
+# legend
+lgd.h = Legend(col_fun = colFun1, title = "A: Average z-score", border = "black", 
+               legend_width = unit(9.2, "cm"), 
+               direction = "horizontal")
+
+lgd.have = Legend(col_fun = colFun2, title = "B: z-score", border = "black", 
+                  legend_width = unit(9.2, "cm"), 
+                  direction = "horizontal")
+
+pd = packLegend(lgd.h, lgd.have, 
+                column_gap = unit(1, "cm"),
+                direction = "horizontal")
+
+
+# Figure 4A
+pdf("../results/Figure4AB.cluster1.pdf", width = 11)
+Heatmap(as.matrix(avez.C0[order(clust.C0$clustA), c("E2", "E3", "E4")]), 
+        col = colFun1,
+        cluster_columns = FALSE,
+        cluster_rows = FALSE,
+        show_row_names = FALSE,
+        show_column_names = TRUE,
+        right_annotation = rowAnnotation(foo = anno(1, sort(clust.C0$clustA))),
+        row_split = sort(clust.C0$clustA), 
+        column_names_side = "bottom",
+        layer_fun = layer_fun,
+        show_heatmap_legend = FALSE,
+        width = unit(5, "cm"),
+        column_names_rot = 0,
+        column_names_centered = T,
+        row_title_gp = gpar(fontsize = 11)
+)
+draw(pd, x = unit(18, "cm"), y = unit(0.95, "cm"))
+grid.text("A", x = unit(0.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=16))
+grid.text("B", x = unit(8.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=16))
+dev.off()
+
+# Figure 4B
+pdf("../results/Figure4AB_cluster4.pdf", width = 11)
+Heatmap(as.matrix(avez.C0[order(clust.C0$clustA), c("E2", "E3", "E4")]), 
+        col = colFun1,
+        cluster_columns = FALSE,
+        cluster_rows = FALSE,
+        show_row_names = FALSE,
+        show_column_names = TRUE,
+        right_annotation = rowAnnotation(foo = anno(4, sort(clust.C0$clustA))),
+        row_split = sort(clust.C0$clustA), 
+        column_names_side = "bottom",
+        layer_fun = layer_fun,
+        show_heatmap_legend = FALSE,
+        width = unit(5, "cm"),
+        column_names_rot = 0,
+        column_names_centered = T,
+        row_title_gp = gpar(fontsize = 11)
+)
+draw(pd, x = unit(18, "cm"), y = unit(0.95, "cm"))
+grid.text("A", x = unit(0.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=16))
+grid.text("B", x = unit(8.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=16))
+dev.off()
+
+```
+
+
+# Figure 4C and 4D
+
+Violin plots where each dot represents a gene.
+
+```{r figure-4cd}
+
+my_violin = function(genes){
+        mDataZ.c = z.C0$z[genes, ]
+        mDataZ.c.e2 = mDataZ.c[,z.C0$E == "E2"]
+        mDataZ.c.e3 = mDataZ.c[,z.C0$E == "E3"]
+        mDataZ.c.e4 = mDataZ.c[,z.C0$E == "E4"]
+
+        my.dat = list(`2` = colMeans(mDataZ.c.e2), 
+                      `3` = colMeans(mDataZ.c.e3), 
+                      `4` = colMeans(mDataZ.c.e4))
+        my.df = reshape2::melt(my.dat)
+        my.df$L1 = as.numeric(my.df$L1)
+        colnames(my.df) = c("z-score", "APOE")
+        my.df$Genes = unlist(lapply(my.dat, function(x) names(x)))
+
+        ggthemr('greyscale')
+        colnames(my.df) = c("z-score", "APOE.num", "Genes")
+        my.df$APOE = as.factor(my.df$APOE.num)
+  
+        to_swap = c("#62bba5", # E4
+                    "#785d37", # E3
+                    "#ffb84d") # E2
+        
+        # figure label
+        APOE_label = c("\u03B52", "\u03B53", "\u03B54")
+        names(APOE_label) = c("E2", "E3", "E4")
+  
+        to_swap = c("#62bba5", # E4
+            "#785d37", # E3
+            "#ffb84d") # E2
+  
+# violin plot
+fig4c = ggplot(my.df, aes(x = APOE.num, y = `z-score`, color = APOE)) +
+  geom_violin(fill = "white", trim = FALSE) +
+  geom_quasirandom(alpha = 0.3, width = 0.1, dodge.width = 0.9, varwidth = TRUE) +
+  scale_color_manual(values = c("#62bba5", "#785d37", "#ffb84d")) +
+  labs(y = "Average Z-Score", x = "APOE Genotype") +
+  theme(text = element_text(size = 14),
+        legend.position="bottom", legend.direction = "horizontal",
+        axis.title.x = element_text(face = "bold", size = 11),
+        axis.title.y = element_text(face = "bold", size = 11),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_text(face = "bold")) +
+  stat_summary(fun.data=mean_cl_normal, geom="errorbar", width=0.2, position = position_dodge(0.9), color = "black")
+        
+        return(fig4c)
+}
+
+fig4c.c1 = my_violin(C0_c1.genes)
+fig4c.c4 = my_violin(C0_c4.genes)
+
+fig4c.c1.p = annotate_figure(fig4c.c1, fig.lab = "C",
+                             fig.lab.size = 16)
+fig4c.c4.p = annotate_figure(fig4c.c4, fig.lab = "D", 
+                             fig.lab.size = 16)
+
+ggsave("../results/Figure4C_0505.pdf", fig4c.c1.p, width = 5, height = 4, device=cairo_pdf)
+ggsave("../results/Figure4D_0505.pdf", fig4c.c4.p, width = 5, height = 4, device=cairo_pdf)
+```
+
+
+# Figure 4E and 4F
+
+E4 vs. E3 average Z-score line plot from C0 to C3. Note that the warnings are due to the Greek letters in the plot.
+
+```{r figure-4ef}
+
+# remove subjects which have no APOE or CERAD record
+sel = (!is.na(cov$APOE)) & (!is.na(cov$C))
+mData.2 = mData[, sel]
+
+# z-score
+means = rowMeans(mData.2)
+sds = apply(mData.2, 1, sd)
+zscore = function(x) return((x - means)/sds)
+mDataZ = apply(mData.2, 2, zscore)
+cov[, EC := paste(paste0("C", C), E, sep = ":")]
+EC = cov$EC[sel]
+
+# average z-score
+aveZ = data.table(Genes = rownames(mDataZ),
+                  C0E2 = rowMeans(mDataZ[, EC == "C0:E2"]),
+                  C0E3 = rowMeans(mDataZ[, EC == "C0:E3"]),
+                  C0E4 = rowMeans(mDataZ[, EC == "C0:E4"]),
+                        
+                  C1E2 = rowMeans(mDataZ[, EC == "C1:E2"]),
+                  C1E3 = rowMeans(mDataZ[, EC == "C1:E3"]),
+                  C1E4 = rowMeans(mDataZ[, EC == "C1:E4"]),
+                        
+                  C2E2 = rowMeans(mDataZ[, EC == "C2:E2"]),
+                  C2E3 = rowMeans(mDataZ[, EC == "C2:E3"]),
+                  C2E4 = rowMeans(mDataZ[, EC == "C2:E4"]),
+                        
+                  C3E2 = rowMeans(mDataZ[, EC == "C3:E2"]),
+                  C3E3 = rowMeans(mDataZ[, EC == "C3:E3"]),
+                  C3E4 = rowMeans(mDataZ[, EC == "C3:E4"]))
+ 
+aveZ2 = melt(aveZ, id.vars = c("Genes"))
+colnames(aveZ2) = c("Genes", "EC", "aveZ") 
+aveZ2[, CERAD := gsub("E[234]$", "", aveZ2$EC)]
+aveZ2[, APOE := gsub("C[0123]", "", aveZ2$EC)]
+
+# colors
+ggthemr("fresh")
+to_swap = c("#62bba5", # E4
+            "#785d37", # E3
+            "#ffb84d") # E2
+
+# figure label
+APOE_label = c("\u03B52", "\u03B53", "\u03B54")
+names(APOE_label) = c("E2", "E3", "E4")
+
+# warnings because greek letters
+fig4.f = ggplot(aveZ2[Genes %in% C0_c4.genes], 
+                aes(x = CERAD, y = aveZ, color = APOE)) + 
+  geom_point() +
+  geom_line(aes(group = factor(Genes)),
+            color = "black",
+            alpha = 0.1) +
+  ylab("Average z-score") +
+  xlab("CERAD NP score") +
+  facet_grid(cols = vars(APOE), labeller = as_labeller(APOE_label)) +
+  scale_color_manual(values = rev(to_swap), labels = APOE_label)
+fig4.f = annotate_figure(fig4.f, fig.lab = "F", fig.lab.size = 16)
+ggsave("../results/Figure4F-astro-C4.pdf", fig4.f, width = 10, height = 5, device=cairo_pdf)
+
+# warnings because greek letters
+fig4.e = ggplot(aveZ2[Genes %in% C0_c1.genes], 
+                aes(x = CERAD, y = aveZ, color = APOE)) + 
+  geom_point() +
+  geom_line(aes(group = factor(Genes)),
+            color = "black",
+            alpha = 0.1) +
+  ylab("Average z-score") +
+  xlab("CERAD NP score") +
+  facet_grid(cols = vars(APOE), labeller = as_labeller(APOE_label)) +
+  scale_color_manual(values = rev(to_swap), labels = APOE_label)
+fig4.e = annotate_figure(fig4.e, fig.lab = "E", fig.lab.size = 16)
+ggsave("../results/Figure4E-astro-C1.pdf", fig4.e, width = 10, height = 5, device=cairo_pdf)
+
+```

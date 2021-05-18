@@ -31,7 +31,7 @@ html {
   --heading-font:    'Montserrat', sans-serif;
   --mono-font:       monospace;
   --body-font:       'Quicksand', sans-serif;
-  --navbar-font:     'Biryani', sans-serif;  /* websites + blogs only */
+  --navbar-font:     'Montserrat', sans-serif;  /* websites + blogs only */
 }
 
 /*-- ARTICLE METADATA --*/
@@ -77,10 +77,42 @@ d-appendix {
 /*-- Additional custom styles --*/
 /* Add any additional CSS rules below                      */
 
-.distill-site-header { 
-  letter-spacing: 2px;
+
+/* NAVIGATION BAR */
+
+.nav-left { 
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+.nav-right > a { 
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nav-dropbtn { 
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+/* ARTICLE FORMATTING */
+
+h1 {
+  margin-top: 2em;
+  font-size: 36px !important;
+}
+
+d-article h1:nth-child(2) {
+  margin-top: 0.67em;
+}
+
+h2 {
+  font-size: 22px !important;
+}
+
+
+/* BACKGROUND COLOR */
 
 body {
   background-color: #F4F1DE;

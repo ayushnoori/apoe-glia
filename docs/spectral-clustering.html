@@ -86,30 +86,30 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Effect of APOE on the Glial Transcriptome: About</title>
+  <title>Effect of APOE on the Glial Transcriptome: Spectral Clustering</title>
 
-  <meta property="description" itemprop="description" content="We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice."/>
+  <meta property="description" itemprop="description" content="This script defines the functions which are used to perform spectral clustering."/>
 
   <link rel="icon" type="image/vnd.microsoft.icon" href="images/favicon.ico"/>
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: About"/>
+  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: Spectral Clustering"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice."/>
+  <meta property="og:description" content="This script defines the functions which are used to perform spectral clustering."/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Effect of APOE on the Glial Transcriptome"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: About"/>
-  <meta property="twitter:description" content="We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice."/>
+  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: Spectral Clustering"/>
+  <meta property="twitter:description" content="This script defines the functions which are used to perform spectral clustering."/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","site","output"]}},"value":[{"type":"character","attributes":{},"value":["About"]},{"type":"character","attributes":{},"value":["We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice.\n"]},{"type":"character","attributes":{},"value":["distill::distill_website"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["Spectral Clustering"]},{"type":"character","attributes":{},"value":["This script defines the functions which are used to perform spectral clustering.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2171,7 +2171,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"About","description":"We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice.","authors":[]}
+{"title":"Spectral Clustering","description":"This script defines the functions which are used to perform spectral clustering.","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2235,10 +2235,10 @@ MSBB
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>About</h1>
+<h1>Spectral Clustering</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>We investigated the differential effects of <em>APOE</em> alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in <em>APOE</em> knock-in mice.</p></p>
+<p><p>This script defines the functions which are used to perform spectral clustering.</p></p>
 </div>
 
 
@@ -2247,33 +2247,184 @@ MSBB
 <nav class="l-text toc figcaption" id="TOC">
 <h3>Contents</h3>
 <ul>
-<li><a href="#setup">Setup</a></li>
-<li><a href="#code-availability">Code Availability</a></li>
-<li><a href="#data-availability">Data Availability</a></li>
-<li><a href="#citation">Citation</a>
+<li><a href="#calculate-affinity-matrix">Calculate Affinity Matrix</a></li>
+<li><a href="#z-scores">Z-Scores</a>
 <ul>
-<li><a href="#affiliations">Affiliations</a></li>
+<li><a href="#calculate-z-score">Calculate Z-Score</a></li>
+<li><a href="#calculate-average-z-score">Calculate Average Z-Score</a></li>
 </ul></li>
-<li><a href="#acknowledgements">Acknowledgements</a></li>
+<li><a href="#spectral-clustering">Spectral Clustering</a></li>
+<li><a href="#statistical-testing">Statistical Testing</a></li>
+<li><a href="#hypergeometric-tests">Hypergeometric Tests</a></li>
 </ul>
 </nav>
 </div>
-<h1 id="setup">Setup</h1>
-<p>Install <a href="https://www.r-project.org/">R</a> to run our code.</p>
-<h1 id="code-availability">Code Availability</h1>
-<p>Our codebase is available on GitHub at <a href="https://ayushnoori.github.io/apoe-glia/">ayushnoori.github.io/apoe-glia</a>.</p>
-<h1 id="data-availability">Data Availability</h1>
-<p>The ROSMAP and MSBB RNA-seq datasets are available from the AMP-AD Knowledge Portal (DOI: <a href="https://doi.org/10.7303/syn3388564">10.7303/syn3388564</a> and <a href="https://doi.org/10.7303/syn3157743">10.7303/syn3157743</a>, respectively). Data from the knock-in mice are available from our <a href="https://github.com/ayushnoori/apoe-glia">GitHub repository</a>.</p>
-<h1 id="citation">Citation</h1>
-<p>Alberto Serrano-Pozo, MD PhD<sup>1,2,3</sup>, Zhaozhi Li, MS<sup>1,2</sup>, Ayush Noori<sup>1,2</sup>, Aziz Mezlini, PhD<sup>1,2,3</sup>, Liang Li, BS<sup>1,2</sup>, Huong N. Nguyen, BS<sup>1,2</sup>, Rosemary J. Jackson, PhD<sup>1,2,3</sup>, Bradley T. Hyman, MD PhD<sup>1,2,3</sup>, Sudeshna Das, PhD<sup>1,2,3</sup>. Effect of <em>APOE</em> Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease. <em>Under review.</em></p>
-<h3 id="affiliations">Affiliations</h3>
-<ol type="1">
-<li>Department of Neurology, Massachusetts General Hospital, Boston MA 02114</li>
-<li>Massachusetts Alzheimer’s Disease Research Center, Charlestown MA 02129</li>
-<li>Harvard Medical School, Boston MA 02116</li>
-</ol>
-<h1 id="acknowledgements">Acknowledgements</h1>
-<p>This work was supported by the Alzheimer’s Association (AACF-17-524184 to AS-P), National Institute on Aging (K08AG064039 to AS-P, R01AG047644-01, T32AG000222-27, RF1AG058674 and U01NS111671 to BTH, and P30AG062421 to BTH and SD), and the MassCATS project (to SD). ROSMAP was supported by National Institute on Aging grants P30AG10161, R01AG15819, and R01AG17917. The MSBB data were generated from postmortem brain tissue collected through the Mount Sinai VA Medical Center Brain Bank and were provided by Dr. Eric Schadt from the Mount Sinai School of Medicine. The authors would like to acknowledge the Cure Alzheimer’s Foundation, Dr. Wilma Wasco, Dr. David Holtzman, and Dr. Rudolph Tanzi for providing the <em>APOE</em> knock-in mice used in this study.</p>
+<h1 id="calculate-affinity-matrix">Calculate Affinity Matrix</h1>
+<p>Calculate affinity matrix for spectral clustering. Code is derived from the <a href="http://compbio.cs.toronto.edu/SNF/SNF/Software.html"><code>SNFtool</code> package</a>, see associated publication in <em>Nature Methods</em> <a href="https://www.nature.com/articles/nmeth.2810">here</a>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#' @param diff </span>
+<span class='va'>affinityCustom</span> <span class='op'>=</span> <span class='kw'>function</span> <span class='op'>(</span><span class='va'>diff</span>, <span class='va'>sigma</span> <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span> 
+<span class='op'>{</span>
+  <span class='va'>N</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>diff</span><span class='op'>)</span>
+  <span class='va'>diff</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='va'>diff</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='va'>diff</span><span class='op'>)</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>2</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/diag.html'>diag</a></span><span class='op'>(</span><span class='va'>diff</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fl'>0</span>
+  <span class='va'>sortedColumns</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/as.matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>diff</span>, <span class='fl'>2</span>, <span class='va'>sort</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>finiteMean</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/is.finite.html'>is.finite</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  <span class='co'># this line has been modified to remove [, 1:K + 1]</span>
+  <span class='va'>means</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>sortedColumns</span>, <span class='fl'>1</span>, <span class='va'>finiteMean</span><span class='op'>)</span> <span class='op'>+</span> 
+    <span class='va'>.Machine</span><span class='op'>$</span><span class='va'>double.eps</span>
+  <span class='va'>avg</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>+</span> <span class='va'>y</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  <span class='va'>Sig</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/outer.html'>outer</a></span><span class='op'>(</span><span class='va'>means</span>, <span class='va'>means</span>, <span class='va'>avg</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>3</span> <span class='op'>*</span> <span class='fl'>2</span> <span class='op'>+</span> <span class='va'>diff</span><span class='op'>/</span><span class='fl'>3</span> <span class='op'>+</span> <span class='va'>.Machine</span><span class='op'>$</span><span class='va'>double.eps</span>
+  <span class='va'>Sig</span><span class='op'>[</span><span class='va'>Sig</span> <span class='op'>&lt;=</span> <span class='va'>.Machine</span><span class='op'>$</span><span class='va'>double.eps</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='va'>.Machine</span><span class='op'>$</span><span class='va'>double.eps</span>
+  <span class='va'>densities</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>dnorm</a></span><span class='op'>(</span><span class='va'>diff</span>, <span class='fl'>0</span>, <span class='va'>sigma</span> <span class='op'>*</span> <span class='va'>Sig</span>, log <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+  <span class='va'>W</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='va'>densities</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='va'>densities</span><span class='op'>)</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>2</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>W</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h1 id="z-scores">Z-Scores</h1>
+<h2 id="calculate-z-score">Calculate Z-Score</h2>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#' @param sf string; C(CERAD)/B(Braak);</span>
+<span class='co'>#' @param level string; level of CERAD or Braak stage;</span>
+<span class='co'>#' @param mData matrix; expression matrix</span>
+<span class='co'>#' @param cov data.table; clinical data</span>
+<span class='va'>to_z_score</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>sf</span>, <span class='va'>level</span>, <span class='va'>mDataG</span>, <span class='va'>cov</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>mDataG</span><span class='op'>)</span> <span class='op'>==</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>projid</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/stop.html'>stop</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='va'>sf</span> <span class='op'>==</span> <span class='st'>"C"</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"select CERAD"</span>, <span class='va'>level</span>, <span class='st'>"samples..\n"</span><span class='op'>)</span>
+    <span class='va'>remove_proj</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span>,<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span> <span class='op'>|</span> <span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>E</span><span class='op'>)</span><span class='op'>]</span>
+    <span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='va'>remove_proj</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+      <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"remove"</span>, <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>remove_proj</span><span class='op'>)</span>, <span class='st'>"samples with missing values..\n"</span><span class='op'>)</span>
+      <span class='va'>mDataG</span> <span class='op'>=</span> <span class='va'>mDataG</span><span class='op'>[</span>, <span class='op'>!</span><span class='va'>remove_proj</span><span class='op'>]</span>
+      <span class='va'>cov</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span> <span class='op'>&amp;</span> <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>E</span><span class='op'>)</span>,<span class='op'>]</span>
+    <span class='op'>}</span>
+    <span class='va'>E</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='va'>C</span> <span class='op'>==</span> <span class='va'>level</span>, <span class='va'>E</span><span class='op'>]</span>
+    <span class='va'>sel</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span> <span class='op'>==</span> <span class='va'>level</span>
+  <span class='op'>}</span><span class='kw'>else</span> <span class='kw'>if</span><span class='op'>(</span><span class='va'>sf</span> <span class='op'>==</span> <span class='st'>"B"</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"select Braak"</span>, <span class='va'>level</span>, <span class='st'>"samples..\n"</span><span class='op'>)</span>
+    <span class='va'>remove_proj</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span>,<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>B</span><span class='op'>)</span> <span class='op'>|</span> <span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>E</span><span class='op'>)</span><span class='op'>]</span>
+    <span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='va'>remove_proj</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+      <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"remove"</span>, <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>remove_proj</span><span class='op'>)</span>,<span class='st'>"samples with missing values..\n"</span><span class='op'>)</span>
+      <span class='va'>mDataG</span> <span class='op'>=</span> <span class='va'>mDataG</span><span class='op'>[</span>, <span class='op'>!</span><span class='va'>remove_proj</span><span class='op'>]</span>
+      <span class='va'>cov</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>B</span><span class='op'>)</span> <span class='op'>&amp;</span> <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>E</span><span class='op'>)</span>,<span class='op'>]</span>
+    <span class='op'>}</span>
+    <span class='va'>E</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='va'>B</span> <span class='op'>==</span> <span class='va'>level</span>, <span class='va'>E</span><span class='op'>]</span>
+    <span class='va'>sel</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>B</span> <span class='op'>==</span> <span class='va'>level</span>
+  <span class='op'>}</span><span class='kw'>else</span><span class='op'>{</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/stop.html'>stop</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  
+  <span class='va'>means</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowMeans</a></span><span class='op'>(</span><span class='va'>mDataG</span><span class='op'>[</span>, <span class='va'>sel</span><span class='op'>]</span><span class='op'>)</span>
+  <span class='va'>sds</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>mDataG</span><span class='op'>[</span>, <span class='va'>sel</span><span class='op'>]</span>, <span class='fl'>1</span>, <span class='va'>sd</span><span class='op'>)</span>
+  <span class='va'>zscore</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>-</span> <span class='va'>means</span><span class='op'>)</span><span class='op'>/</span><span class='va'>sds</span><span class='op'>)</span>
+  <span class='va'>mData_z</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>mDataG</span><span class='op'>[</span>, <span class='va'>sel</span><span class='op'>]</span>, <span class='fl'>2</span>, <span class='va'>zscore</span><span class='op'>)</span>
+  
+  <span class='co'># check should be TRUE</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"random check:"</span>,
+      <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>mData_z</span><span class='op'>[</span><span class='fl'>9</span>,<span class='op'>]</span> <span class='op'>==</span> <span class='op'>(</span><span class='va'>mDataG</span><span class='op'>[</span><span class='fl'>9</span>,<span class='va'>sel</span><span class='op'>]</span> <span class='op'>-</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>mDataG</span><span class='op'>[</span><span class='fl'>9</span>,<span class='va'>sel</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>mDataG</span><span class='op'>[</span><span class='fl'>9</span>,<span class='va'>sel</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>,
+      <span class='st'>"\n"</span><span class='op'>)</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>z <span class='op'>=</span> <span class='va'>mData_z</span>, E <span class='op'>=</span> <span class='va'>E</span>, mData <span class='op'>=</span> <span class='va'>mDataG</span><span class='op'>[</span>, <span class='va'>sel</span><span class='op'>]</span>,
+              means <span class='op'>=</span> <span class='va'>means</span>, sds <span class='op'>=</span> <span class='va'>sds</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h2 id="calculate-average-z-score">Calculate Average Z-Score</h2>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#' @param z_list list; list generated by to_z_score()</span>
+<span class='va'>to_ave_z</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>z_list</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='va'>z</span> <span class='op'>=</span> <span class='va'>z_list</span><span class='op'>$</span><span class='va'>z</span>
+  <span class='va'>E</span> <span class='op'>=</span> <span class='va'>z_list</span><span class='op'>$</span><span class='va'>E</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>Genes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span>,
+                    E2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowMeans</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>[</span>, <span class='va'>E</span> <span class='op'>==</span> <span class='st'>"E2"</span><span class='op'>]</span><span class='op'>)</span>,
+                    E3 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowMeans</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>[</span>, <span class='va'>E</span> <span class='op'>==</span> <span class='st'>"E3"</span><span class='op'>]</span><span class='op'>)</span>,
+                    E4 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>rowMeans</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>[</span>, <span class='va'>E</span> <span class='op'>==</span> <span class='st'>"E4"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h1 id="spectral-clustering">Spectral Clustering</h1>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#' @param avez data.table/data.frame/matrix containing the average z-scores of E2, E3, and E4</span>
+<span class='co'>#' @param k number of cluster</span>
+<span class='va'>spectral_clustering</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>avez</span>, <span class='va'>k</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>9</span><span class='op'>)</span>
+  
+  <span class='va'>zMtx</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/as.matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>avez</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"E2"</span>, <span class='st'>"E3"</span>, <span class='st'>"E4"</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>zMtx</span><span class='op'>)</span> <span class='op'>=</span> <span class='va'>avez</span><span class='op'>$</span><span class='va'>Genes</span>
+  <span class='va'>zMtx</span> <span class='op'>=</span> <span class='va'>zMtx</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>zMtx</span><span class='op'>)</span><span class='op'>)</span>, <span class='op'>]</span>
+  
+  <span class='co'># calculate distance matrix</span>
+  <span class='va'>distM</span> <span class='op'>=</span> <span class='va'>zMtx</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/dist2.html'>dist2</a></span><span class='op'>(</span><span class='va'>.</span>, <span class='va'>.</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='va'>.</span><span class='op'>^</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span>
+  <span class='co'># calculate similarity matrix</span>
+  <span class='va'>simM</span> <span class='op'>=</span> <span class='fu'>affinityCustom</span><span class='op'>(</span><span class='va'>distM</span><span class='op'>)</span>
+  <span class='co'># perform spectral clustering</span>
+  <span class='va'>clustA</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/SNFtool/man/spectralClustering.html'>spectralClustering</a></span><span class='op'>(</span><span class='va'>simM</span>, K <span class='op'>=</span> <span class='va'>k</span><span class='op'>)</span>
+  
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>clustA <span class='op'>=</span> <span class='va'>clustA</span>,
+              zMtx <span class='op'>=</span> <span class='va'>zMtx</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h1 id="statistical-testing">Statistical Testing</h1>
+<p>Statistical testing of interested microglia-<em>APOE</em> genes across <em>APOE</em> genotypes.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#' @param z matrix; z </span>
+<span class='co'>#' @param genes vector; vector of interested genes</span>
+<span class='co'>#' @param cov data.table; clinical data</span>
+<span class='co'>#' @param adj.donor T/F; adjusted by donor or not</span>
+<span class='co'>#' @param donor donor id; need provide if adj.donor = T</span>
+<span class='va'>test_avez</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>zmtx</span>, <span class='va'>clust_genes</span>, <span class='va'>cov</span>, <span class='va'>donor</span> <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>adj.donor</span> <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
+    ave_z <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colSums.html'>colMeans</a></span><span class='op'>(</span><span class='va'>zmtx</span><span class='op'>[</span><span class='va'>clust_genes</span>, <span class='op'>]</span><span class='op'>)</span>,
+    APO <span class='op'>=</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>E</span><span class='op'>)</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span> <span class='op'>!=</span> <span class='st'>"E3"</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/stop.html'>stop</a></span><span class='op'>(</span><span class='st'>"must use E3 as reference\n"</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='va'>adj.donor</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/lme4/lme4/'>lme4</a></span><span class='op'>)</span>
+    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/runehaubo/lmerTestR'>lmerTest</a></span><span class='op'>)</span>
+    <span class='va'>data</span><span class='op'>$</span><span class='va'>donor</span> <span class='op'>=</span> <span class='va'>donor</span>
+    <span class='va'>fit</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/lme4/man/lmer.html'>lmer</a></span><span class='op'>(</span><span class='va'>ave_z</span> <span class='op'>~</span> <span class='op'>(</span><span class='fl'>1</span><span class='op'>|</span><span class='va'>donor</span><span class='op'>)</span><span class='op'>+</span> <span class='va'>APO</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
+  <span class='op'>}</span><span class='kw'>else</span><span class='op'>{</span>
+    <span class='va'>fit</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>ave_z</span> <span class='op'>~</span> <span class='va'>APO</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>fit</span>, confint <span class='op'>=</span> <span class='cn'>TRUE</span>, digits <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h1 id="hypergeometric-tests">Hypergeometric Tests</h1>
+<p>Hypergeometric tests of interested microglia-<em>APOE</em> genes across <em>APOE</em> genotypes.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#' @param genes1 vector;</span>
+<span class='co'>#' @param genes2 vector; </span>
+<span class='va'>phyper_test</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>genes1</span>, <span class='va'>genes2</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='va'>q</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>genes1</span>, <span class='va'>genes2</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>s</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>genes1</span><span class='op'>)</span>
+  <span class='va'>n</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span>
+  <span class='va'>m</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>genes2</span><span class='op'>)</span>
+  <span class='va'>p</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Hypergeometric.html'>phyper</a></span><span class='op'>(</span><span class='va'>q</span>,<span class='va'>m</span>,<span class='va'>n</span>,<span class='va'>s</span>, lower.tail <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>p</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

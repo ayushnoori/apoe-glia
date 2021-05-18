@@ -1,0 +1,240 @@
+---
+title: "Define ROSMAP Variables"
+description: |
+ This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.
+output:
+  distill::distill_article:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+# Dependencies
+
+Load requisite packages.
+
+```{r load-packages}
+
+library(data.table)
+
+```
+
+
+# Read FPKM Data
+
+Read FPKM data, remove the version from Ensembl ID, and remove duplicated samples. Note that subject `82317494` has 3 corresponding sample IDs: `492_120515_0`, `492_120515_6`, and `492_120515_7` (the latter is shortened to `492_120515` in the ID column); keep the latest sequencing data (i.e., `492_120515_7`).
+
+```{r fpkm-data}
+
+# read FPKM data
+fpkm_file = "../Data/ROSMAP_RNAseq_FPKM_gene.tsv"
+rosmap_fpkm = fread(fpkm_file, stringsAsFactors = FALSE, header = T, sep = "\t")
+all(rosmap_fpkm$tracking_id == rosmap_fpkm$gene_id)
+gene_id = rosmap_fpkm$gene_id
+rosmap_fpkm = rosmap_fpkm[, c(-1,-2), with = F]
+rosmap_fpkm = as.data.frame(rosmap_fpkm)
+
+# remove version from Ensembl ID
+rownames(rosmap_fpkm) = gsub("\\.\\d*$", "", gene_id)
+
+# remove duplicated samples
+duplicate_sample_ids = c("492_120515_0","492_120515_6")
+rosmap_fpkm = rosmap_fpkm[, -which(colnames(rosmap_fpkm) %in% duplicate_sample_ids)]
+
+```
+
+
+# Read Covariate Data
+
+Read ROSMAP ID mapping file.
+
+```{r rosmap-map}
+
+# read ROSMAP ID map
+key_map_file = "../Data/ROSMAP_IDkey.csv"
+key_map = fread(key_map_file)
+key_map = unique(key_map[, .(projid, mrna_id)])
+
+```
+
+Read and pre-process covariate data.
+
+```{r covariate-data}
+
+# read and process covariate data
+cov_file = "../Data/ROSMAP_clinical.csv"
+cov = fread(cov_file)
+
+# rename covariate data and merge with ROSMAP IDs
+setnames(cov, c("projid", "cts_mmse30_lv", "braaksc", "ceradsc", "cogdx", "apoe_genotype"), 
+         c("projid", "MMSE", "Braak", "CERAD", "ClinicalDiagnosis", "RawAPOE"))
+cov[key_map, on = .(projid), mrna_id := mrna_id]
+
+# no version number
+cov[, mrna_id_nov := gsub("_\\d$", "", mrna_id)]
+
+```
+
+
+# Reorder Data
+
+```{r reorder-data}
+
+# extract clinical data in the same order as in the data
+colnames(rosmap_fpkm) = gsub("_\\d$", "", colnames(rosmap_fpkm)) 
+
+# remove samples without clinical data
+colnames(rosmap_fpkm)[!colnames(rosmap_fpkm) %in% c(cov$mrna_id_nov)]
+rosmap_fpkm = rosmap_fpkm[, colnames(rosmap_fpkm) %in% cov$mrna_id_nov]
+all(colnames(rosmap_fpkm) %in% cov$mrna_id_nov)
+cov = cov[data.table(mrna_id_nov = colnames(rosmap_fpkm)), on = .(mrna_id_nov)]
+
+# check that cov and rosmap_fpkm have same order
+all(cov$mrna_id_nov == colnames(rosmap_fpkm))
+colnames(rosmap_fpkm) = cov$projid
+
+```
+
+
+# Define Clinical Variables
+
+## Braak
+
+Group levels into 3 categories:
+* `1` = `Normal/I/II`
+* `2` = `III/IV`
+* `3` = `V/VI`
+
+Number of `NA` values in Braak: 0.
+Proportion of `NA` values: 0.
+
+```{r braak}
+
+# refactor
+cov[, C := as.factor(CERAD)]
+levels(cov$C) = c(3,2,1,0)
+cov[, C := as.character(C)]
+cov[, C := factor(C)]
+
+# double-check
+table(cov$C, cov$CERAD)
+
+```
+
+## CERAD
+
+Old ROSMAP levels:
+* `1` = `Definite`
+* `2` = `Probable`
+* `3` = `Possible`
+* `4` = `Normal`
+
+Define new levels:
+* `1` = `Normal`
+* `2` = `Possible`
+* `3` = `Probable`
+* `4` = `Definite`
+
+Number of `NA` values in CERAD: 0.
+Proportion of `NA` values: 0.
+
+```{r cerad}
+
+# refactor
+cov[, C := as.factor(CERAD)]
+levels(cov$C) = c(3,2,1,0)
+cov[, C := as.character(C)]
+cov[, C := factor(C)]
+
+# double-check
+table(cov$C, cov$CERAD)
+
+```
+
+## APOE
+
+Group levels into 3 categories:
+* `E2` = `E2/E2` and `E2/E3`
+* `E3` = `E3/E3`
+* `E4` = `E2/E4`, `E3/E4`, and `E4/E4`
+
+Number of `NA` values in APOE: 1.
+Proportion of `NA` values: 0.002.
+
+```{r apoe}
+
+# refactor
+cov[, APOE := as.factor(RawAPOE)]
+levels(cov$APOE) = c("E2", "E2", "E4", "E3", "E4", "E4")
+cov[, E := as.character(APOE)]
+cov[, E := factor(E, levels = c("E3", "E2", "E4"))]
+
+# double-check
+table(cov$E, cov$RawAPOE)
+
+```
+
+## E4 Count
+
+Group levels into 3 categories:
+* `0` = `E2/E2`, `E3/E3`, and `E2/E3`
+* `1` = `E2/E4` and `E3/E4`
+* `2` = `E4/E4`
+
+```{r e4-count}
+
+# refactor
+cov[, E4num := as.factor(RawAPOE)]
+levels(cov$E4num) = c(0, 0, 1, 0, 1, 2)
+cov[, E4num := as.numeric(as.character(E4num))]
+
+# double-check
+table(cov$E4num, cov$RawAPOE)
+
+```
+
+## E2 Count
+
+Group levels into 3 categories:
+* `0` = `E4/E4`, `E3/E3`, and `E3/E4`
+* `1` = `E2/E4` and `E2/E3`
+* `2` = `E2/E2`
+
+```{r e2-count}
+
+# refactor
+cov[, E2num := as.factor(RawAPOE)]
+levels(cov$E2num) = c(2, 1, 1, 0, 0, 0)
+cov[, E2num := as.numeric(as.character(E2num))]
+
+# double-check
+table(cov$E2num, cov$RawAPOE)
+
+```
+
+## Age at Death
+
+Clean age at death variable.
+
+```{r age-death}
+
+# clean age at death
+cov[, age_at_death := gsub("90\\+", "91", age_death)]
+cov[, age_at_death := as.numeric(age_at_death)]
+
+```
+
+
+# Save Results
+
+```{r save-results}
+
+# save results
+rosmap = list(fpkm = rosmap_fpkm,
+              cov = cov)
+save(rosmap, file = "../Data/ROSMAP-24.Rdata")
+
+```

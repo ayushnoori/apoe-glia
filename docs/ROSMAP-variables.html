@@ -86,30 +86,30 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Effect of APOE on the Glial Transcriptome: About</title>
+  <title>Effect of APOE on the Glial Transcriptome: Define ROSMAP Variables</title>
 
-  <meta property="description" itemprop="description" content="We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice."/>
+  <meta property="description" itemprop="description" content="This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data."/>
 
   <link rel="icon" type="image/vnd.microsoft.icon" href="images/favicon.ico"/>
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: About"/>
+  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: Define ROSMAP Variables"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice."/>
+  <meta property="og:description" content="This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data."/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Effect of APOE on the Glial Transcriptome"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: About"/>
-  <meta property="twitter:description" content="We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice."/>
+  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: Define ROSMAP Variables"/>
+  <meta property="twitter:description" content="This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data."/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","site","output"]}},"value":[{"type":"character","attributes":{},"value":["About"]},{"type":"character","attributes":{},"value":["We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice.\n"]},{"type":"character","attributes":{},"value":["distill::distill_website"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["Define ROSMAP Variables"]},{"type":"character","attributes":{},"value":["This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2171,7 +2171,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"About","description":"We investigated the differential effects of *APOE* alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in *APOE* knock-in mice.","authors":[]}
+{"title":"Define ROSMAP Variables","description":"This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2235,10 +2235,10 @@ MSBB
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>About</h1>
+<h1>Define ROSMAP Variables</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>We investigated the differential effects of <em>APOE</em> alleles on the microglia and astrocyte transcriptome in the absence and presence of neuritic plaques (NPs) using bulk brain RNA-seq data from two large brain banks and performed follow-on experiments in <em>APOE</em> knock-in mice.</p></p>
+<p><p>This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.</p></p>
 </div>
 
 
@@ -2247,33 +2247,196 @@ MSBB
 <nav class="l-text toc figcaption" id="TOC">
 <h3>Contents</h3>
 <ul>
-<li><a href="#setup">Setup</a></li>
-<li><a href="#code-availability">Code Availability</a></li>
-<li><a href="#data-availability">Data Availability</a></li>
-<li><a href="#citation">Citation</a>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#read-fpkm-data">Read FPKM Data</a></li>
+<li><a href="#read-covariate-data">Read Covariate Data</a></li>
+<li><a href="#reorder-data">Reorder Data</a></li>
+<li><a href="#define-clinical-variables">Define Clinical Variables</a>
 <ul>
-<li><a href="#affiliations">Affiliations</a></li>
+<li><a href="#braak">Braak</a></li>
+<li><a href="#cerad">CERAD</a></li>
+<li><a href="#apoe">APOE</a></li>
+<li><a href="#e4-count">E4 Count</a></li>
+<li><a href="#e2-count">E2 Count</a></li>
+<li><a href="#age-at-death">Age at Death</a></li>
 </ul></li>
-<li><a href="#acknowledgements">Acknowledgements</a></li>
+<li><a href="#save-results">Save Results</a></li>
 </ul>
 </nav>
 </div>
-<h1 id="setup">Setup</h1>
-<p>Install <a href="https://www.r-project.org/">R</a> to run our code.</p>
-<h1 id="code-availability">Code Availability</h1>
-<p>Our codebase is available on GitHub at <a href="https://ayushnoori.github.io/apoe-glia/">ayushnoori.github.io/apoe-glia</a>.</p>
-<h1 id="data-availability">Data Availability</h1>
-<p>The ROSMAP and MSBB RNA-seq datasets are available from the AMP-AD Knowledge Portal (DOI: <a href="https://doi.org/10.7303/syn3388564">10.7303/syn3388564</a> and <a href="https://doi.org/10.7303/syn3157743">10.7303/syn3157743</a>, respectively). Data from the knock-in mice are available from our <a href="https://github.com/ayushnoori/apoe-glia">GitHub repository</a>.</p>
-<h1 id="citation">Citation</h1>
-<p>Alberto Serrano-Pozo, MD PhD<sup>1,2,3</sup>, Zhaozhi Li, MS<sup>1,2</sup>, Ayush Noori<sup>1,2</sup>, Aziz Mezlini, PhD<sup>1,2,3</sup>, Liang Li, BS<sup>1,2</sup>, Huong N. Nguyen, BS<sup>1,2</sup>, Rosemary J. Jackson, PhD<sup>1,2,3</sup>, Bradley T. Hyman, MD PhD<sup>1,2,3</sup>, Sudeshna Das, PhD<sup>1,2,3</sup>. Effect of <em>APOE</em> Alleles on the Glial Transcriptome in Normal Aging and Alzheimer’s Disease. <em>Under review.</em></p>
-<h3 id="affiliations">Affiliations</h3>
-<ol type="1">
-<li>Department of Neurology, Massachusetts General Hospital, Boston MA 02114</li>
-<li>Massachusetts Alzheimer’s Disease Research Center, Charlestown MA 02129</li>
-<li>Harvard Medical School, Boston MA 02116</li>
-</ol>
-<h1 id="acknowledgements">Acknowledgements</h1>
-<p>This work was supported by the Alzheimer’s Association (AACF-17-524184 to AS-P), National Institute on Aging (K08AG064039 to AS-P, R01AG047644-01, T32AG000222-27, RF1AG058674 and U01NS111671 to BTH, and P30AG062421 to BTH and SD), and the MassCATS project (to SD). ROSMAP was supported by National Institute on Aging grants P30AG10161, R01AG15819, and R01AG17917. The MSBB data were generated from postmortem brain tissue collected through the Mount Sinai VA Medical Center Brain Bank and were provided by Dr. Eric Schadt from the Mount Sinai School of Medicine. The authors would like to acknowledge the Cure Alzheimer’s Foundation, Dr. Wilma Wasco, Dr. David Holtzman, and Dr. Rudolph Tanzi for providing the <em>APOE</em> knock-in mice used in this study.</p>
+<h1 id="dependencies">Dependencies</h1>
+<p>Load requisite packages.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://Rdatatable.gitlab.io/data.table'>data.table</a></span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="read-fpkm-data">Read FPKM Data</h1>
+<p>Read FPKM data, remove the version from Ensembl ID, and remove duplicated samples. Note that subject <code>82317494</code> has 3 corresponding sample IDs: <code>492_120515_0</code>, <code>492_120515_6</code>, and <code>492_120515_7</code> (the latter is shortened to <code>492_120515</code> in the ID column); keep the latest sequencing data (i.e., <code>492_120515_7</code>).</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read FPKM data</span>
+<span class='va'>fpkm_file</span> <span class='op'>=</span> <span class='st'>"../Data/ROSMAP_RNAseq_FPKM_gene.tsv"</span>
+<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>fpkm_file</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span>, header <span class='op'>=</span> <span class='cn'>T</span>, sep <span class='op'>=</span> <span class='st'>"\t"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>$</span><span class='va'>tracking_id</span> <span class='op'>==</span> <span class='va'>rosmap_fpkm</span><span class='op'>$</span><span class='va'>gene_id</span><span class='op'>)</span>
+<span class='va'>gene_id</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>$</span><span class='va'>gene_id</span>
+<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1</span>,<span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span>, with <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>
+<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span>
+
+<span class='co'># remove version from Ensembl ID</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"\\.\\d*$"</span>, <span class='st'>""</span>, <span class='va'>gene_id</span><span class='op'>)</span>
+
+<span class='co'># remove duplicated samples</span>
+<span class='va'>duplicate_sample_ids</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"492_120515_0"</span>,<span class='st'>"492_120515_6"</span><span class='op'>)</span>
+<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>[</span>, <span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>duplicate_sample_ids</span><span class='op'>)</span><span class='op'>]</span>
+</code></pre>
+</div>
+</div>
+<h1 id="read-covariate-data">Read Covariate Data</h1>
+<p>Read ROSMAP ID mapping file.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read ROSMAP ID map</span>
+<span class='va'>key_map_file</span> <span class='op'>=</span> <span class='st'>"../Data/ROSMAP_IDkey.csv"</span>
+<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>key_map_file</span><span class='op'>)</span>
+<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>unique</a></span><span class='op'>(</span><span class='va'>key_map</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>projid</span>, <span class='va'>mrna_id</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Read and pre-process covariate data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read and process covariate data</span>
+<span class='va'>cov_file</span> <span class='op'>=</span> <span class='st'>"../Data/ROSMAP_clinical.csv"</span>
+<span class='va'>cov</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>cov_file</span><span class='op'>)</span>
+
+<span class='co'># rename covariate data and merge with ROSMAP IDs</span>
+<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='va'>cov</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"projid"</span>, <span class='st'>"cts_mmse30_lv"</span>, <span class='st'>"braaksc"</span>, <span class='st'>"ceradsc"</span>, <span class='st'>"cogdx"</span>, <span class='st'>"apoe_genotype"</span><span class='op'>)</span>, 
+         <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"projid"</span>, <span class='st'>"MMSE"</span>, <span class='st'>"Braak"</span>, <span class='st'>"CERAD"</span>, <span class='st'>"ClinicalDiagnosis"</span>, <span class='st'>"RawAPOE"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span><span class='va'>key_map</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>projid</span><span class='op'>)</span>, <span class='va'>mrna_id</span> <span class='op'>:=</span> <span class='va'>mrna_id</span><span class='op'>]</span>
+
+<span class='co'># no version number</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>mrna_id_nov</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"_\\d$"</span>, <span class='st'>""</span>, <span class='va'>mrna_id</span><span class='op'>)</span><span class='op'>]</span>
+</code></pre>
+</div>
+</div>
+<h1 id="reorder-data">Reorder Data</h1>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># extract clinical data in the same order as in the data</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"_\\d$"</span>, <span class='st'>""</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>)</span> 
+
+<span class='co'># remove samples without clinical data</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span><span class='op'>)</span>
+<span class='va'>cov</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>mrna_id_nov <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>)</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>mrna_id_nov</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># check that cov and rosmap_fpkm have same order</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>projid</span>
+</code></pre>
+</div>
+</div>
+<h1 id="define-clinical-variables">Define Clinical Variables</h1>
+<h2 id="braak">Braak</h2>
+<p>Group levels into 3 categories: * <code>1</code> = <code>Normal/I/II</code> * <code>2</code> = <code>III/IV</code> * <code>3</code> = <code>V/VI</code></p>
+<p>Number of <code>NA</code> values in Braak: 0. Proportion of <code>NA</code> values: 0.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>CERAD</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>1</span>,<span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>CERAD</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="cerad">CERAD</h2>
+<p>Old ROSMAP levels: * <code>1</code> = <code>Definite</code> * <code>2</code> = <code>Probable</code> * <code>3</code> = <code>Possible</code> * <code>4</code> = <code>Normal</code></p>
+<p>Define new levels: * <code>1</code> = <code>Normal</code> * <code>2</code> = <code>Possible</code> * <code>3</code> = <code>Probable</code> * <code>4</code> = <code>Definite</code></p>
+<p>Number of <code>NA</code> values in CERAD: 0. Proportion of <code>NA</code> values: 0.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>CERAD</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>1</span>,<span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>CERAD</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="apoe">APOE</h2>
+<p>Group levels into 3 categories: * <code>E2</code> = <code>E2/E2</code> and <code>E2/E3</code> * <code>E3</code> = <code>E3/E3</code> * <code>E4</code> = <code>E2/E4</code>, <code>E3/E4</code>, and <code>E4/E4</code></p>
+<p>Number of <code>NA</code> values in APOE: 1. Proportion of <code>NA</code> values: 0.002.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>APOE</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>RawAPOE</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>APOE</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"E2"</span>, <span class='st'>"E2"</span>, <span class='st'>"E4"</span>, <span class='st'>"E3"</span>, <span class='st'>"E4"</span>, <span class='st'>"E4"</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>APOE</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>E</span>, levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"E3"</span>, <span class='st'>"E2"</span>, <span class='st'>"E4"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="e4-count">E4 Count</h2>
+<p>Group levels into 3 categories: * <code>0</code> = <code>E2/E2</code>, <code>E3/E3</code>, and <code>E2/E3</code> * <code>1</code> = <code>E2/E4</code> and <code>E3/E4</code> * <code>2</code> = <code>E4/E4</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E4num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>RawAPOE</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E4num</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E4num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>E4num</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E4num</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="e2-count">E2 Count</h2>
+<p>Group levels into 3 categories: * <code>0</code> = <code>E4/E4</code>, <code>E3/E3</code>, and <code>E3/E4</code> * <code>1</code> = <code>E2/E4</code> and <code>E2/E3</code> * <code>2</code> = <code>E2/E2</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E2num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>RawAPOE</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E2num</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E2num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>E2num</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E2num</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="age-at-death">Age at Death</h2>
+<p>Clean age at death variable.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># clean age at death</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>age_at_death</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"90\\+"</span>, <span class='st'>"91"</span>, <span class='va'>age_death</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>age_at_death</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>age_at_death</span><span class='op'>)</span><span class='op'>]</span>
+</code></pre>
+</div>
+</div>
+<h1 id="save-results">Save Results</h1>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># save results</span>
+<span class='va'>rosmap</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fpkm <span class='op'>=</span> <span class='va'>rosmap_fpkm</span>,
+              cov <span class='op'>=</span> <span class='va'>cov</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/save.html'>save</a></span><span class='op'>(</span><span class='va'>rosmap</span>, file <span class='op'>=</span> <span class='st'>"../Data/ROSMAP-24.Rdata"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

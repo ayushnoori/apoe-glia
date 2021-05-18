@@ -1,0 +1,830 @@
+---
+title: "ROSMAP Microglia Analysis"
+description: |
+ This script performs analysis of ROSMAP microglia data.
+output:
+  distill::distill_article:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Dependencies
+
+Load requisite packages. Note that package [`cttobin/ggthemr`](https://github.com/cttobin/ggthemr) hosted on GitHub is used to provide `ggplot2` themes. This package can be downloaded via `devtools::install_github("cttobin/ggthemr")`.
+
+```{r load-packages}
+
+rm(list = ls())
+require(limma)
+require(latex2exp)
+require(ComplexHeatmap)
+require(data.table)
+require(pheatmap)
+require(ggplot2)
+require(gridExtra)
+require(ggthemr)
+require(SNFtool)
+require(circlize)
+require(patchwork)
+require(cowplot)
+require(ggpubr)
+require(ggprism)
+require(ggbeeswarm)
+
+ds = "ROSMAP"
+dtype = "log2FPKM"
+load("../Data/ROSMAP-24-adj-low.expr.genes.removed.Rdata")
+
+source("models.R")
+source("spectral-clustering.R")
+
+# load expression data 
+mData = expSet$mData
+
+```
+
+
+# Select Microglia Genes
+
+First, select only microglia genes (n = 574). Of the microglial genes, select only those that exist in ROSMAP (n = 519).
+
+```{r select-microglia}
+
+celltype = "microglia"
+
+# select only microglia genes
+genes = readLines("../Data/Microglia Genes.txt")
+
+# select microglia genes that exist in ROSMAP
+annot = fread("../Data/ENSEMBL GRCh38.p7.csv")
+annot = unique(annot[GeneSymbol %in% genes,])
+ensembl_ids = intersect(rownames(mData), annot$EnsemblID)
+annot = unique(annot[EnsemblID %in% ensembl_ids,])
+
+# remove duplicated genes
+annot = annot[!duplicated(GeneSymbol), ]
+ensembl_ids = annot$EnsemblID
+
+# check results
+any(duplicated(ensembl_ids)) # no duplicated ids
+any(is.na(ensembl_ids))      # no NA
+length(ensembl_ids)
+
+```
+
+
+# Pre-Processing
+
+```{r pre-processing}
+
+# select interesting genes
+mData = mData[annot$EnsemblID, ]
+all(rownames(mData) == annot$EnsemblID)
+rownames(mData) = annot$GeneSymbol
+
+# set metadata
+cov = expSet$cov
+
+```
+
+
+# Run Models
+* Model 1: `exp ~ APOE + CERAD | exp ~ APOE + Braak`
+* Model 1.5: `exp ~ APOE + CERAD e2, e4` dosage model
+* Model 2 baseline: `C0E4-C0E3, C0E2-C0E3 | B1E4-B1E3, B1E2-B1E3`
+* Model 2.5: `exp ~ APOE + CERAD e2, e4` dosage model for C0 subjects only
+* Model 3: `C3E4-C3E3, C3E2-C3E3 | B3E4-B3E3, B3E2-B3E3`
+* Model 4: `C23E4-C23E3, C23E2-C23E3`
+* Model 5: `C1E4-C1E3, C1E2-C1E3`
+
+## Model 1
+
+Run Model 1, which is `exp ~ APOE + CERAD | exp ~ APOE + Braak`. Then, generate Table S2, which is comprised of differentially expressed microglia genes across APOE groups for ROSMAP DLPFC and each of MSBB brain regions.
+
+```{r model-1}
+
+# run Model 1
+tT_CERAD = run_model1(mData, cov$C, cov$E, annot)
+tT_Braak = run_model1(mData, cov$B,cov$E, annot)
+
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol) 
+
+# Table S2
+TableS2 = copy(annot[order(GeneSymbol), ])
+TableS2[tT_CERAD, on="EnsemblID",  
+        c("ROSMAP_E4vsE3_logFC", "ROSMAP_E4vsE3_CI.L", "ROSMAP_E4vsE3_CI.R", 
+          "ROSMAP_E4vsE3_P.Value", "ROSMAP_E4vsE3_adj.P.Val", 
+          "ROSMAP_E2vsE3_logFC", "ROSMAP_E2vsE3_CI.L", "ROSMAP_E2vsE3_CI.R", 
+          "ROSMAP_E2vsE3_P.Value", "ROSMAP_E2vsE3_adj.P.Val") := .(
+           i.E4vsE3_logFC, i.E4vsE3_CI.L, i.E4vsE3_CI.R,
+           i.E4vsE3_P.Value, i.E4vsE3_adj.P.Val,  
+           i.E2vsE3_logFC, i.E2vsE3_CI.L, i.E2vsE3_CI.R, 
+           i.E2vsE3_P.Value, i.E2vsE3_adj.P.Val)]
+fwrite(TableS2, "../results/TableS2.csv")
+
+```
+
+## Model 1.5
+
+Run Model 1.5, which is `exp ~ APOE + CERAD e2, e4` dosage model. Then, generate Table S3, which is comprised of differentially expressed microglia genes across APOE groups for ROSMAP DLPFC and each of MSBB brain regions using a dosage model.
+
+```{r model-1.5}
+
+# run Model 1.5 with E4 and E2 copies as numeric
+tT_CERAD_ENum = run_model1.5(mData, cov$C, cov$E4num, cov$E2num, annot)
+
+e4_num_genes = intersect(tT_CERAD_ENum[e4_P.Value < 0.05 & e4_logFC > 0, GeneSymbol], tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,GeneSymbol])
+length(e4_num_genes)
+
+e2_num_genes = intersect(tT_CERAD_ENum[e2_P.Value < 0.05 & e2_logFC < 0, GeneSymbol], tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0, GeneSymbol])
+length(e2_num_genes)
+
+intersect(tT_CERAD_ENum[e4_P.Value < 0.05 & e4_logFC > 0, GeneSymbol],
+          tT_CERAD_ENum[e2_P.Value < 0.05 & e2_logFC < 0, GeneSymbol])
+
+# Table S3
+TableS3 = annot[order(GeneSymbol), ]
+TableS3 = TableS3[tT_CERAD_ENum, on = .(EnsemblID, GeneSymbol, Description),
+          c("ROSMAP_e4_logFC", "ROSMAP_e4_CI.L", "ROSMAP_e4_CI.R", 
+            "ROSMAP_e4_P.Value", "ROSMAP_e4_adj.P.Val") := .(
+            i.e4_logFC, i.e4_CI.L, i.e4_CI.R, i.e4_P.Value, i.e4_adj.P.Val)]
+TableS3 = TableS3[tT_CERAD_ENum, on = .(EnsemblID, GeneSymbol, Description), 
+          c("ROSMAP_e2_logFC", "ROSMAP_e2_CI.L", "ROSMAP_e2_CI.R",
+            "ROSMAP_e2_P.Value", "ROSMAP_e2_adj.P.Val") := .(
+            i.e2_logFC, i.e2_CI.L, i.e2_CI.R, i.e2_P.Value, i.e2_adj.P.Val)]
+fwrite(TableS3, "../results/TableS3.csv")
+
+```
+
+## Model 2
+
+Run Model 2 baseline, which is `C0E4-C0E3, C0E2-C0E3 | B1E4-B1E3, B1E2-B1E3`. 
+
+```{r model-2}
+
+# run Model 2
+tT2_CERAD = run_model2("CERAD", mData, cov$C, cov$E, annot) 
+tT2_Braak = run_model2("Braak", mData, cov$B, cov$E, annot)
+
+length(tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT2_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT2_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT2_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+length(tT2_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT2_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT2_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)
+
+```
+
+## Model 2.5
+
+Run Model 2.5, which is `exp ~ APOE + CERAD e2, e4` dosage model for C0 subjects only.
+
+```{r model-2.5}
+
+# run Model 2.5 with with E4 and E2 copies as numeric, C0 subjects only
+
+# select only the C0 subjects
+cSubject = 0
+mData_C0 = mData[, which(cov$C == cSubject)]
+
+tT_CERAD_ENum_C0 = run_model2.5(mData_C0, cov[C == cSubject, E4num], 
+                        cov[C == cSubject, E2num], annot)
+
+nrow(tT_CERAD_ENum_C0[e4_P.Value < 0.05, ])  
+nrow(tT_CERAD_ENum_C0[e2_P.Value < 0.05, ])
+
+e4Num_genes_C0 = intersect(
+  tT_CERAD_ENum_C0[e4_P.Value < 0.05 & e4_logFC > 0, GeneSymbol], 
+  tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0, GeneSymbol])
+e2Num_genes_C0 = intersect(
+  tT_CERAD_ENum_C0[e2_P.Value < 0.05 & e2_logFC < 0,GeneSymbol], 
+  tT2_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0, GeneSymbol])
+
+intersect(tT_CERAD_ENum_C0[e4_P.Value < 0.05 & e4_logFC > 0, GeneSymbol],
+          tT_CERAD_ENum_C0[e2_P.Value < 0.05 & e2_logFC > 0, GeneSymbol])
+
+```
+
+## Model 3
+
+Run Model 3, which is `C3E4-C3E3, C3E2-C3E3 | B3E4-B3E3, B3E2-B3E3`.
+
+```{r model-3}
+
+# run Model 3
+tT3_CERAD = run_model3("CERAD", mData, cov$C, cov$E, annot) 
+tT3_Braak = run_model3("Braak", mData, cov$B, cov$E, annot)
+
+length(tT3_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+length(tT3_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT3_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)
+length(tT3_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT3_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+length(tT3_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT3_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)
+length(tT3_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)
+
+```
+
+## Model 4
+
+Run Model 4, which is `C23E4-C23E3, C23E2-C23E3`.
+
+```{r model-4}
+
+# run Model 4
+tT4_CERAD = run_model4(mData, cov$C, cov$APOE, annot) 
+
+nrow(tT4_CERAD[E4vsE3_P.Value < 0.05,])
+
+length(tT4_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)
+length(tT4_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT4_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)
+length(tT4_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)
+
+```
+
+## Model 5
+
+Run Model 5, which is `C1E4-C1E3, C1E2-C1E3`.
+
+```{r model-5}
+
+# run Model 5
+tT5_CERAD = run_model5(mData, cov$C, cov$APOE, annot) 
+
+nrow(tT5_CERAD[C1E4vsC1E3_P.Value < 0.05,])
+nrow(tT5_CERAD[C2E4vsC2E3_P.Value < 0.05,])
+
+```
+
+
+# Z-Score Analysis
+
+Compute z-scores.
+
+```{r compute-z}
+
+z.C0 = to_z_score("C", 0, mData, cov)
+z.C3 = to_z_score("C", 3, mData, cov)
+z.B1 = to_z_score("B", 1, mData, cov)
+z.B3 = to_z_score("B", 3, mData, cov)
+
+```
+
+Calculate average z-scores.
+
+```{r average-z}
+
+avez.C0 = to_ave_z(z.C0)
+avez.C3 = to_ave_z(z.C3)
+avez.B1 = to_ave_z(z.B1)
+avez.B3 = to_ave_z(z.B3)
+
+```
+
+
+# Spectral Clustering
+
+## C0
+* Number of Clusters: 3
+* Index of Cluster of Interest: 3
+* Number of C0 Genes: 172
+
+After running spectral clustering, generate Table S1, which is a detailed list of microglia-*APOE* cluster genes in ROSMAP DLPFC and MSBB STG CERAD 0 subjects.
+
+```{r c0-clustering}
+
+# spectral clustering
+c = 3; k = 3
+clust.C0 = spectral_clustering(avez.C0, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.C0$clustA))
+rownames(annot_row) = rownames(clust.C0$zMtx)
+pheatmap(clust.C0$zMtx[order(clust.C0$clustA),],
+         annotation_row = annot_row[order(clust.C0$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+C0.genes = sort(rownames(clust.C0$zMtx)[clust.C0$clustA == c])
+length(C0.genes)
+
+# Table S1
+TableS1 = as.data.frame(cbind(clust.C0$clustA, clust.C0$zMtx))
+setDT(TableS1)
+TableS1[, GeneSymbol := rownames(clust.C0$zMtx)]
+TableS1 = annot[GeneSymbol %in% TableS1$GeneSymbol][TableS1, on = .(GeneSymbol)]
+
+colnames(TableS1) = c("EnsemblID", "GeneSymbol", "Description", "Cluster", "ROSMAP_E2", "ROSMAP_E3", "ROSMAP_E4")
+TableS1 = TableS1[Cluster == c,]
+TableS1 = TableS1[,Cluster := NULL]
+TableS1 = TableS1[!duplicated(GeneSymbol), ]
+TableS1 = TableS1[order(GeneSymbol), ]
+fwrite(TableS1, "../results/TableS1.csv", row.names = F)
+
+```
+
+## C3
+* Number of Clusters: 3
+* Index of Cluster of Interest: 3
+* Number of C3 Genes: 181
+
+```{r c3-clustering}
+
+# spectral clustering
+c = 3; k = 3
+clust.C3 = spectral_clustering(avez.C3, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.C3$clustA))
+rownames(annot_row) = rownames(clust.C3$zMtx)
+pheatmap(clust.C3$zMtx[order(clust.C3$clustA),],
+         annotation_row = annot_row[order(clust.C3$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+C3.genes = sort(rownames(clust.C3$zMtx)[clust.C3$clustA == c])
+length(C3.genes)
+
+```
+
+## B1
+* Number of Clusters: 3
+* Index of Cluster of Interest: 3
+* Number of B1 Genes: 200
+
+```{r b1-clustering}
+
+# spectral clustering
+k = 3; c = 3
+# k = 4; c = 4
+clust.B1 = spectral_clustering(avez.B1, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.B1$clustA))
+rownames(annot_row) = rownames(clust.B1$zMtx)
+pheatmap(clust.B1$zMtx[order(clust.B1$clustA),],
+         annotation_row = annot_row[order(clust.B1$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+B1.genes = sort(rownames(clust.B1$zMtx)[clust.B1$clustA == c])
+sum(clust.B1$clustA == c)
+length(B1.genes)
+
+```
+
+## B3
+* Number of Clusters: 3
+* Index of Cluster of Interest: 2
+* Number of B3 Genes: 174
+
+```{r b3-clustering}
+
+# spectral clustering
+k = 3; c = 2
+# k = 4; c = 3
+clust.B3 = spectral_clustering(avez.B3, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.B3$clustA))
+rownames(annot_row) = rownames(clust.B3$zMtx)
+pheatmap(clust.B3$zMtx[order(clust.B3$clustA),],
+         annotation_row = annot_row[order(clust.B3$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+# interested in cluster 2
+B3.genes = sort(rownames(clust.B3$zMtx)[clust.B3$clustA == c])
+length(B3.genes)
+
+```
+
+
+## Overlap
+Intersection of C0 and C3 genes: 87. Intersection of B1 and B3 genes: 69.
+
+### qPCR Genes
+* Non-microglial and low-expressed genes: *CLU*, *GFAP*, *TNF*.
+* Intersect with C0 genes: *TREM2*, *TYROBP*, *P2RY12*, *C1QA*, *C3*, *CD68*.
+* Not in C0 genes: *CX3CR1*, *IL1B*.
+* Intersect with C3 genes: *TREM2*, *TYROBP*.
+* Not in C3 genes: *P2RY12*, *CX3CR1*, *C1QA*, *C3*, *CD68*, *IL1B*, *TNF*.
+
+```{r hypergeometric-tests}
+
+# hypergeometric tests
+phyper_test(C0.genes, B1.genes)
+phyper_test(C3.genes, B3.genes)
+phyper_test(C0.genes, C3.genes)
+phyper_test(B1.genes, B3.genes)
+
+```
+
+
+# Statistical Testing
+
+Statistical testing of microglia-APOE genes across *APOE* genotypes. Average of Z-scores for interested genes for each individual as outcome, with *APOE* genotype as a covariate. Use *APOE* `E3/E3` as the baseline.
+
+
+```{r statistical-testing}
+
+# C0 test
+cov_C0 = cov[C == 0,]
+all(cov_C0$projid == colnames(z.C0$z))
+test_avez(z.C0$z, C0.genes, cov_C0)
+
+# C3 test
+cov_C3 = cov[C == 3,]
+all(cov_C3$projid == colnames(z.C3$z))
+test_avez(z.C3$z, C3.genes, cov_C3)
+
+# B1 test
+cov_B1 = cov[B == 1,]
+all(cov_B1$projid == colnames(z.B1$z))
+test_avez(z.B1$z, B1.genes, cov_B1)
+
+# B3 test
+cov_B3 = cov[B == 3,]
+all(cov_B1$projid == colnames(z.B1$z))
+test_avez(z.B3$z, B3.genes, cov_B3)
+
+```
+
+
+# Figure 2A and 2B
+* Figure 2A: the heatmap for spectral clustering.
+* Figure 2B: the individual z-score heatmap (C0 subjects).
+
+Column cluster (subjects) based on `E2`, `E3`, `E4` group separately. Row cluster (genes) based on dendrogram.
+
+```{r figure-2ab}
+
+# prepare data
+zC0 = z.C0$z
+zC0 = zC0[order(clust.C0$clustA),]
+zC0.genes = zC0[rownames(zC0) %in% C0.genes,]
+
+# color function
+colFun1 = colorRamp2(c(-1, -0.5, 0, 0.5, 1), 
+            c("#4575b4", "#74add1", "white", "#f46d43", "#d73027"))
+colFun2 = colorRamp2(c(-4, -2, 0, 2, 4), 
+            c("#0000FFFF", "#7C50FDFF", "#EEEEEEFF", "#FF6545FF", "#FF0000FF"))
+
+# Figure 2B
+# individual z-score heatmap for ROSMAP C0 subjects
+topAnnot = HeatmapAnnotation(z = anno_barplot(
+  colMeans(zC0.genes), smooth = TRUE, 
+  axis_param = list(gp = gpar(fontsize = 5))), 
+  annotation_height = unit(0.7, "cm"))
+
+h = Heatmap(zC0.genes, 
+            name = "z-score",
+            col = colFun2,
+            show_row_names = FALSE,
+            show_column_names = FALSE,
+            cluster_rows = TRUE,
+            show_heatmap_legend = FALSE,
+            column_split = factor(z.C0$E, levels = c("E2", "E3", "E4")),
+            cluster_column_slices = FALSE,
+            column_title_gp =  gpar(col = "black", fontsize = 12),
+            show_column_dend = TRUE,
+            show_row_dend = TRUE,
+            border = "#AAAAAA",
+            row_dend_side = "right",
+            height = unit(12.7, "cm"),
+            column_dend_height = unit(0.7, "cm"),
+            row_dend_width = unit(0.7, "cm"),
+            width = unit(17, "cm"),
+            top_annotation = topAnnot
+)
+
+panel_fun = function(index, nm) {
+  pushViewport(viewport())
+  grid.rect()
+  grid.rect(gp = gpar(fill = "white", col = "white"))
+  grid.lines(c(0, 1, 1, 0), c(0, 0, 1, 1), gp = gpar(col = "#AAAAAA"), 
+             default.units = "npc")
+  draw(h, newpage = FALSE)
+  popViewport()
+}
+
+
+# box for Figure 2B
+zoom_idx = which(rownames(zC0) %in% C0.genes)
+layer_fun = function(j, i, x, y, width, height, fill) {
+  v = pindex(zC0, i, j)
+  if(i %in% zoom_idx) {
+    grid.rect(gp = gpar(lwd = 2, col = "black"))
+  }
+}
+
+anno = anno_zoom(align_to = zoom_idx, which = "row", 
+                 panel_fun = panel_fun, 
+                 width = unit(21, "cm"), 
+                 gap = unit(5, "cm"),
+                 size = unit(15.5, "cm"),
+                 link_width = unit(2, "cm"),
+                 link_height = unit(5, "cm"),
+                 link_gp = gpar(fill = "white", col = "#AAAAAA"),
+                 internal_line = FALSE)
+
+
+# legend
+lgd.h = Legend(col_fun = colFun1, title = "A: Average z-score", border = "black", 
+               legend_width = unit(8.9, "cm"), 
+               direction = "horizontal")
+
+lgd.have = Legend(col_fun = colFun2, title = "B: z-score", border = "black", 
+                  legend_width = unit(8.9, "cm"), 
+                  direction = "horizontal")
+
+pd = packLegend(lgd.h, lgd.have, 
+                column_gap = unit(0.5, "cm"),
+                direction = "horizontal")
+
+
+# Figure 2A
+# heatmap for average z-scores
+pdf("../results/Figure2AB.pdf", width = 11)
+Heatmap(as.matrix(avez.C0[order(clust.C0$clustA), c("E2", "E3", "E4")]), 
+        col = colFun1,
+        cluster_columns = FALSE,
+        cluster_rows = FALSE,
+        show_row_names = FALSE,
+        show_column_names = TRUE,
+        right_annotation = rowAnnotation(foo = anno),
+        row_split = sort(clust.C0$clustA), 
+        column_names_side = "bottom",
+        layer_fun = layer_fun,
+        show_heatmap_legend = FALSE,
+        width = unit(5, "cm"),
+        column_names_rot = 0,
+        column_names_centered = T,
+        row_title_gp = gpar(fontsize = 11)
+)
+draw(pd, x = unit(18.3, "cm"), y = unit(17, "cm"))
+grid.text("A", x = unit(0.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=16))
+grid.text("B", x = unit(8.5, "cm"), y = unit(17.2, "cm"), gp = gpar(fontsize=16))
+dev.off()
+
+```
+
+
+# Figure 2C
+
+Violin plots where each dot represents a person.
+
+```{r figure-2c}
+
+# zC0: z-score of C0 subjects only
+zC0 = z.C0$z[C0.genes, ]
+zC0.e2 = zC0[,z.C0$E == "E2"]
+zC0.e3 = zC0[,z.C0$E == "E3"]
+zC0.e4 = zC0[,z.C0$E == "E4"]
+
+my.dat = list(`2` = colMeans(zC0.e2), `3` = colMeans(zC0.e3), `4` = colMeans(zC0.e4))
+my.df = reshape2::melt(my.dat)
+my.df$L1 = as.numeric(my.df$L1)
+colnames(my.df) = c("z-score", "APOE.num")
+ggthemr('greyscale')
+my.df$APOE = as.factor(my.df$APOE.num)
+  
+to_swap = c("#62bba5", # E4
+            "#785d37", # E3
+            "#ffb84d") # E2
+  
+# violin plot
+ggplot(my.df, aes(x = APOE.num, y = `z-score`, color = APOE)) +
+  geom_violin(fill = "white", trim = FALSE) +
+  geom_quasirandom(alpha = 0.3, width = 0.1, dodge.width = 0.9, varwidth = TRUE) +
+  scale_color_manual(values = c("#62bba5", "#785d37", "#ffb84d")) +
+  labs(y = "Average Z-Score", x = "APOE Genotype") +
+  theme(text = element_text(size = 14),
+        legend.position="bottom", legend.direction = "horizontal",
+        axis.title.x = element_text(face = "bold", size = 11),
+        axis.title.y = element_text(face = "bold", size = 11),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_text(face = "bold")) +
+  stat_summary(fun.data=mean_cl_normal, geom="errorbar", width=0.2, position = position_dodge(0.9), color = "black")
+ggsave("../results/Figure2C-ROSMAP.pdf", width = 5, height = 4, dpi = 300)
+
+```
+
+
+# Figure 3B
+
+E4 vs. E3 average Z-score line plot from C0 to C3.
+
+```{r figure-3b}
+
+all(colnames(mData) == cov$projid)
+
+# remove subjects which have no APOE or CERAD record
+sel = (!is.na(cov$APOE)) & (!is.na(cov$C))
+mData.2 = mData[, sel]
+
+# z-score
+means = rowMeans(mData.2)
+sds = apply(mData.2, 1, sd)
+zscore = function(x) return((x - means)/sds)
+mDataZ = apply(mData.2, 2, zscore)
+cov[, EC := paste(paste0("C", C), E, sep = ":")]
+EC = cov$EC[sel]
+
+# average z-score
+aveZ = data.table(Genes = rownames(mDataZ),
+                  C0E2 = rowMeans(mDataZ[, EC == "C0:E2"]),
+                  C0E3 = rowMeans(mDataZ[, EC == "C0:E3"]),
+                  C0E4 = rowMeans(mDataZ[, EC == "C0:E4"]),
+                        
+                  C1E2 = rowMeans(mDataZ[, EC == "C1:E2"]),
+                  C1E3 = rowMeans(mDataZ[, EC == "C1:E3"]),
+                  C1E4 = rowMeans(mDataZ[, EC == "C1:E4"]),
+                        
+                  C2E2 = rowMeans(mDataZ[, EC == "C2:E2"]),
+                  C2E3 = rowMeans(mDataZ[, EC == "C2:E3"]),
+                  C2E4 = rowMeans(mDataZ[, EC == "C2:E4"]),
+                        
+                  C3E2 = rowMeans(mDataZ[, EC == "C3:E2"]),
+                  C3E3 = rowMeans(mDataZ[, EC == "C3:E3"]),
+                  C3E4 = rowMeans(mDataZ[, EC == "C3:E4"]))
+
+aveZ2 = melt(aveZ, id.vars = c("Genes"))
+colnames(aveZ2) = c("Genes", "EC", "aveZ") 
+aveZ2[, CERAD := gsub("E[234]$", "", aveZ2$EC)]
+aveZ2[, APOE := gsub("C[0123]", "", aveZ2$EC)]
+
+# colors
+ggthemr("fresh")
+to_swap = c("#62bba5", # E4
+            "#785d37", # E3
+            "#ffb84d") # E2
+
+# figure label
+APOE_label = c("\u03B52", "\u03B53", "\u03B54")
+names(APOE_label) = c("E2", "E3", "E4")
+
+# Figure 3B
+ggplot(aveZ2[Genes %in% C13.genes], aes(x = CERAD, y = aveZ, color = APOE)) + 
+  geom_point() +
+  geom_line(aes(group = factor(Genes)),
+            color = "black",
+            alpha = 0.1) +
+  ylab("Average z-score") +
+  xlab("CERAD NP score") +
+  facet_grid(cols = vars(APOE), labeller = as_labeller(APOE_label)) +
+  scale_color_manual(values = rev(to_swap), labels = APOE_label)
+ggsave("../results/Figure3B_intersect_C0&C3.genes.pdf", width = 10, height = 5, device=cairo_pdf)
+
+```
+
+
+# Figure 3C
+
+Correlation matrix comparing the APOE4 versus APOE3 change.
+
+```{r figure-3c}
+
+# prepare data for downstream analysis
+fig3_tT2_CERAD = copy(tT2_CERAD)
+colnames(fig3_tT2_CERAD) = gsub("E4vsE3", "C0E4vsC0E3",colnames(fig3_tT2_CERAD))
+colnames(fig3_tT2_CERAD) = gsub("E2vsE3", "C0E2vsC0E3",colnames(fig3_tT2_CERAD))
+fig3_tT3_CERAD = copy(tT3_CERAD)
+colnames(fig3_tT3_CERAD) = gsub("E4vsE3", "C3E4vsC3E3",colnames(fig3_tT3_CERAD))
+colnames(fig3_tT3_CERAD) = gsub("E2vsE3", "C3E2vsC3E3",colnames(fig3_tT3_CERAD))
+
+fig3 = fig3_tT2_CERAD[tT5_CERAD, on=c("GeneSymbol", "EnsemblID", "Description")]
+fig3 = fig3[fig3_tT3_CERAD, on=c("GeneSymbol", "EnsemblID", "Description")]
+
+fig3.1 = fig3[GeneSymbol %in% C13.genes, 
+      .(C0E4vsC0E3_logFC, C1E4vsC1E3_logFC, C2E4vsC2E3_logFC, C3E4vsC3E3_logFC)]
+fig3.2 = tidyr::gather(fig3.1, "CERAD", "logFC", 1:4) 
+
+colnames(fig3.1) = c("C0", "C1", "C2", "C3")
+ggthemr("fresh")
+fig3.c = tidyr::gather(fig3.1, "CERAD", "logFC")
+setDT(fig3.c)
+
+# axis labels
+axisLow = list("C0" = c("C1", "C2", "C3"),
+               "C1" = c("C2", "C3"),
+               "C2" = c("C3"))
+
+axisUp = list("C1" = c("C0"),
+              "C2" = c("C0", "C1"),
+              "C3" = c("C0", "C1", "C2"))
+
+# color
+color = list("C0" = "#f1c40f",
+             "C1" = "#3498db",
+             "C2" = "#2ecc71",
+             "C3" = "#e74c3c")
+
+# Figure 3C
+p = list()
+for(pCol in names(axisLow)){
+  x = pCol
+  for (y in axisLow[[pCol]]){
+    label = paste0(x, y)
+    p[["low"]][[label]] = ggplot(data = fig3.1, mapping = aes_string(x, y)) +
+    geom_point(size = 0.5) +
+    geom_abline(intercept = 0, slope = 1, color = "black", linetype = 2, alpha = 1.4) +
+    xlim(-0.4, 1.2) + ylim(-0.4, 1.2) +
+    theme(axis.line=element_line(color = "#786049"),
+          panel.border = element_rect(color = "#786049", fill = NA, size=1)) +
+    ylab(y) + xlab(x) 
+  }
+}
+
+for(pCol in names(axisUp)){
+  x = pCol
+  for (y in axisUp[[pCol]]){
+    label = paste0(x, y)
+    p[["up"]][[label]] = ggplot(fig3.c[CERAD %in% c(x, y), ], 
+                aes(x = logFC, group = CERAD, fill = CERAD, color = CERAD)) +
+         geom_density(alpha = 0.5) +
+         ylab(y) +
+         xlab(x) +
+         xlim(-0.4, 1.2) +
+         ylim(0, 4.5) +
+         theme(panel.border = element_rect(color = "#786049", fill = NA, size=1)) + 
+         scale_fill_manual(breaks = c("C0", "C1", "C2", "C3"), 
+                           values = c("#f1c40f", "#3498db", "#2ecc71", "#e74c3c"))+ 
+         scale_color_manual(breaks = c("C0", "C1", "C2", "C3"), 
+                           values = c("#f1c40f", "#3498db", "#2ecc71", "#e74c3c")) + 
+         theme(legend.position = "none")  
+  }
+}
+
+for(pCol in c("C0", "C1", "C2", "C3")){
+  x = pCol
+  p[[x]] = ggplot() + 
+           annotate("text", x = 4, y = 25, size=8, label = x, color = "#555555") + 
+           theme(panel.border = element_rect(color = "#786049", fill = NA, size=1),
+                 panel.grid.major = element_blank(),
+                 axis.ticks = element_line(color = "white")
+           ) + 
+           scale_x_discrete(labels= " ") +
+           scale_y_discrete(labels= " ") +
+           xlab(x) +
+           ylab(x) 
+}
+
+# legend 
+pAllD = ggplot(fig3.c, 
+                aes(x = logFC, group = CERAD, fill = CERAD, color = CERAD)) +
+         geom_density(alpha = 0.5) +
+         scale_fill_manual(breaks = c("C0", "C1", "C2", "C3"), 
+                           values = c("#f1c40f", "#3498db", "#2ecc71", "#e74c3c"))+ 
+         scale_color_manual(breaks = c("C0", "C1", "C2", "C3"), 
+                           values = c("#f1c40f", "#3498db", "#2ecc71", "#e74c3c")) 
+legend = cowplot::get_legend(pAllD)
+
+fig3c = ggarrange(p[["C0"]], p[["up"]][["C1C0"]], p[["up"]][["C2C0"]], 
+                  p[["up"]][["C3C0"]], p[["low"]][["C0C1"]], p[["C1"]],
+                  p[["up"]][["C2C1"]],  p[["up"]][["C3C1"]],
+                  p[["low"]][["C0C2"]], p[["low"]][["C1C2"]], 
+                  p[["C2"]],  p[["up"]][["C3C2"]],
+                  p[["low"]][["C0C3"]], p[["low"]][["C1C3"]], 
+                  p[["low"]][["C2C3"]], p[["C3"]],
+          nrow = 4, ncol = 4, heights = c(3, 3, 3, 3), align = "hv")
+fig3c2 = annotate_figure(fig3c,
+            bottom = text_grob("log Fold Change E4 vs E3 in CERAD NP score", 
+            size = 12, color = "#555555"),
+            left = text_grob("log Fold Change E4 vs E3 in CERAD NP score", 
+                             size = 12, rot = 90, color = "#555555")
+)
+fig3c3 = cowplot::plot_grid(fig3c2, NULL, legend, 
+                            rel_widths = c(4, 0.02, .3), nrow = 1)
+ggsave("../results/Figure3C_intersect_C0&C3.genes.pdf", fig3c3, width = 9, height = 8)
+
+```

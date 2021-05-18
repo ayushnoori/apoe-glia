@@ -1885,7 +1885,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     --heading-font:    'Montserrat', sans-serif;
     --mono-font:       monospace;
     --body-font:       'Quicksand', sans-serif;
-    --navbar-font:     'Biryani', sans-serif;  /* websites + blogs only */
+    --navbar-font:     'Montserrat', sans-serif;  /* websites + blogs only */
   }
 
   /*-- ARTICLE METADATA --*/
@@ -1931,10 +1931,42 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   /*-- Additional custom styles --*/
   /* Add any additional CSS rules below                      */
 
-  .distill-site-header { 
-    letter-spacing: 2px;
+
+  /* NAVIGATION BAR */
+
+  .nav-left { 
+    letter-spacing: 1px;
     text-transform: uppercase;
   }
+
+  .nav-right > a { 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .nav-dropbtn { 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+
+  /* ARTICLE FORMATTING */
+
+  h1 {
+    margin-top: 2em;
+    font-size: 36px !important;
+  }
+
+  d-article h1:nth-child(2) {
+    margin-top: 0.67em;
+  }
+
+  h2 {
+    font-size: 22px !important;
+  }
+
+
+  /* BACKGROUND COLOR */
 
   body {
     background-color: #F4F1DE;
@@ -2151,7 +2183,46 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 <div class="nav-right">
 <a href="index.html">Home</a>
-<a href="qPCR-analysis.html">qPCR Analysis</a>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+Functions
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="models.html">Models</a>
+<a href="spectral-clustering.html">Spectral Clustering</a>
+</div>
+</div>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+ROSMAP
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="ROSMAP-variables.html">Define Variables</a>
+<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<hr/>
+<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<hr/>
+<a href="ROSMAP-astrocyte.html">Astrocyte Analysis</a>
+</div>
+</div>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+MSBB
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="ROSMAP-variables.html">Define Variables</a>
+<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<hr/>
+<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+</div>
+</div>
+<a href="qPCR-analysis.html">qPCR</a>
 <a href="https://github.com/ayushnoori/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>

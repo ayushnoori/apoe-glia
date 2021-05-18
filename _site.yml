@@ -13,6 +13,33 @@ navbar:
   right:
     - text: "Home"
       href: index.html
-    - text: "qPCR Analysis"
+    - text: "Functions"
+      menu:
+        - text: "Models"
+          href: models.html
+        - text: "Spectral Clustering"
+          href: spectral-clustering.html
+    - text: "ROSMAP"
+      menu:
+        - text: "Define Variables"
+          href: ROSMAP-variables.html
+        - text: "Pre-Process Data"
+          href: ROSMAP-preprocess.html
+        - text: "---"
+        - text: "Microglia Analysis"
+          href: ROSMAP-microglia.html
+        - text: "---"
+        - text: "Astrocyte Analysis"
+          href: ROSMAP-astrocyte.html
+    - text: "MSBB"
+      menu:
+        - text: "Define Variables"
+          href: ROSMAP-variables.html
+        - text: "Pre-Process Data"
+          href: ROSMAP-preprocess.html
+        - text: "---"
+        - text: "Microglia Analysis"
+          href: ROSMAP-microglia.html
+    - text: "qPCR"
       href: qPCR-analysis.html
 output: distill::distill_article
