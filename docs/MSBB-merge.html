@@ -86,30 +86,30 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Effect of APOE on the Glial Transcriptome: qPCR Analysis</title>
+  <title>Effect of APOE on the Glial Transcriptome: Merge MSBB Data</title>
 
-  <meta property="description" itemprop="description" content="This script performs analysis of RT-qPCR data."/>
+  <meta property="description" itemprop="description" content="This script uses ComBat to merge MSBB data."/>
 
   <link rel="icon" type="image/vnd.microsoft.icon" href="images/favicon.ico"/>
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: qPCR Analysis"/>
+  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: Merge MSBB Data"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="This script performs analysis of RT-qPCR data."/>
+  <meta property="og:description" content="This script uses ComBat to merge MSBB data."/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Effect of APOE on the Glial Transcriptome"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: qPCR Analysis"/>
-  <meta property="twitter:description" content="This script performs analysis of RT-qPCR data."/>
+  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: Merge MSBB Data"/>
+  <meta property="twitter:description" content="This script uses ComBat to merge MSBB data."/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["qPCR Analysis"]},{"type":"character","attributes":{},"value":["This script performs analysis of RT-qPCR data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["Merge MSBB Data"]},{"type":"character","attributes":{},"value":["This script uses ComBat to merge MSBB data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2171,7 +2171,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"qPCR Analysis","description":"This script performs analysis of RT-qPCR data.","authors":[]}
+{"title":"Merge MSBB Data","description":"This script uses ComBat to merge MSBB data.","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2216,10 +2216,10 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="MSBB-variables.html">Define Variables</a>
+<a href="MSBB-merge.html">Merge Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia.html">Microglia Analysis</a>
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
@@ -2235,10 +2235,10 @@ MSBB
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>qPCR Analysis</h1>
+<h1>Merge MSBB Data</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>This script performs analysis of RT-qPCR data.</p></p>
+<p><p>This script uses ComBat to merge MSBB data.</p></p>
 </div>
 
 
@@ -2248,11 +2248,90 @@ MSBB
 <h3>Contents</h3>
 <ul>
 <li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#read-data">Read Data</a></li>
+<li><a href="#remove-batch-effects">Remove Batch Effects</a></li>
+<li><a href="#save-results">Save Results</a></li>
 </ul>
 </nav>
 </div>
 <h1 id="dependencies">Dependencies</h1>
 <p>Load requisite packages.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://Rdatatable.gitlab.io/data.table'>data.table</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>sva</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="read-data">Read Data</h1>
+<p>Define brain regions.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>brain_regions</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IFG"</span>, <span class='st'>"STG"</span>, <span class='st'>"PHG"</span>, <span class='st'>"FP"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Read expression data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read mData</span>
+<span class='va'>MSBB_mData</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>brain_regions</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>brain_region</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='co'># process expression file</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"processing"</span>, <span class='va'>brain_region</span>, <span class='st'>"...\n"</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/load.html'>load</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"../Data/MSBB-"</span>, <span class='va'>brain_region</span>,<span class='st'>"-24.Rdata"</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>expSet</span><span class='op'>$</span><span class='va'>mData</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>MSBB_mData</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>MSBB_mData</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>MSBB_mData</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>cbind</span>, <span class='va'>MSBB_mData</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Read covariate data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># load cov data</span>
+<span class='va'>MSBB_cov</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>brain_regions</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>brain_region</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='co'># process expression file</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"processing"</span>, <span class='va'>brain_region</span>, <span class='st'>"...\n"</span><span class='op'>)</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/load.html'>load</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"../Data/MSBB-"</span>, <span class='va'>brain_region</span>,<span class='st'>"-24.Rdata"</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>expSet</span><span class='op'>$</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>brain_region</span> <span class='op'>=</span> <span class='va'>brain_region</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>expSet</span><span class='op'>$</span><span class='va'>cov</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+<span class='va'>MSBB_cov</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/do.call.html'>do.call</a></span><span class='op'>(</span><span class='va'>rbind</span>, <span class='va'>MSBB_cov</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Confirm sample order.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>MSBB_mData</span><span class='op'>)</span> <span class='op'>==</span> <span class='va'>MSBB_cov</span><span class='op'>$</span><span class='va'>individualIdentifier</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="remove-batch-effects">Remove Batch Effects</h1>
+<p>First, create the model matrix for the adjustment variables, including the variable of interest. Note that you do not include batch when creating this model matrix; rather, batch will be included in the ComBat function call in the following chunk. In this case, there are no other adjustment variables so we simply fit an intercept term.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>modcombat</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/model.matrix.html'>model.matrix</a></span><span class='op'>(</span><span class='op'>~</span><span class='fl'>1</span>, data<span class='op'>=</span><span class='va'>MSBB_cov</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Now, remove batch effects using the ComBat approach from the <code>sva</code> package. The input data is assumed to be cleaned and normalized before batch effect removal.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>MSBB_combat</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/sva/man/ComBat.html'>ComBat</a></span><span class='op'>(</span>dat<span class='op'>=</span><span class='va'>MSBB_mData</span>, batch<span class='op'>=</span><span class='va'>MSBB_cov</span><span class='op'>$</span><span class='va'>brain_region</span>, mod<span class='op'>=</span><span class='va'>modcombat</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="save-results">Save Results</h1>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>expSet</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mData <span class='op'>=</span> <span class='va'>MSBB_combat</span>,
+              cov <span class='op'>=</span> <span class='va'>MSBB_cov</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/save.html'>save</a></span><span class='op'>(</span><span class='va'>expSet</span>, file <span class='op'>=</span> <span class='st'>"../Data/MSBB-combated.Rdata"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

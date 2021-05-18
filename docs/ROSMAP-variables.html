@@ -88,7 +88,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_meta_tags-->
   <title>Effect of APOE on the Glial Transcriptome: Define ROSMAP Variables</title>
 
-  <meta property="description" itemprop="description" content="This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data."/>
+  <meta property="description" itemprop="description" content="This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data."/>
 
   <link rel="icon" type="image/vnd.microsoft.icon" href="images/favicon.ico"/>
 
@@ -96,20 +96,20 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
   <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: Define ROSMAP Variables"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data."/>
+  <meta property="og:description" content="This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data."/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Effect of APOE on the Glial Transcriptome"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
   <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: Define ROSMAP Variables"/>
-  <meta property="twitter:description" content="This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data."/>
+  <meta property="twitter:description" content="This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data."/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["Define ROSMAP Variables"]},{"type":"character","attributes":{},"value":["This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["Define ROSMAP Variables"]},{"type":"character","attributes":{},"value":["This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2171,7 +2171,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Define ROSMAP Variables","description":"This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.","authors":[]}
+{"title":"Define ROSMAP Variables","description":"This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data.","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2216,10 +2216,10 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="MSBB-variables.html">Define Variables</a>
+<a href="MSBB-merge.html">Merge Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia.html">Microglia Analysis</a>
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
@@ -2238,7 +2238,7 @@ MSBB
 <h1>Define ROSMAP Variables</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.</p></p>
+<p><p>This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data.</p></p>
 </div>
 
 
@@ -2346,13 +2346,13 @@ MSBB
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
-<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>CERAD</span><span class='op'>)</span><span class='op'>]</span>
-<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>1</span>,<span class='fl'>0</span><span class='op'>)</span>
-<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>]</span>
-<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>B</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>Braak</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>B</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>2</span>,<span class='fl'>3</span>,<span class='fl'>3</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>B</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>B</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>B</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>B</span><span class='op'>)</span><span class='op'>]</span>
 
 <span class='co'># double-check</span>
-<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>CERAD</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>B</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>Braak</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>

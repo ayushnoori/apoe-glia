@@ -1,7 +1,7 @@
 ---
 title: "Define ROSMAP Variables"
 description: |
- This script performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, and defines variables in the covariate data.
+ This script first performs preprocessing of ROSMAP FPKM and covariate data so that they have same order, then defines variables in the covariate data.
 output:
   distill::distill_article:
     toc: true
@@ -114,13 +114,13 @@ Proportion of `NA` values: 0.
 ```{r braak}
 
 # refactor
-cov[, C := as.factor(CERAD)]
-levels(cov$C) = c(3,2,1,0)
-cov[, C := as.character(C)]
-cov[, C := factor(C)]
+cov[, B := as.factor(cov$Braak)]
+levels(cov$B) = c(1,1,1,2,2,3,3)
+cov[, B := as.character(B)]
+cov[, B := factor(B)]
 
 # double-check
-table(cov$C, cov$CERAD)
+table(cov$B, cov$Braak)
 
 ```
 

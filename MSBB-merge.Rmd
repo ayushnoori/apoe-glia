@@ -1,0 +1,104 @@
+---
+title: "Merge MSBB Data"
+description: |
+ This script uses ComBat to merge MSBB data.
+output:
+  distill::distill_article:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Dependencies
+
+Load requisite packages.
+
+```{r load-packages}
+
+library(data.table)
+library(sva)
+
+```
+
+
+# Read Data
+
+Define brain regions.
+
+```{r define-regions}
+
+brain_regions = c("IFG", "STG", "PHG", "FP")
+
+```
+
+Read expression data.
+
+```{r read-mdata}
+
+# read mData
+MSBB_mData = lapply(brain_regions, function(brain_region){
+  # process expression file
+  cat("processing", brain_region, "...\n")
+  load(paste0("../Data/MSBB-", brain_region,"-24.Rdata"))
+  return(expSet$mData)
+})
+all(unlist(lapply(MSBB_mData, function(x) all(rownames(x) == rownames(MSBB_mData[[1]])))))
+MSBB_mData = do.call(cbind, MSBB_mData)
+
+```
+
+Read covariate data.
+
+```{r read-covariate}
+
+# load cov data
+MSBB_cov = lapply(brain_regions, function(brain_region){
+  # process expression file
+  cat("processing", brain_region, "...\n")
+  load(paste0("../Data/MSBB-", brain_region,"-24.Rdata"))
+  expSet$cov$brain_region = brain_region
+  return(expSet$cov)
+})
+MSBB_cov = do.call(rbind, MSBB_cov)
+
+```
+
+Confirm sample order.
+
+```{r confirm-order}
+
+all(colnames(MSBB_mData) == MSBB_cov$individualIdentifier)
+
+```
+
+
+# Remove Batch Effects
+
+First, create the model matrix for the adjustment variables, including the variable of interest. Note that you do not include batch when creating this model matrix; rather, batch will be included in the ComBat function call in the following chunk. In this case, there are no other adjustment variables so we simply fit an intercept term.
+
+```{r create-matrix}
+
+modcombat = model.matrix(~1, data=MSBB_cov)
+
+```
+
+Now, remove batch effects using the ComBat approach from the `sva` package. The input data is assumed to be cleaned and normalized before batch effect removal.
+
+```{r remove-batch}
+
+MSBB_combat = ComBat(dat=MSBB_mData, batch=MSBB_cov$brain_region, mod=modcombat)
+
+```
+
+
+# Save Results
+
+```{r save-results}
+
+expSet = list(mData = MSBB_combat,
+              cov = MSBB_cov)
+save(expSet, file = "../Data/MSBB-combated.Rdata")
+
+```

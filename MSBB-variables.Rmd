@@ -1,7 +1,7 @@
 ---
-title: "qPCR Analysis"
+title: "Define MSBB Variables"
 description: |
- This script performs analysis of RT-qPCR data.
+ This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data.
 output:
   distill::distill_article:
     toc: true
@@ -15,4 +15,273 @@ knitr::opts_chunk$set(eval = FALSE)
 
 Load requisite packages.
 
+```{r load-packages}
 
+library(data.table)
+
+```
+
+
+# Define Paths
+
+Define brain regions for analysis and paths to normalized data files (i.e., Trimmed Mean of M-Values or TMM matrices).
+
+```{r read-data}
+
+brain_regions = c("IFG", "STG", "PHG", "FP")
+data_files = list(
+  IFG = "../Data/AMP-AD_MSBB_MSSM_BM_44.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv",
+  STG = "../Data/AMP-AD_MSBB_MSSM_BM_22.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv",
+  PHG = "../Data/AMP-AD_MSBB_MSSM_BM_36.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv",
+  FP = "../Data/AMP-AD_MSBB_MSSM_BM_10.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv"
+)
+
+```
+
+
+# Analyze Brain Regions
+
+Iterate over previously specified brain regions to process each region. **All code after this chunk should be encapsulated in a `for` loop.** To appropriately document the code, pseudocode of the `for` loop is shown below, while the contents of the `for` loop are described in subsequent chunks.
+
+```{r analyze-regions}
+
+for(brain_region in brain_regions) {
+  
+  # insert following chunks here
+  
+}
+
+```
+
+For the purposes of illustration, we define the `brain_region` of interest as the inferior frontal fygrus (IFG).
+
+```{r define-region}
+
+brain_region = "IFG"
+
+```
+
+
+# Process Expression Data
+
+Process expression data and remove unnecessary headers from sample IDs (e.g., `S109B355.BM_10_798` becomes `BM_10_798`).
+
+```{r process-expression}
+
+# process expression data
+cat("processing", brain_region, "...\n")
+data_file = unlist(data_files[brain_region])
+msbb = suppressWarnings({fread(data_file, sep = "\t")})
+gene_ids = msbb$V1
+msbb = as.data.frame(msbb[, -1, with = F])
+rownames(msbb) = gene_ids
+
+# remove unnecessary headers
+colnames(msbb) = gsub("^.*\\.", "", colnames(msbb))
+
+```
+
+Extract subject IDs in the same order as the sample IDs, then check for samples without an ID match.
+
+```{r extract-subjects}
+
+# extract subject IDs
+key_file =  "../Data/MSBB_RNAseq_covariates_November2018Update.csv"
+key_map = fread(key_file)
+key_map = unique(key_map[, .(sampleIdentifier, individualIdentifier)])
+
+# check for samples without an ID match
+cat("any samples don't have id match? ")
+cat(any(!colnames(msbb) %in% key_map$sampleIdentifier), "\n")
+sub_key_map = key_map[data.table(sampleIdentifier = colnames(msbb)), on = .(sampleIdentifier)]
+all(sub_key_map$sampleIdentifier == colnames(msbb))
+colnames(msbb) = sub_key_map$individualIdentifier
+
+
+```
+
+Check for duplicated samples.
+
+```{r check-duplicates}
+
+# any duplicated samples?
+if(any(duplicated(colnames(msbb)))){
+  cat("remove duplicate samples..\n")
+  msbb = msbb[, !duplicated(colnames(msbb))]
+}
+
+```
+
+
+# Process Covariate Data
+
+Note that subject #1009 has an invalid Braak score of 9.
+
+```{r process-covariate}
+
+cov_file = "../Data/MSBB_clinical.csv"
+cov = fread(cov_file)
+setnames(cov, c("NP.1", "bbscore"), c("CERAD", "Braak"))
+cov[Braak > 6, Braak := NA]
+
+```
+
+Extract clinical data in the same order as in the data.
+
+```{r extract-clinical}
+
+cov = cov[data.table(individualIdentifier = colnames(msbb)), on = .(individualIdentifier)]
+all(cov$individualIdentifier == colnames(msbb))
+
+```
+
+
+# Define Clinical Variables
+
+## Braak
+
+Group levels into 3 categories:
+* `1` = `Normal/I/II`
+* `2` = `III/IV`
+* `3` = `V/VI`
+
+```{r braak}
+
+cov[, B := as.factor(cov$Braak)]
+levels(cov$B) = c(1,1,1,2,2,3,3)
+cov[, B := as.factor(as.character(B))]
+table(cov$B, cov$Braak)
+
+# double-check
+table(cov$C, cov$Braak)
+
+```
+
+## CERAD
+
+Old MSBB levels:
+* `1` = `Normal`
+* `2` = `Definite`
+* `3` = `Probable`
+* `4` = `Possible`
+
+Define new levels:
+* `1` = `Normal`
+* `2` = `Possible`
+* `3` = `Probable`
+* `4` = `Definite`
+
+```{r cerad}
+
+# refactor
+cov[, C := as.factor(CERAD)]
+levels(cov$C) = c(0,3,2,1)
+cov[, C := as.factor(as.character(C))]
+
+# double-check
+table(cov$C, cov$CERAD)
+
+```
+
+## Raw APOE
+
+Define 2 categories:
+* `1` = `E2/E2` and `E3/E3`
+* `2` = `E3/E4`, `E2/E4`, and `E4/E4`
+
+`NA` values will be treated as `E3/E3`.
+
+```{r raw-apoe}
+
+# define variable
+cov$RawAPOE = paste0(cov$Apo1, cov$Apo2)
+cov$RawAPOE = gsub("NANA", NA, cov$RawAPOE)
+
+# treat NA values as E3/E3
+cov[is.na(RawAPOE), RawAPOE := "33"]
+
+```
+
+## APOE
+
+Group levels into 3 categories:
+* `E2` = `E2/E2` and `E2/E3`
+* `E3` = `E3/E3`
+* `E4` = `E2/E4`, `E3/E4`, and `E4/E4`
+
+Number of `NA` values in APOE: 1.
+Proportion of `NA` values: 0.002.
+
+```{r apoe}
+
+# refactor
+levels(cov$E) = c("E2", "E2", "E4", "E3", "E4", "E4")
+cov[, E := factor(as.character(E), levels = c("E3", "E2", "E4"))]
+
+# double-check
+table(cov$E, cov$RawAPOE)
+
+```
+
+## E4 Count
+
+Group levels into 3 categories:
+* `0` = `E2/E2`, `E3/E3`, and `E2/E3`
+* `1` = `E2/E4` and `E3/E4`
+* `2` = `E4/E4`
+
+```{r e4-count}
+
+# refactor
+cov[, E4num := as.factor(RawAPOE)]
+levels(cov$E4num) = c(0, 0, 1, 0, 1, 2)
+cov[, E4num := as.numeric(as.character(E4num))]
+
+# double-check
+table(cov$E4num, cov$RawAPOE)
+
+```
+
+## E2 Count
+
+Group levels into 3 categories:
+* `0` = `E4/E4`, `E3/E3`, and `E3/E4`
+* `1` = `E2/E4` and `E2/E3`
+* `2` = `E2/E2`
+
+```{r e2-count}
+
+# refactor
+cov[, E2num := as.factor(RawAPOE)]
+levels(cov$E2num) = c(2, 1, 1, 0, 0, 0)
+cov[, E2num := as.numeric(as.character(E2num))]
+
+# double-check
+table(cov$E2num, cov$RawAPOE)
+
+```
+
+## Age at Death
+
+Clean age at death variable.
+
+```{r age-death}
+
+# clean age at death
+cov[, age_at_death := gsub("90\\+", "91", AOD)]
+cov[, age_at_death := as.numeric(age_at_death)]
+
+```
+
+
+# Save Results
+
+Choose levels and contrasts, then save results.
+
+```{r save-results}
+
+# save results
+expSet = list(mData = msbb, cov = cov)
+save(expSet, file = paste0("../Data/MSBB-", brain_region,"-24.Rdata"))
+
+```

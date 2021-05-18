@@ -1,7 +1,7 @@
 ---
-title: "qPCR Analysis"
+title: "MSBB Microglia Analysis"
 description: |
- This script performs analysis of RT-qPCR data.
+ This script performs analysis of MSBB microglia data.
 output:
   distill::distill_article:
     toc: true
@@ -15,4 +15,421 @@ knitr::opts_chunk$set(eval = FALSE)
 
 Load requisite packages.
 
+```{r load-packages}
 
+rm(list = ls())
+require(limma)
+require(ComplexHeatmap)
+require(data.table)
+require(circlize)
+require(openxlsx)
+require(tidyverse)
+require(SNFtool)
+require(pheatmap)
+require(ggprism)
+
+ds = "MSBB-combat"
+dtype = "TMM"
+brainRegion = "combated"
+load(paste0("../Data/MSBB-", brainRegion,".Rdata"))
+cat("\nBrain Region: ", brainRegion, "\n")
+
+source("models.R")
+source("spectral-clustering.R")
+
+# load expression data 
+mData = expSet$mData
+
+```
+
+
+# Select Microglia Genes
+
+First, select only microglia genes (n = 574). Of the microglial genes, select only those that exist in MSBB (n = 526).
+
+```{r select-microglia}
+
+celltype = "microglia"
+
+# select only microglial genes
+genes = readLines("../Data/Microglia Genes.txt")
+
+# select microglia genes that exist in MSBB
+annot = fread("../Data/ENSEMBL GRCh38.p7.csv")
+annot = unique(annot[GeneSymbol %in% genes,])
+ensembl_ids = intersect(rownames(mData), annot$EnsemblID)
+annot = unique(annot[EnsemblID %in% ensembl_ids,])
+
+# remove duplicated genes
+annot = annot[!duplicated(GeneSymbol), ]
+ensembl_ids = annot$EnsemblID
+
+# check results
+any(duplicated(ensembl_ids)) # no duplicated ids
+any(is.na(ensembl_ids))      # no NA
+length(ensembl_ids)
+
+```
+
+
+# Pre-Processing
+
+```{r pre-processing}
+
+# select interesting genes
+mData = mData[annot$EnsemblID, ]
+all(rownames(mData) == annot$EnsemblID)
+rownames(mData) = annot$GeneSymbol
+
+# set metadata
+cov = expSet$cov
+
+```
+
+
+# Run Models
+* Model 1: `exp ~ APOE + CERAD | exp ~ APOE + Braak`
+* Model 1.5: `exp ~ APOE + CERAD e2, e4` dosage model
+
+## Model 1
+
+Run Model 1, which is `exp ~ APOE + CERAD | exp ~ APOE + Braak`. Then, generate Table S2, which is comprised of differentially expressed microglia genes across APOE groups for MSBB data.
+
+```{r model-1}
+
+# run Model 1
+tT_CERAD = run_model1(mData, cov$C, cov$E, annot)
+tT_Braak = run_model1(mData, cov$B,cov$E, annot)
+
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)
+
+length(tT_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_CERAD[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_Braak[E4vsE3_P.Value < 0.05 & E4vsE3_logFC < 0,]$GeneSymbol)  
+
+length(tT_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC > 0,]$GeneSymbol)  
+length(tT_Braak[E2vsE3_P.Value < 0.05 & E2vsE3_logFC < 0,]$GeneSymbol) 
+
+
+# Table S2
+TableS2 = fread("../results/TableS2.csv")
+TableS2[tT_CERAD, on="EnsemblID",  
+        c("MSBB_E4vsE3_logFC", "MSBB_E4vsE3_CI.L", "MSBB_E4vsE3_CI.R", 
+          "MSBB_E4vsE3_P.Value", "MSBB_E4vsE3_adj.P.Val", 
+          "MSBB_E2vsE3_logFC", "MSBB_E2vsE3_CI.L", "MSBB_E2vsE3_CI.R", 
+          "MSBB_E2vsE3_P.Value", "MSBB_E2vsE3_adj.P.Val") := .(
+           i.E4vsE3_logFC, i.E4vsE3_CI.L, i.E4vsE3_CI.R,
+           i.E4vsE3_P.Value, i.E4vsE3_adj.P.Val,  
+           i.E2vsE3_logFC, i.E2vsE3_CI.L, i.E2vsE3_CI.R, 
+           i.E2vsE3_P.Value, i.E2vsE3_adj.P.Val)]
+TableS2 = TableS2[order(GeneSymbol), ]
+fwrite(TableS2, "../results/TableS2.csv")
+
+```
+
+## Model 1.5
+
+Run Model 1.5, which is `exp ~ APOE + CERAD e2, e4` dosage model. Then, generate Table S3, which is comprised of differentially expressed microglia genes across APOE groups for ROSMAP DLPFC and each of MSBB brain regions using a dosage model.
+
+```{r model-1.5}
+
+# run Model 1.5 with E4 and E2 copies as numeric
+tT_CERAD_ENum = run_model1.5(mData, cov$C, cov$E4num, cov$E2num, annot)
+
+e4_num_genes = intersect(tT_CERAD_ENum[e4_P.Value < 0.05 & e4_logFC > 0, GeneSymbol], tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0,GeneSymbol])
+length(e4_num_genes)
+
+e2_num_genes = intersect(tT_CERAD_ENum[e2_P.Value < 0.05 & e2_logFC < 0, GeneSymbol], tT_CERAD[E4vsE3_P.Value < 0.05 & E4vsE3_logFC > 0, GeneSymbol])
+length(e2_num_genes)
+
+intersect(tT_CERAD_ENum[e4_P.Value < 0.05 & e4_logFC > 0, GeneSymbol],
+          tT_CERAD_ENum[e2_P.Value < 0.05 & e2_logFC < 0, GeneSymbol])
+
+# Table S3
+TableS3 = fread("../results/TableS3.csv")
+TableS3 = TableS3[tT_CERAD_ENum, on = .(EnsemblID, GeneSymbol, Description),
+          c("MSBB_e4_logFC", "MSBB_e4_CI.L", "MSBB_e4_CI.R", 
+            "MSBB_e4_P.Value", "MSBB_e4_adj.P.Val") := .(
+            i.e4_logFC, i.e4_CI.L, i.e4_CI.R, i.e4_P.Value, i.e4_adj.P.Val)]
+TableS3 = TableS3[tT_CERAD_ENum, on = .(EnsemblID, GeneSymbol, Description), 
+          c("MSBB_e2_logFC", "MSBB_e2_CI.L", "MSBB_e2_CI.R",
+            "MSBB_e2_P.Value", "MSBB_e2_adj.P.Val") := .(
+            i.e2_logFC, i.e2_CI.L, i.e2_CI.R, i.e2_P.Value, i.e2_adj.P.Val)]
+fwrite(TableS3, "../results/TableS3.csv")
+
+```
+
+
+# Z-Score Analysis
+
+Compute z-scores.
+
+```{r compute-z}
+
+z.C0 = to_z_score("C", 0, mData, cov)
+z.C3 = to_z_score("C", 3, mData, cov)
+z.B1 = to_z_score("B", 1, mData, cov)
+z.B3 = to_z_score("B", 3, mData, cov)
+
+```
+
+Calculate average z-scores.
+
+```{r average-z}
+
+avez.C0 = to_ave_z(z.C0)
+avez.C3 = to_ave_z(z.C3)
+avez.B1 = to_ave_z(z.B1)
+avez.B3 = to_ave_z(z.B3)
+
+```
+
+
+# Spectral Clustering
+
+## C0
+* Number of Clusters: 3
+* Index of Cluster of Interest: 3
+* Number of C0 Genes: 176
+
+```{r c0-clustering}
+
+# spectral clustering
+c = 3; k = 3
+clust.C0 = spectral_clustering(avez.C0, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.C0$clustA))
+rownames(annot_row) = rownames(clust.C0$zMtx)
+pheatmap(clust.C0$zMtx[order(clust.C0$clustA),],
+         annotation_row = annot_row[order(clust.C0$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+C0.genes = sort(rownames(clust.C0$zMtx)[clust.C0$clustA == c])
+length(C0.genes)
+
+```
+
+## C3
+* Number of Clusters: 3
+* Index of Cluster of Interest: 2
+* Number of C3 Genes: 185
+
+```{r c3-clustering}
+
+# spectral clustering
+c = 2; k = 3
+clust.C3 = spectral_clustering(avez.C3, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.C3$clustA))
+rownames(annot_row) = rownames(clust.C3$zMtx)
+pheatmap(clust.C3$zMtx[order(clust.C3$clustA),],
+         annotation_row = annot_row[order(clust.C3$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+C3.genes = sort(rownames(clust.C3$zMtx)[clust.C3$clustA == c])
+length(C3.genes)
+
+```
+
+## B1
+* Number of Clusters: 3
+* Index of Cluster of Interest: 3
+* Number of B1 Genes: 160
+
+```{r b1-clustering}
+
+# spectral clustering
+k = 3; c = 3
+clust.B1 = spectral_clustering(avez.B1, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.B1$clustA))
+rownames(annot_row) = rownames(clust.B1$zMtx)
+pheatmap(clust.B1$zMtx[order(clust.B1$clustA),],
+         annotation_row = annot_row[order(clust.B1$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+B1.genes = sort(rownames(clust.B1$zMtx)[clust.B1$clustA == c])
+length(B1.genes)
+
+```
+
+## B3
+* Number of Clusters: 3
+* Index of Cluster of Interest: 2
+* Number of B3 Genes: 179
+
+```{r b3-clustering}
+
+# spectral clustering
+k = 3; c = 2
+clust.B3 = spectral_clustering(avez.B3, k)
+
+# visualization
+annot_row = data.frame(cluster = as.character(clust.B3$clustA))
+rownames(annot_row) = rownames(clust.B3$zMtx)
+pheatmap(clust.B3$zMtx[order(clust.B3$clustA),],
+         annotation_row = annot_row[order(clust.B3$clustA), , drop = F],
+         cluster_rows = F, cluster_cols = F,
+         show_rownames = F)
+
+# interested genes
+B3.genes = sort(rownames(clust.B3$zMtx)[clust.B3$clustA == c])
+length(B3.genes)
+
+```
+
+
+## Overlap
+
+```{r hypergeometric-tests}
+
+# hypergeometric test 
+phyper_test(C0.genes, B1.genes)
+phyper_test(C3.genes, B3.genes)
+phyper_test(C0.genes, C3.genes)
+phyper_test(B1.genes, B3.genes)
+
+```
+
+
+# Statistical Testing
+
+Statistical testing of ROSMAP microglia-APOE genes across *APOE* genotypes. Use the average of z-scores for genes of interest for each individual as the outcome, with *APOE* genotype as a covariate and *APOE* `E3/E3` as the baseline.
+
+
+```{r statistical-testing}
+
+# ROSMAP C0 genes
+TableS1 = fread("../results/TableS1.csv")
+rosmap.C0.genes = TableS1$GeneSymbol
+
+# C0 test
+cov_C0 = cov[C == 0,]
+all(cov_C0$individualIdentifier == colnames(z.C0$z))
+test_avez(z.C0$z, C0.genes, cov_C0)
+
+# C0 test based on ROSMAP genes
+test_avez(z.C0$z, intersect(rownames(z.C0$z), rosmap.C0.genes), cov_C0)
+
+# adjusted by donor
+test_avez(z.C0$z, intersect(rownames(z.C0$z), rosmap.C0.genes), cov_C0, adj.donor = T, donor = colnames(z.C0$z))
+
+# add to Table S1
+MSBB_aveZ = copy(avez.C0)
+setnames(MSBB_aveZ, c("Genes", "E2", "E3", "E4"), 
+         c("GeneSymbol", paste("MSBB", c("E2", "E3", "E4"), sep = "_")))
+TableS1 = MSBB_aveZ[GeneSymbol %in% rosmap.C0.genes, ][TableS1, on = .(GeneSymbol)]
+TableS1 = TableS1[, .(GeneSymbol, EnsemblID, Description, ROSMAP_E2, ROSMAP_E3, ROSMAP_E4,
+            MSBB_E2, MSBB_E3, MSBB_E4)]
+fwrite(TableS1, "../results/TableS1.csv")
+
+# C3 test
+cov_C3 = cov[C == 3,]
+all(cov_C3$individualIdentifier == colnames(z.C3$z))
+test_avez(z.C3$z, C3.genes, cov_C3)
+
+# B1 test
+cov_B1 = cov[B == 1,]
+all(cov_B1$individualIdentifier == colnames(z.B1$z))
+test_avez(z.B1$z, B1.genes, cov_B1)
+
+# B3 test
+cov_B3 = cov[B == 3,]
+all(cov_B1$individualIdentifier == colnames(z.B1$z))
+test_avez(z.B3$z, B3.genes, cov_B3)
+
+```
+
+Select ROSMAP C0 genes.
+
+```{r select-rosmap}
+
+# read ROSMAP C0 genes
+TableS3 = fread("../results/TableS3.csv")
+rosmap_C0.genes = TableS3$GeneSymbol
+mDataZ.rosmap_C0.genes = z.C0$z[rownames(z.C0$z) %in% rosmap_C0.genes,]
+mDataZ.rosmap_C0.genes.e2 = mDataZ.rosmap_C0.genes[,z.C0$E == "E2"]
+mDataZ.rosmap_C0.genes.e3 = mDataZ.rosmap_C0.genes[,z.C0$E == "E3"]
+mDataZ.rosmap_C0.genes.e4 = mDataZ.rosmap_C0.genes[,z.C0$E == "E4"]
+
+# check dimension
+table(z.C0$E) == data.frame(
+  E3 = ncol(mDataZ.rosmap_C0.genes.e3),
+  E2 = ncol(mDataZ.rosmap_C0.genes.e2), 
+  E4 = ncol(mDataZ.rosmap_C0.genes.e4))
+
+# compute intersection
+intersect(rosmap_C0.genes, C0.genes)
+
+```
+
+Statistical testing of ROSMAP microglia-APOE C0 genes across *APOE* genotypes. Use the average of z-scores for genes of interest for each individual as the outcome, with *APOE* genotype as a covariate and *APOE* `E3/E3` as the baseline.
+
+```{r rosmap-testing}
+
+# test on ROSMAP C0 genes
+cov_C0 = cov[C == 0,]
+all(cov_C0$individualIdentifier == colnames(z.C0$z))
+test_avez(z.C0$z, intersect(rosmap_C0.genes, rownames(mData)), cov_C0)
+
+# read ROSMAP C3 genes
+rosmap_C3.genes = read.xlsx("../results/ROSMAP_miroglia_cluster_genes_remove.low.expressed.genes.xlsx", sheet = "C3(k=3)", colNames = F)
+rosmap_C3.genes = rosmap_C3.genes$X1
+
+# test on ROSMAP C3 genes
+cov_C3 = cov[C == 3,]
+all(cov_C3$individualIdentifier == colnames(z.C3$z))
+test_avez(z.C3$z, intersect(rosmap_C3.genes, rownames(mData)), cov_C3)
+```
+
+
+# ROSMAP/MSBB Plot
+
+Plot of ROSMAP C0 genes in MSBB C0 subjects where each dot represents a person.
+
+```{r rosmap-msbb}
+
+# reshape data
+my.dat = list(`2` = colMeans(mDataZ.rosmap_C0.genes.e2), 
+              `3` = colMeans(mDataZ.rosmap_C0.genes.e3), 
+              `4` = colMeans(mDataZ.rosmap_C0.genes.e4))
+my.df = reshape2::melt(my.dat)
+my.df$L1 = as.numeric(my.df$L1)
+colnames(my.df) = c("z-score", "APOE")
+colnames(my.df) = c("z-score", "APOE.num")
+my.df$APOE = as.factor(my.df$APOE.num)
+  
+# colors
+ggthemr('greyscale')
+to_swap = c("#62bba5", # E4
+            "#785d37", # E3
+            "#ffb84d") # E2
+
+ggplot(my.df, aes(x = APOE.num, y = `z-score`, color = APOE)) +
+  geom_violin(fill = "white", trim = FALSE) +
+  geom_quasirandom(alpha = 0.3, width = 0.1, dodge.width = 0.9, varwidth = TRUE) +
+  scale_color_manual(values = c("#62bba5", "#785d37", "#ffb84d")) +
+  labs(y = "Average Z-Score", x = "APOE Genotype") +
+  theme(text = element_text(size = 14),
+        legend.position="bottom", legend.direction = "horizontal",
+        axis.title.x = element_text(face = "bold", size = 11),
+        axis.title.y = element_text(face = "bold", size = 11),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_text(face = "bold")) +
+  stat_summary(fun.data=mean_cl_normal, geom="errorbar", width=0.2, position = position_dodge(0.9), color = "black")
+ggsave("../results/Figure2-combat.pdf", width = 5, height = 4, dpi = 300)
+
+```

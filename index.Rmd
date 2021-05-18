@@ -10,7 +10,7 @@ output:
 
 ```{r include = FALSE, eval = FALSE}
 
-# to load packages
+# to render website
 library(rmarkdown)
 library(distill)
 render_site()

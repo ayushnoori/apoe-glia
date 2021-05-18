@@ -34,12 +34,12 @@ navbar:
     - text: "MSBB"
       menu:
         - text: "Define Variables"
-          href: ROSMAP-variables.html
-        - text: "Pre-Process Data"
-          href: ROSMAP-preprocess.html
+          href: MSBB-variables.html
+        - text: "Merge Data"
+          href: MSBB-merge.html
         - text: "---"
         - text: "Microglia Analysis"
-          href: ROSMAP-microglia.html
+          href: MSBB-microglia.html
     - text: "qPCR"
       href: qPCR-analysis.html
 output: distill::distill_article

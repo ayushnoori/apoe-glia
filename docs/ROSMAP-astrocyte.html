@@ -2216,10 +2216,10 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="MSBB-variables.html">Define Variables</a>
+<a href="MSBB-merge.html">Merge Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia.html">Microglia Analysis</a>
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
@@ -2613,7 +2613,7 @@ MSBB
 </div>
 </div>
 <h1 id="statistical-testing">Statistical Testing</h1>
-<p>Statistical testing of astrocyte-APOE genes across <em>APOE</em> genotypes. Average of Z-scores for interested genes for each individual as outcome, with <em>APOE</em> genotype as a covariate. Use <em>APOE</em> <code>E3/E3</code> as the baseline.</p>
+<p>Statistical testing of astrocyte-APOE genes across <em>APOE</em> genotypes. Use the average of z-scores for genes of interest for each individual as the outcome, with <em>APOE</em> genotype as a covariate and <em>APOE</em> <code>E3/E3</code> as the baseline.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># C0 test</span>
@@ -2818,7 +2818,7 @@ MSBB
 <span class='co'># violin plot</span>
 <span class='va'>fig4c</span> <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>my.df</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>APOE.num</span>, y <span class='op'>=</span> <span class='va'>`z-score`</span>, color <span class='op'>=</span> <span class='va'>APOE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_violin.html'>geom_violin</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"white"</span>, trim <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://rdrr.io/pkg/ggbeeswarm/man/geom_quasirandom.html'>geom_quasirandom</a></span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='fl'>0.3</span>, width <span class='op'>=</span> <span class='fl'>0.1</span>, dodge.width <span class='op'>=</span> <span class='fl'>0.9</span>, varwidth <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_quasirandom</span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='fl'>0.3</span>, width <span class='op'>=</span> <span class='fl'>0.1</span>, dodge.width <span class='op'>=</span> <span class='fl'>0.9</span>, varwidth <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_color_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#62bba5"</span>, <span class='st'>"#785d37"</span>, <span class='st'>"#ffb84d"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>"Average Z-Score"</span>, x <span class='op'>=</span> <span class='st'>"APOE Genotype"</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>text <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>size <span class='op'>=</span> <span class='fl'>14</span><span class='op'>)</span>,

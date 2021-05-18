@@ -2216,10 +2216,10 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="MSBB-variables.html">Define Variables</a>
+<a href="MSBB-merge.html">Merge Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia.html">Microglia Analysis</a>
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
@@ -2626,7 +2626,6 @@ MSBB
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># spectral clustering</span>
 <span class='va'>k</span> <span class='op'>=</span> <span class='fl'>3</span>; <span class='va'>c</span> <span class='op'>=</span> <span class='fl'>3</span>
-<span class='co'># k = 4; c = 4</span>
 <span class='va'>clust.B1</span> <span class='op'>=</span> <span class='fu'>spectral_clustering</span><span class='op'>(</span><span class='va'>avez.B1</span>, <span class='va'>k</span><span class='op'>)</span>
 
 <span class='co'># visualization</span>
@@ -2693,7 +2692,7 @@ MSBB
 </div>
 </div>
 <h1 id="statistical-testing">Statistical Testing</h1>
-<p>Statistical testing of microglia-APOE genes across <em>APOE</em> genotypes. Average of Z-scores for interested genes for each individual as outcome, with <em>APOE</em> genotype as a covariate. Use <em>APOE</em> <code>E3/E3</code> as the baseline.</p>
+<p>Statistical testing of ROSMAP microglia-APOE genes across <em>APOE</em> genotypes. Use the average of z-scores for genes of interest for each individual as the outcome, with <em>APOE</em> genotype as a covariate and <em>APOE</em> <code>E3/E3</code> as the baseline.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># C0 test</span>

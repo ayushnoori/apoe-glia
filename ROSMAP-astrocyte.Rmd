@@ -375,7 +375,7 @@ ggsave("../results/venn_rosmap_astrocyte_B1&B3.pdf")
 
 # Statistical Testing
 
-Statistical testing of astrocyte-APOE genes across *APOE* genotypes. Average of Z-scores for interested genes for each individual as outcome, with *APOE* genotype as a covariate. Use *APOE* `E3/E3` as the baseline.
+Statistical testing of astrocyte-APOE genes across *APOE* genotypes. Use the average of z-scores for genes of interest for each individual as the outcome, with *APOE* genotype as a covariate and *APOE* `E3/E3` as the baseline.
 
 ```{r statistical-testing}
 

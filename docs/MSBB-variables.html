@@ -86,30 +86,30 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Effect of APOE on the Glial Transcriptome: qPCR Analysis</title>
+  <title>Effect of APOE on the Glial Transcriptome: Define MSBB Variables</title>
 
-  <meta property="description" itemprop="description" content="This script performs analysis of RT-qPCR data."/>
+  <meta property="description" itemprop="description" content="This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data."/>
 
   <link rel="icon" type="image/vnd.microsoft.icon" href="images/favicon.ico"/>
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: qPCR Analysis"/>
+  <meta property="og:title" content="Effect of APOE on the Glial Transcriptome: Define MSBB Variables"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="This script performs analysis of RT-qPCR data."/>
+  <meta property="og:description" content="This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data."/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Effect of APOE on the Glial Transcriptome"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: qPCR Analysis"/>
-  <meta property="twitter:description" content="This script performs analysis of RT-qPCR data."/>
+  <meta property="twitter:title" content="Effect of APOE on the Glial Transcriptome: Define MSBB Variables"/>
+  <meta property="twitter:description" content="This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data."/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["qPCR Analysis"]},{"type":"character","attributes":{},"value":["This script performs analysis of RT-qPCR data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output"]}},"value":[{"type":"character","attributes":{},"value":["Define MSBB Variables"]},{"type":"character","attributes":{},"value":["This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data.\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2171,7 +2171,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"qPCR Analysis","description":"This script performs analysis of RT-qPCR data.","authors":[]}
+{"title":"Define MSBB Variables","description":"This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data.","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2216,10 +2216,10 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="MSBB-variables.html">Define Variables</a>
+<a href="MSBB-merge.html">Merge Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia.html">Microglia Analysis</a>
 </div>
 </div>
 <a href="qPCR-analysis.html">qPCR</a>
@@ -2235,10 +2235,10 @@ MSBB
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>qPCR Analysis</h1>
+<h1>Define MSBB Variables</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>This script performs analysis of RT-qPCR data.</p></p>
+<p><p>This script first matches MSBB expression data to the clinical data, then defines variables in the covariate data.</p></p>
 </div>
 
 
@@ -2248,11 +2248,235 @@ MSBB
 <h3>Contents</h3>
 <ul>
 <li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#define-paths">Define Paths</a></li>
+<li><a href="#analyze-brain-regions">Analyze Brain Regions</a></li>
+<li><a href="#process-expression-data">Process Expression Data</a></li>
+<li><a href="#process-covariate-data">Process Covariate Data</a></li>
+<li><a href="#define-clinical-variables">Define Clinical Variables</a>
+<ul>
+<li><a href="#braak">Braak</a></li>
+<li><a href="#cerad">CERAD</a></li>
+<li><a href="#raw-apoe">Raw APOE</a></li>
+<li><a href="#apoe">APOE</a></li>
+<li><a href="#e4-count">E4 Count</a></li>
+<li><a href="#e2-count">E2 Count</a></li>
+<li><a href="#age-at-death">Age at Death</a></li>
+</ul></li>
+<li><a href="#save-results">Save Results</a></li>
 </ul>
 </nav>
 </div>
 <h1 id="dependencies">Dependencies</h1>
 <p>Load requisite packages.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://Rdatatable.gitlab.io/data.table'>data.table</a></span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="define-paths">Define Paths</h1>
+<p>Define brain regions for analysis and paths to normalized data files (i.e., Trimmed Mean of M-Values or TMM matrices).</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>brain_regions</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IFG"</span>, <span class='st'>"STG"</span>, <span class='st'>"PHG"</span>, <span class='st'>"FP"</span><span class='op'>)</span>
+<span class='va'>data_files</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+  IFG <span class='op'>=</span> <span class='st'>"../Data/AMP-AD_MSBB_MSSM_BM_44.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv"</span>,
+  STG <span class='op'>=</span> <span class='st'>"../Data/AMP-AD_MSBB_MSSM_BM_22.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv"</span>,
+  PHG <span class='op'>=</span> <span class='st'>"../Data/AMP-AD_MSBB_MSSM_BM_36.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv"</span>,
+  FP <span class='op'>=</span> <span class='st'>"../Data/AMP-AD_MSBB_MSSM_BM_10.normalized.sex_race_age_RIN_PMI_exonicRate_rRnaRate_batch_adj.tsv"</span>
+<span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="analyze-brain-regions">Analyze Brain Regions</h1>
+<p>Iterate over previously specified brain regions to process each region. <strong>All code after this chunk should be encapsulated in a <code>for</code> loop.</strong> To appropriately document the code, pseudocode of the <code>for</code> loop is shown below, while the contents of the <code>for</code> loop are described in subsequent chunks.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'>for</span><span class='op'>(</span><span class='va'>brain_region</span> <span class='kw'>in</span> <span class='va'>brain_regions</span><span class='op'>)</span> <span class='op'>{</span>
+  
+  <span class='co'># insert following chunks here</span>
+  
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<p>For the purposes of illustration, we define the <code>brain_region</code> of interest as the inferior frontal fygrus (IFG).</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>brain_region</span> <span class='op'>=</span> <span class='st'>"IFG"</span>
+</code></pre>
+</div>
+</div>
+<h1 id="process-expression-data">Process Expression Data</h1>
+<p>Process expression data and remove unnecessary headers from sample IDs (e.g., <code>S109B355.BM_10_798</code> becomes <code>BM_10_798</code>).</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># process expression data</span>
+<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"processing"</span>, <span class='va'>brain_region</span>, <span class='st'>"...\n"</span><span class='op'>)</span>
+<span class='va'>data_file</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='va'>data_files</span><span class='op'>[</span><span class='va'>brain_region</span><span class='op'>]</span><span class='op'>)</span>
+<span class='va'>msbb</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/warning.html'>suppressWarnings</a></span><span class='op'>(</span><span class='op'>{</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>data_file</span>, sep <span class='op'>=</span> <span class='st'>"\t"</span><span class='op'>)</span><span class='op'>}</span><span class='op'>)</span>
+<span class='va'>gene_ids</span> <span class='op'>=</span> <span class='va'>msbb</span><span class='op'>$</span><span class='va'>V1</span>
+<span class='va'>msbb</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>[</span>, <span class='op'>-</span><span class='fl'>1</span>, with <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span> <span class='op'>=</span> <span class='va'>gene_ids</span>
+
+<span class='co'># remove unnecessary headers</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"^.*\\."</span>, <span class='st'>""</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Extract subject IDs in the same order as the sample IDs, then check for samples without an ID match.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># extract subject IDs</span>
+<span class='va'>key_file</span> <span class='op'>=</span>  <span class='st'>"../Data/MSBB_RNAseq_covariates_November2018Update.csv"</span>
+<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>key_file</span><span class='op'>)</span>
+<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>unique</a></span><span class='op'>(</span><span class='va'>key_map</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>sampleIdentifier</span>, <span class='va'>individualIdentifier</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
+
+<span class='co'># check for samples without an ID match</span>
+<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"any samples don't have id match? "</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>key_map</span><span class='op'>$</span><span class='va'>sampleIdentifier</span><span class='op'>)</span>, <span class='st'>"\n"</span><span class='op'>)</span>
+<span class='va'>sub_key_map</span> <span class='op'>=</span> <span class='va'>key_map</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>sampleIdentifier <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>sampleIdentifier</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>sub_key_map</span><span class='op'>$</span><span class='va'>sampleIdentifier</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span> <span class='op'>=</span> <span class='va'>sub_key_map</span><span class='op'>$</span><span class='va'>individualIdentifier</span>
+</code></pre>
+</div>
+</div>
+<p>Check for duplicated samples.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># any duplicated samples?</span>
+<span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"remove duplicate samples..\n"</span><span class='op'>)</span>
+  <span class='va'>msbb</span> <span class='op'>=</span> <span class='va'>msbb</span><span class='op'>[</span>, <span class='op'>!</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h1 id="process-covariate-data">Process Covariate Data</h1>
+<p>Note that subject #1009 has an invalid Braak score of 9.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cov_file</span> <span class='op'>=</span> <span class='st'>"../Data/MSBB_clinical.csv"</span>
+<span class='va'>cov</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>cov_file</span><span class='op'>)</span>
+<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='va'>cov</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"NP.1"</span>, <span class='st'>"bbscore"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"CERAD"</span>, <span class='st'>"Braak"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span><span class='va'>Braak</span> <span class='op'>&gt;</span> <span class='fl'>6</span>, <span class='va'>Braak</span> <span class='op'>:=</span> <span class='cn'>NA</span><span class='op'>]</span>
+</code></pre>
+</div>
+</div>
+<p>Extract clinical data in the same order as in the data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cov</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>individualIdentifier <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>individualIdentifier</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>individualIdentifier</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>msbb</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h1 id="define-clinical-variables">Define Clinical Variables</h1>
+<h2 id="braak">Braak</h2>
+<p>Group levels into 3 categories: * <code>1</code> = <code>Normal/I/II</code> * <code>2</code> = <code>III/IV</code> * <code>3</code> = <code>V/VI</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cov</span><span class='op'>[</span>, <span class='va'>B</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>Braak</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>B</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>2</span>,<span class='fl'>3</span>,<span class='fl'>3</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>B</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>B</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>B</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>Braak</span><span class='op'>)</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>Braak</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="cerad">CERAD</h2>
+<p>Old MSBB levels: * <code>1</code> = <code>Normal</code> * <code>2</code> = <code>Definite</code> * <code>3</code> = <code>Probable</code> * <code>4</code> = <code>Possible</code></p>
+<p>Define new levels: * <code>1</code> = <code>Normal</code> * <code>2</code> = <code>Possible</code> * <code>3</code> = <code>Probable</code> * <code>4</code> = <code>Definite</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>CERAD</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>3</span>,<span class='fl'>2</span>,<span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>C</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>CERAD</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="raw-apoe">Raw APOE</h2>
+<p>Define 2 categories: * <code>1</code> = <code>E2/E2</code> and <code>E3/E3</code> * <code>2</code> = <code>E3/E4</code>, <code>E2/E4</code>, and <code>E4/E4</code></p>
+<p><code>NA</code> values will be treated as <code>E3/E3</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># define variable</span>
+<span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>Apo1</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>Apo2</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"NANA"</span>, <span class='cn'>NA</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+
+<span class='co'># treat NA values as E3/E3</span>
+<span class='va'>cov</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>RawAPOE</span><span class='op'>)</span>, <span class='va'>RawAPOE</span> <span class='op'>:=</span> <span class='st'>"33"</span><span class='op'>]</span>
+</code></pre>
+</div>
+</div>
+<h2 id="apoe">APOE</h2>
+<p>Group levels into 3 categories: * <code>E2</code> = <code>E2/E2</code> and <code>E2/E3</code> * <code>E3</code> = <code>E3/E3</code> * <code>E4</code> = <code>E2/E4</code>, <code>E3/E4</code>, and <code>E4/E4</code></p>
+<p>Number of <code>NA</code> values in APOE: 1. Proportion of <code>NA</code> values: 0.002.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"E2"</span>, <span class='st'>"E2"</span>, <span class='st'>"E4"</span>, <span class='st'>"E3"</span>, <span class='st'>"E4"</span>, <span class='st'>"E4"</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>E</span><span class='op'>)</span>, levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"E3"</span>, <span class='st'>"E2"</span>, <span class='st'>"E4"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="e4-count">E4 Count</h2>
+<p>Group levels into 3 categories: * <code>0</code> = <code>E2/E2</code>, <code>E3/E3</code>, and <code>E2/E3</code> * <code>1</code> = <code>E2/E4</code> and <code>E3/E4</code> * <code>2</code> = <code>E4/E4</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E4num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>RawAPOE</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E4num</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E4num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>E4num</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E4num</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="e2-count">E2 Count</h2>
+<p>Group levels into 3 categories: * <code>0</code> = <code>E4/E4</code>, <code>E3/E3</code>, and <code>E3/E4</code> * <code>1</code> = <code>E2/E4</code> and <code>E2/E3</code> * <code>2</code> = <code>E2/E2</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># refactor</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E2num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>as.factor</a></span><span class='op'>(</span><span class='va'>RawAPOE</span><span class='op'>)</span><span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E2num</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>E2num</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>E2num</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># double-check</span>
+<span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>E2num</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>RawAPOE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="age-at-death">Age at Death</h2>
+<p>Clean age at death variable.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># clean age at death</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>age_at_death</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"90\\+"</span>, <span class='st'>"91"</span>, <span class='va'>AOD</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span><span class='op'>[</span>, <span class='va'>age_at_death</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>age_at_death</span><span class='op'>)</span><span class='op'>]</span>
+</code></pre>
+</div>
+</div>
+<h1 id="save-results">Save Results</h1>
+<p>Choose levels and contrasts, then save results.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># save results</span>
+<span class='va'>expSet</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mData <span class='op'>=</span> <span class='va'>msbb</span>, cov <span class='op'>=</span> <span class='va'>cov</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/save.html'>save</a></span><span class='op'>(</span><span class='va'>expSet</span>, file <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"../Data/MSBB-"</span>, <span class='va'>brain_region</span>,<span class='st'>"-24.Rdata"</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
