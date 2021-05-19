@@ -25,7 +25,7 @@ library(data.table)
 
 # Read FPKM Data
 
-Read FPKM data, remove the version from Ensembl ID, and remove duplicated samples. Note that subject `82317494` has 3 corresponding sample IDs: `492_120515_0`, `492_120515_6`, and `492_120515_7` (the latter is shortened to `492_120515` in the ID column); keep the latest sequencing data (i.e., `492_120515_7`).
+Read FPKM data, remove the version from Ensembl ID, and remove duplicated samples.
 
 ```{r fpkm-data}
 
