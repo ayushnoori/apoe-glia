@@ -2156,7 +2156,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+  <script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2195,8 +2195,8 @@ Functions
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="models.html">Models</a>
-<a href="spectral-clustering.html">Spectral Clustering</a>
+<a href="models">Models</a>
+<a href="spectral-clustering">Spectral Clustering</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2206,12 +2206,12 @@ ROSMAP
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="ROSMAP-variables">Define Variables</a>
+<a href="ROSMAP-preprocess">Pre-Process Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="ROSMAP-microglia">Microglia Analysis</a>
 <hr/>
-<a href="ROSMAP-astrocyte.html">Astrocyte Analysis</a>
+<a href="ROSMAP-astrocyte">Astrocyte Analysis</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2221,13 +2221,13 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="MSBB-variables.html">Define Variables</a>
-<a href="MSBB-merge.html">Merge Data</a>
+<a href="MSBB-variables">Define Variables</a>
+<a href="MSBB-merge">Merge Data</a>
 <hr/>
-<a href="MSBB-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia">Microglia Analysis</a>
 </div>
 </div>
-<a href="qPCR-analysis.html">qPCR</a>
+<a href="qPCR-analysis">qPCR</a>
 <a href="https://github.com/mindds/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
@@ -2267,7 +2267,7 @@ MSBB
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># data manipulation</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://Rdatatable.gitlab.io/data.table'>data.table</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>data.table</span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://purrr.tidyverse.org'>purrr</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://magrittr.tidyverse.org'>magrittr</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://stringr.tidyverse.org'>stringr</a></span><span class='op'>)</span>
@@ -2289,7 +2289,7 @@ MSBB
 
 <span class='co'># caption text and display significance</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://wilkelab.org/ggtext/'>ggtext</a></span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/const-ae/ggsignif'>ggsignif</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://const-ae.github.io/ggsignif/'>ggsignif</a></span><span class='op'>)</span>
 
 <span class='co'># heatmap</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pheatmap</span><span class='op'>)</span>
@@ -2331,7 +2331,7 @@ MSBB
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># define function to read data</span>
 <span class='va'>read_data</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>sheet_number</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='fu'><a href='https://rdrr.io/pkg/openxlsx/man/read.xlsx.html'>read.xlsx</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>ddir</span>, <span class='st'>"qPCR Data.xlsx"</span><span class='op'>)</span>, sheet <span class='op'>=</span> <span class='va'>sheet_number</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html'>as.data.table</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='fu'>as.data.table</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
     <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>}</span>
 
@@ -2352,7 +2352,7 @@ MSBB
 <span class='va'>fac</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"Genotype"</span>, <span class='st'>"Genotype"</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Genotype"</span>, <span class='st'>"Treatment"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>purrr</span><span class='fu'>::</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/set_names.html'>set_names</a></span><span class='op'>(</span><span class='va'>opt</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='va'>.</span><span class='op'>[[</span><span class='va'>nm</span><span class='op'>]</span><span class='op'>]</span>
   
 <span class='co'># extract gene names</span>
-<span class='va'>lab</span> <span class='op'>=</span> <span class='va'>dCT</span><span class='op'>[</span>, <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Mouse"</span>, <span class='st'>"Sex"</span>, <span class='va'>..fac</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='va'>.</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>lab</span> <span class='op'>=</span> <span class='va'>dCT</span><span class='op'>[</span>, <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Mouse"</span>, <span class='st'>"Sex"</span>, <span class='va'>..fac</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='va'>.</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span><span class='op'>]</span>
 
 <span class='co'># calculate average of reference group (i.e., APOE3 OR APOE3/PBS)</span>
 <span class='va'>ctrl</span> <span class='op'>=</span> <span class='va'>dCT</span><span class='op'>[</span>, <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map</a></span><span class='op'>(</span><span class='va'>.SD</span>, <span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>.x</span>, na.rm <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>, .SDcols <span class='op'>=</span> <span class='va'>lab</span>, by <span class='op'>=</span> <span class='va'>fac</span><span class='op'>]</span>
@@ -2361,10 +2361,10 @@ MSBB
 <span class='va'>ctrl</span> <span class='op'>=</span> <span class='kw'>if</span><span class='op'>(</span><span class='va'>nm</span> <span class='op'>==</span> <span class='st'>"LPS"</span><span class='op'>)</span> <span class='va'>ctrl</span><span class='op'>[</span><span class='va'>Genotype</span> <span class='op'>==</span> <span class='st'>"APOE3"</span> <span class='op'>&amp;</span> <span class='va'>Treatment</span> <span class='op'>==</span> <span class='st'>"PBS"</span>, <span class='va'>..lab</span><span class='op'>]</span> <span class='kw'>else</span> <span class='va'>ctrl</span><span class='op'>[</span><span class='va'>Genotype</span> <span class='op'>==</span> <span class='st'>"APOE3"</span>, <span class='va'>..lab</span><span class='op'>]</span>
 
 <span class='co'># calculate ddCT</span>
-<span class='va'>ddCT</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>dCT</span><span class='op'>)</span><span class='op'>[</span>, <span class='op'>(</span><span class='va'>lab</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map2.html'>map2</a></span><span class='op'>(</span><span class='va'>.SD</span>, <span class='va'>ctrl</span>, <span class='op'>~</span><span class='va'>.x</span><span class='op'>-</span><span class='va'>.y</span><span class='op'>)</span>, .SDcols <span class='op'>=</span> <span class='va'>lab</span><span class='op'>]</span>
+<span class='va'>ddCT</span> <span class='op'>=</span> <span class='fu'><a href='http://fs.r-lib.org/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>dCT</span><span class='op'>)</span><span class='op'>[</span>, <span class='op'>(</span><span class='va'>lab</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map2.html'>map2</a></span><span class='op'>(</span><span class='va'>.SD</span>, <span class='va'>ctrl</span>, <span class='op'>~</span><span class='va'>.x</span><span class='op'>-</span><span class='va'>.y</span><span class='op'>)</span>, .SDcols <span class='op'>=</span> <span class='va'>lab</span><span class='op'>]</span>
 
 <span class='co'># calculate RQ</span>
-<span class='va'>RQ</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>ddCT</span><span class='op'>)</span><span class='op'>[</span>, <span class='op'>(</span><span class='va'>lab</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fl'>2</span><span class='op'>^</span><span class='op'>-</span><span class='va'>.SD</span>, .SDcols <span class='op'>=</span> <span class='va'>lab</span><span class='op'>]</span>
+<span class='va'>RQ</span> <span class='op'>=</span> <span class='fu'><a href='http://fs.r-lib.org/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>ddCT</span><span class='op'>)</span><span class='op'>[</span>, <span class='op'>(</span><span class='va'>lab</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fl'>2</span><span class='op'>^</span><span class='op'>-</span><span class='va'>.SD</span>, .SDcols <span class='op'>=</span> <span class='va'>lab</span><span class='op'>]</span>
 </code></pre>
 </div>
 </div>
@@ -2427,9 +2427,9 @@ MSBB
   
   <span class='co'># create posthoc table</span>
   <span class='va'>posthoc</span> <span class='op'>=</span>  <span class='va'>stat_tukey</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html'>as.data.table</a></span><span class='op'>(</span>keep.rownames <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Comparison"</span>, <span class='st'>"Difference"</span>, <span class='st'>"Lower CI"</span>, <span class='st'>"Upper CI"</span>, <span class='st'>"p"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='va'>.</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Start"</span>, <span class='st'>"End"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/tstrsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>Comparison</span>, <span class='st'>"-"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='op'>{</span> <span class='fu'>.</span><span class='op'>(</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='va'>.</span>, <span class='fl'>2</span><span class='op'>)</span>, <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='va'>.</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>}</span><span class='op'>]</span>
+    <span class='fu'>as.data.table</span><span class='op'>(</span>keep.rownames <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='fu'>setnames</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Comparison"</span>, <span class='st'>"Difference"</span>, <span class='st'>"Lower CI"</span>, <span class='st'>"Upper CI"</span>, <span class='st'>"p"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='va'>.</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Start"</span>, <span class='st'>"End"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/strsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>Comparison</span>, <span class='st'>"-"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='op'>{</span> <span class='fu'>.</span><span class='op'>(</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='va'>.</span>, <span class='fl'>2</span><span class='op'>)</span>, <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='va'>.</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>}</span><span class='op'>]</span>
   
   <span class='co'># reorder for APOE</span>
   <span class='kw'>if</span><span class='op'>(</span><span class='va'>nm</span> <span class='op'>==</span> <span class='st'>"APOE"</span><span class='op'>)</span> <span class='op'>{</span> <span class='va'>posthoc</span> <span class='op'>=</span> <span class='va'>posthoc</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>2</span><span class='op'>)</span>, <span class='op'>]</span> <span class='op'>}</span> <span class='co'># E2/E3, E3/E4, E2/E4 </span>
@@ -2437,15 +2437,15 @@ MSBB
   <span class='co'># rename for LPS</span>
   <span class='kw'>if</span><span class='op'>(</span><span class='va'>nm</span> <span class='op'>==</span> <span class='st'>"LPS"</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>posthoc</span> <span class='op'>=</span> <span class='va'>posthoc</span> <span class='op'>%&gt;%</span> 
-      <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Treatment</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/tstrsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>Start</span>, <span class='st'>":"</span><span class='op'>)</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
+      <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Treatment</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/strsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>Start</span>, <span class='st'>":"</span><span class='op'>)</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
       <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Treatment</span> <span class='op'>:=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>Treatment</span>, levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"PBS"</span>, <span class='st'>"LPS"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
-      <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Start</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/tstrsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>Start</span>, <span class='st'>":"</span><span class='op'>)</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
-      <span class='va'>.</span><span class='op'>[</span>, <span class='va'>End</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/tstrsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>End</span>, <span class='st'>":"</span><span class='op'>)</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>]</span>
+      <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Start</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/strsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>Start</span>, <span class='st'>":"</span><span class='op'>)</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
+      <span class='va'>.</span><span class='op'>[</span>, <span class='va'>End</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/strsplit.html'>strsplit</a></span><span class='op'>(</span><span class='va'>End</span>, <span class='st'>":"</span><span class='op'>)</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>]</span>
   <span class='op'>}</span>
   
   <span class='co'># create output table</span>
   <span class='va'>comps</span> <span class='op'>=</span> <span class='kw'>if</span><span class='op'>(</span><span class='va'>nm</span> <span class='op'>==</span> <span class='st'>"LPS"</span><span class='op'>)</span> <span class='va'>posthoc</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span> <span class='va'>Treatment</span>, <span class='st'>" "</span>, <span class='va'>Start</span>, <span class='st'>"/"</span>, <span class='va'>End</span><span class='op'>)</span><span class='op'>]</span> <span class='kw'>else</span> <span class='va'>posthoc</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>Start</span>, <span class='va'>End</span>, sep <span class='op'>=</span> <span class='st'>"/"</span><span class='op'>)</span><span class='op'>]</span>
-  <span class='va'>output</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>Gene <span class='op'>=</span> <span class='va'>gene</span><span class='op'>)</span>
+  <span class='va'>output</span> <span class='op'>=</span> <span class='fu'>data.table</span><span class='op'>(</span>Gene <span class='op'>=</span> <span class='va'>gene</span><span class='op'>)</span>
   
   <span class='co'># function to add columns by reference</span>
   <span class='va'>create_anova_col</span> <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>cn</span><span class='op'>)</span> <span class='op'>{</span> <span class='va'>output</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"ANOVA"</span>, <span class='va'>cn</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"p"</span>, <span class='st'>"p adj."</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>stat_aov</span><span class='op'>[</span><span class='va'>cn</span>, <span class='st'>"Pr(&gt;F)"</span><span class='op'>]</span>, <span class='va'>stat_aov</span><span class='op'>[</span><span class='va'>cn</span>, <span class='st'>"Pr(&gt;F)"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>}</span>
@@ -2461,12 +2461,12 @@ MSBB
   <span class='co'># reorder columns to group by comparison</span>
   <span class='fu'><a href='https://rdrr.io/r/base/unlist.html'>unlist</a></span><span class='op'>(</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map</a></span><span class='op'>(</span><span class='va'>comps</span>, <span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grep</a></span><span class='op'>(</span><span class='va'>.x</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>output</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
     <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>ncol</a></span><span class='op'>(</span><span class='va'>output</span><span class='op'>)</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span><span class='op'>)</span>, <span class='va'>.</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setcolorder.html'>setcolorder</a></span><span class='op'>(</span><span class='va'>output</span>, <span class='va'>.</span><span class='op'>)</span>
+    <span class='fu'>setcolorder</span><span class='op'>(</span><span class='va'>output</span>, <span class='va'>.</span><span class='op'>)</span>
   
   <span class='co'># calculate mean and SD of RQ values, then ensure error bars are not negative</span>
   <span class='va'>desc</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/psych/man/describe.by.html'>describeBy</a></span><span class='op'>(</span><span class='va'>RQ</span><span class='op'>[</span>, <span class='va'>..gene</span><span class='op'>]</span>, <span class='va'>RQ</span><span class='op'>[</span>, <span class='va'>..fac</span><span class='op'>]</span>, mat <span class='op'>=</span> <span class='cn'>TRUE</span>, digits <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html'>as.data.table</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"group1"</span>, <span class='st'>"group2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Genotype"</span>, <span class='st'>"Treatment"</span><span class='op'>)</span>, skip_absent <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='fu'>as.data.table</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='fu'>setnames</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"group1"</span>, <span class='st'>"group2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Genotype"</span>, <span class='st'>"Treatment"</span><span class='op'>)</span>, skip_absent <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
     <span class='va'>.</span><span class='op'>[</span>, <span class='va'>.SD</span>, .SDcols <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>fac</span>, <span class='st'>"mean"</span>, <span class='st'>"sd"</span>, <span class='st'>"se"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
     <span class='va'>.</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"maxY"</span>, <span class='st'>"minY"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>mean</span> <span class='op'>+</span> <span class='va'>se</span>, <span class='va'>mean</span> <span class='op'>-</span> <span class='va'>se</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
     <span class='va'>.</span><span class='op'>[</span><span class='va'>minY</span> <span class='op'>&lt;</span> <span class='fl'>0</span>, <span class='va'>minY</span> <span class='op'>:=</span> <span class='fl'>0</span><span class='op'>]</span>
@@ -2486,14 +2486,14 @@ MSBB
   <span class='co'># adjust bar height for PBS/LPS</span>
   <span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>posthoc</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='fl'>0</span> <span class='op'>&amp;</span> <span class='va'>nm</span> <span class='op'>==</span> <span class='st'>"LPS"</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='va'>posthoc</span> <span class='op'>=</span> <span class='va'>posthoc</span> <span class='op'>%&gt;%</span> 
-      <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/merge.html'>merge</a></span><span class='op'>(</span><span class='va'>desc</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>mean</span> <span class='op'>+</span> <span class='fl'>1.3</span><span class='op'>*</span><span class='va'>sd</span><span class='op'>)</span>, by <span class='op'>=</span> <span class='st'>"Treatment"</span><span class='op'>]</span>, by <span class='op'>=</span> <span class='st'>"Treatment"</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-      <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='st'>"V1"</span>, <span class='st'>"GroupHeight"</span><span class='op'>)</span>
+      <span class='fu'><a href='https://rdrr.io/r/base/merge.html'>merge</a></span><span class='op'>(</span><span class='va'>desc</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>mean</span> <span class='op'>+</span> <span class='fl'>1.3</span><span class='op'>*</span><span class='va'>sd</span><span class='op'>)</span>, by <span class='op'>=</span> <span class='st'>"Treatment"</span><span class='op'>]</span>, by <span class='op'>=</span> <span class='st'>"Treatment"</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+      <span class='fu'>setnames</span><span class='op'>(</span><span class='st'>"V1"</span>, <span class='st'>"GroupHeight"</span><span class='op'>)</span>
   <span class='op'>}</span>
   
   <span class='co'># create caption labels</span>
   <span class='va'>caption_labels</span> <span class='op'>=</span> <span class='va'>stat_aov</span> <span class='op'>%&gt;%</span>
     <span class='va'>.</span><span class='op'>[</span><span class='op'>!</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span> <span class='op'>==</span> <span class='st'>"Residuals"</span><span class='op'>)</span>, <span class='op'>]</span> <span class='op'>%&gt;%</span>
-    <span class='op'>{</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>Comparison <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span>, pVal <span class='op'>=</span> <span class='va'>.</span><span class='op'>[</span>, <span class='st'>"Pr(&gt;F)"</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>}</span> <span class='op'>%&gt;%</span>
+    <span class='op'>{</span> <span class='fu'>data.table</span><span class='op'>(</span>Comparison <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span>, pVal <span class='op'>=</span> <span class='va'>.</span><span class='op'>[</span>, <span class='st'>"Pr(&gt;F)"</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>}</span> <span class='op'>%&gt;%</span>
     <span class='va'>.</span><span class='op'>[</span><span class='va'>Comparison</span> <span class='op'>==</span> <span class='st'>"Genotype:Treatment"</span>, <span class='va'>Comparison</span> <span class='op'>:=</span> <span class='st'>"Interaction"</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
     <span class='va'>.</span><span class='op'>[</span>, <span class='va'>Label</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_chr</a></span><span class='op'>(</span><span class='va'>pVal</span>, <span class='va'>generate_label</span><span class='op'>)</span><span class='op'>]</span>
   
@@ -2562,7 +2562,7 @@ MSBB
 <span class='va'>output</span><span class='op'>[</span>, <span class='op'>(</span><span class='va'>adj</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map</a></span><span class='op'>(</span><span class='va'>.SD</span>, <span class='op'>~</span><span class='fu'><a href='https://rdrr.io/r/stats/p.adjust.html'>p.adjust</a></span><span class='op'>(</span><span class='va'>.x</span>, method <span class='op'>=</span> <span class='st'>"BH"</span><span class='op'>)</span><span class='op'>)</span>, .SDcols <span class='op'>=</span> <span class='va'>adj</span><span class='op'>]</span>
 
 <span class='co'># save output</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fwrite.html'>fwrite</a></span><span class='op'>(</span><span class='va'>output</span>, <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>rdir</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>nm</span>, <span class='st'>"Statistical Results.csv"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>fwrite</span><span class='op'>(</span><span class='va'>output</span>, <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>rdir</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>nm</span>, <span class='st'>"Statistical Results.csv"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2688,7 +2688,7 @@ MSBB
 <span class='va'>hm</span><span class='op'>$</span><span class='va'>tree_row</span> <span class='op'>%&gt;%</span>
   <span class='op'>{</span><span class='va'>.</span><span class='op'>$</span><span class='va'>labels</span><span class='op'>[</span><span class='va'>.</span><span class='op'>$</span><span class='va'>order</span><span class='op'>]</span><span class='op'>}</span> <span class='op'>%&gt;%</span>
   <span class='va'>cor_dat</span><span class='op'>[</span><span class='va'>.</span>, <span class='va'>.</span><span class='op'>]</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/as.data.table.html'>as.data.table</a></span><span class='op'>(</span>keep.rownames <span class='op'>=</span> <span class='st'>""</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>as.data.table</span><span class='op'>(</span>keep.rownames <span class='op'>=</span> <span class='st'>""</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/pkg/openxlsx/man/writeData.html'>writeData</a></span><span class='op'>(</span><span class='va'>wb</span>, <span class='va'>s2</span>, x <span class='op'>=</span> <span class='va'>.</span>, headerStyle <span class='op'>=</span> <span class='va'>hs</span><span class='op'>)</span>
 
 <span class='co'># set column widths and row heights for statistical results</span>

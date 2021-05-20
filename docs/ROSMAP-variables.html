@@ -2156,7 +2156,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+  <script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2195,8 +2195,8 @@ Functions
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="models.html">Models</a>
-<a href="spectral-clustering.html">Spectral Clustering</a>
+<a href="models">Models</a>
+<a href="spectral-clustering">Spectral Clustering</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2206,12 +2206,12 @@ ROSMAP
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="ROSMAP-variables">Define Variables</a>
+<a href="ROSMAP-preprocess">Pre-Process Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="ROSMAP-microglia">Microglia Analysis</a>
 <hr/>
-<a href="ROSMAP-astrocyte.html">Astrocyte Analysis</a>
+<a href="ROSMAP-astrocyte">Astrocyte Analysis</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2221,13 +2221,13 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="MSBB-variables.html">Define Variables</a>
-<a href="MSBB-merge.html">Merge Data</a>
+<a href="MSBB-variables">Define Variables</a>
+<a href="MSBB-merge">Merge Data</a>
 <hr/>
-<a href="MSBB-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia">Microglia Analysis</a>
 </div>
 </div>
-<a href="qPCR-analysis.html">qPCR</a>
+<a href="qPCR-analysis">qPCR</a>
 <a href="https://github.com/mindds/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
@@ -2273,7 +2273,7 @@ MSBB
 <p>Load requisite packages.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://Rdatatable.gitlab.io/data.table'>data.table</a></span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>data.table</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2283,7 +2283,7 @@ MSBB
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read FPKM data</span>
 <span class='va'>fpkm_file</span> <span class='op'>=</span> <span class='st'>"../Data/ROSMAP_RNAseq_FPKM_gene.tsv"</span>
-<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>fpkm_file</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span>, header <span class='op'>=</span> <span class='cn'>T</span>, sep <span class='op'>=</span> <span class='st'>"\t"</span><span class='op'>)</span>
+<span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='va'>fpkm_file</span>, stringsAsFactors <span class='op'>=</span> <span class='cn'>FALSE</span>, header <span class='op'>=</span> <span class='cn'>T</span>, sep <span class='op'>=</span> <span class='st'>"\t"</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>$</span><span class='va'>tracking_id</span> <span class='op'>==</span> <span class='va'>rosmap_fpkm</span><span class='op'>$</span><span class='va'>gene_id</span><span class='op'>)</span>
 <span class='va'>gene_id</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>$</span><span class='va'>gene_id</span>
 <span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>1</span>,<span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span>, with <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>
@@ -2304,8 +2304,8 @@ MSBB
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read ROSMAP ID map</span>
 <span class='va'>key_map_file</span> <span class='op'>=</span> <span class='st'>"../Data/ROSMAP_IDkey.csv"</span>
-<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>key_map_file</span><span class='op'>)</span>
-<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>unique</a></span><span class='op'>(</span><span class='va'>key_map</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>projid</span>, <span class='va'>mrna_id</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
+<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='va'>key_map_file</span><span class='op'>)</span>
+<span class='va'>key_map</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>key_map</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>projid</span>, <span class='va'>mrna_id</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2314,10 +2314,10 @@ MSBB
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read and process covariate data</span>
 <span class='va'>cov_file</span> <span class='op'>=</span> <span class='st'>"../Data/ROSMAP_clinical.csv"</span>
-<span class='va'>cov</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='va'>cov_file</span><span class='op'>)</span>
+<span class='va'>cov</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='va'>cov_file</span><span class='op'>)</span>
 
 <span class='co'># rename covariate data and merge with ROSMAP IDs</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='va'>cov</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"projid"</span>, <span class='st'>"cts_mmse30_lv"</span>, <span class='st'>"braaksc"</span>, <span class='st'>"ceradsc"</span>, <span class='st'>"cogdx"</span>, <span class='st'>"apoe_genotype"</span><span class='op'>)</span>, 
+<span class='fu'>setnames</span><span class='op'>(</span><span class='va'>cov</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"projid"</span>, <span class='st'>"cts_mmse30_lv"</span>, <span class='st'>"braaksc"</span>, <span class='st'>"ceradsc"</span>, <span class='st'>"cogdx"</span>, <span class='st'>"apoe_genotype"</span><span class='op'>)</span>, 
          <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"projid"</span>, <span class='st'>"MMSE"</span>, <span class='st'>"Braak"</span>, <span class='st'>"CERAD"</span>, <span class='st'>"ClinicalDiagnosis"</span>, <span class='st'>"RawAPOE"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>cov</span><span class='op'>[</span><span class='va'>key_map</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>projid</span><span class='op'>)</span>, <span class='va'>mrna_id</span> <span class='op'>:=</span> <span class='va'>mrna_id</span><span class='op'>]</span>
 
@@ -2336,7 +2336,7 @@ MSBB
 <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span><span class='op'>)</span><span class='op'>]</span>
 <span class='va'>rosmap_fpkm</span> <span class='op'>=</span> <span class='va'>rosmap_fpkm</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span><span class='op'>]</span>
 <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span><span class='op'>)</span>
-<span class='va'>cov</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></span><span class='op'>(</span>mrna_id_nov <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>)</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>mrna_id_nov</span><span class='op'>)</span><span class='op'>]</span>
+<span class='va'>cov</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='fu'>data.table</span><span class='op'>(</span>mrna_id_nov <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>)</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>mrna_id_nov</span><span class='op'>)</span><span class='op'>]</span>
 
 <span class='co'># check that cov and rosmap_fpkm have same order</span>
 <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>cov</span><span class='op'>$</span><span class='va'>mrna_id_nov</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>rosmap_fpkm</span><span class='op'>)</span><span class='op'>)</span>

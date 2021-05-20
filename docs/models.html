@@ -2156,7 +2156,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+  <script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2195,8 +2195,8 @@ Functions
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="models.html">Models</a>
-<a href="spectral-clustering.html">Spectral Clustering</a>
+<a href="models">Models</a>
+<a href="spectral-clustering">Spectral Clustering</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2206,12 +2206,12 @@ ROSMAP
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="ROSMAP-variables">Define Variables</a>
+<a href="ROSMAP-preprocess">Pre-Process Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="ROSMAP-microglia">Microglia Analysis</a>
 <hr/>
-<a href="ROSMAP-astrocyte.html">Astrocyte Analysis</a>
+<a href="ROSMAP-astrocyte">Astrocyte Analysis</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2221,13 +2221,13 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="MSBB-variables.html">Define Variables</a>
-<a href="MSBB-merge.html">Merge Data</a>
+<a href="MSBB-variables">Define Variables</a>
+<a href="MSBB-merge">Merge Data</a>
 <hr/>
-<a href="MSBB-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia">Microglia Analysis</a>
 </div>
 </div>
-<a href="qPCR-analysis.html">qPCR</a>
+<a href="qPCR-analysis">qPCR</a>
 <a href="https://github.com/mindds/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
@@ -2303,8 +2303,8 @@ MSBB
   
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.sfE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E4vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.sfE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.sfE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E2vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.sfE</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT1.sfE</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT2.sfE</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT1.sfE</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT2.sfE</span><span class='op'>)</span>
   <span class='va'>tT.sfE</span> <span class='op'>=</span> <span class='va'>tT1.sfE</span><span class='op'>[</span><span class='va'>tT2.sfE</span>, on<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='st'>"EnsemblID"</span>, <span class='st'>"Description"</span><span class='op'>)</span><span class='op'>]</span>
   
   <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>tT.sfE</span><span class='op'>)</span>
@@ -2351,10 +2351,10 @@ MSBB
   <span class='va'>tT_CERAD_E4Num</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/limma/man/toptable.html'>topTable</a></span><span class='op'>(</span><span class='va'>fit.eb.sfE</span>, sort.by<span class='op'>=</span><span class='st'>"none"</span>, number<span class='op'>=</span><span class='cn'>Inf</span>, coef<span class='op'>=</span><span class='fl'>2</span>, confint<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
   <span class='va'>tT_CERAD_E2Num</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/limma/man/toptable.html'>topTable</a></span><span class='op'>(</span><span class='va'>fit.eb.sfE</span>, sort.by<span class='op'>=</span><span class='st'>"none"</span>, number<span class='op'>=</span><span class='cn'>Inf</span>, coef<span class='op'>=</span><span class='fl'>3</span>, confint<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
   
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT_CERAD_E4Num</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT_CERAD_E2Num</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT_CERAD_E4Num</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT_CERAD_E2Num</span><span class='op'>)</span>
   
-  <span class='va'>tT</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>)</span>
+  <span class='va'>tT</span> <span class='op'>=</span> <span class='fu'><a href='http://fs.r-lib.org/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>)</span>
   <span class='va'>tT</span> <span class='op'>=</span> <span class='va'>tT</span><span class='op'>[</span><span class='va'>tT_CERAD_E4Num</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>EnsemblID</span>, <span class='va'>GeneSymbol</span>, <span class='va'>Description</span><span class='op'>)</span>, 
           <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"e4_logFC"</span>, <span class='st'>"e4_CI.L"</span>, <span class='st'>"e4_CI.R"</span>,
             <span class='st'>"e4_P.Value"</span>, <span class='st'>"e4_adj.P.Val"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span>
@@ -2425,8 +2425,8 @@ MSBB
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E4vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E2vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
   <span class='va'>tT.EBase</span> <span class='op'>=</span> <span class='va'>tT1.EBase</span><span class='op'>[</span><span class='va'>tT2.EBase</span>, on<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='st'>"EnsemblID"</span>, <span class='st'>"Description"</span><span class='op'>)</span><span class='op'>]</span>
 
   <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>tT.EBase</span><span class='op'>)</span>
@@ -2472,10 +2472,10 @@ MSBB
   <span class='va'>tT_CERAD_E4Num</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/limma/man/toptable.html'>topTable</a></span><span class='op'>(</span><span class='va'>fit.eb.sfE</span>, sort.by<span class='op'>=</span><span class='st'>"none"</span>, number<span class='op'>=</span><span class='cn'>Inf</span>, coef<span class='op'>=</span><span class='fl'>2</span>, confint<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
   <span class='va'>tT_CERAD_E2Num</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/limma/man/toptable.html'>topTable</a></span><span class='op'>(</span><span class='va'>fit.eb.sfE</span>, sort.by<span class='op'>=</span><span class='st'>"none"</span>, number<span class='op'>=</span><span class='cn'>Inf</span>, coef<span class='op'>=</span><span class='fl'>3</span>, confint<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
   
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT_CERAD_E4Num</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT_CERAD_E2Num</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT_CERAD_E4Num</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT_CERAD_E2Num</span><span class='op'>)</span>
   
-  <span class='va'>tT</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>)</span>
+  <span class='va'>tT</span> <span class='op'>=</span> <span class='fu'><a href='http://fs.r-lib.org/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>)</span>
   <span class='va'>tT</span> <span class='op'>=</span> <span class='va'>tT</span><span class='op'>[</span><span class='va'>tT_CERAD_E4Num</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>EnsemblID</span>, <span class='va'>GeneSymbol</span>, <span class='va'>Description</span><span class='op'>)</span>, 
           <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"e4_logFC"</span>, <span class='st'>"e4_CI.L"</span>, <span class='st'>"e4_CI.R"</span>,
             <span class='st'>"e4_P.Value"</span>, <span class='st'>"e4_adj.P.Val"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span>
@@ -2547,8 +2547,8 @@ MSBB
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E4vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E2vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
   
   <span class='va'>tT.EBase</span> <span class='op'>=</span> <span class='va'>tT1.EBase</span><span class='op'>[</span><span class='va'>tT2.EBase</span>, on<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='st'>"EnsemblID"</span>, <span class='st'>"Description"</span><span class='op'>)</span><span class='op'>]</span>
   
@@ -2601,8 +2601,8 @@ MSBB
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E4vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"E2vsE3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
 
   <span class='va'>tT.EBase</span> <span class='op'>=</span> <span class='va'>tT1.EBase</span><span class='op'>[</span><span class='va'>tT2.EBase</span>, on<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='st'>"EnsemblID"</span>, <span class='st'>"Description"</span><span class='op'>)</span><span class='op'>]</span>
   
@@ -2660,10 +2660,10 @@ MSBB
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT3.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"C2E4vsC2E3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT3.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT4.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"C2E2vsC2E3_"</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>tT4.EBase</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>4</span><span class='op'>:</span><span class='fl'>11</span><span class='op'>]</span><span class='op'>)</span>
   
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT3.EBase</span><span class='op'>)</span>
-  <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setDT.html'>setDT</a></span><span class='op'>(</span><span class='va'>tT4.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT1.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT2.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT3.EBase</span><span class='op'>)</span>
+  <span class='fu'>setDT</span><span class='op'>(</span><span class='va'>tT4.EBase</span><span class='op'>)</span>
   
   <span class='va'>tT.EBase</span> <span class='op'>=</span> <span class='va'>tT1.EBase</span><span class='op'>[</span><span class='va'>tT2.EBase</span>, on<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='st'>"EnsemblID"</span>, <span class='st'>"Description"</span><span class='op'>)</span><span class='op'>]</span>
   <span class='va'>tT.EBase</span> <span class='op'>=</span> <span class='va'>tT.EBase</span><span class='op'>[</span><span class='va'>tT3.EBase</span>, on<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='st'>"EnsemblID"</span>, <span class='st'>"Description"</span><span class='op'>)</span><span class='op'>]</span>

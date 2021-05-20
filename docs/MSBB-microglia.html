@@ -2156,7 +2156,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     color: var(--hover-color, white);
   }</style>
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+  <script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2195,8 +2195,8 @@ Functions
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="models.html">Models</a>
-<a href="spectral-clustering.html">Spectral Clustering</a>
+<a href="models">Models</a>
+<a href="spectral-clustering">Spectral Clustering</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2206,12 +2206,12 @@ ROSMAP
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="ROSMAP-variables.html">Define Variables</a>
-<a href="ROSMAP-preprocess.html">Pre-Process Data</a>
+<a href="ROSMAP-variables">Define Variables</a>
+<a href="ROSMAP-preprocess">Pre-Process Data</a>
 <hr/>
-<a href="ROSMAP-microglia.html">Microglia Analysis</a>
+<a href="ROSMAP-microglia">Microglia Analysis</a>
 <hr/>
-<a href="ROSMAP-astrocyte.html">Astrocyte Analysis</a>
+<a href="ROSMAP-astrocyte">Astrocyte Analysis</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -2221,13 +2221,13 @@ MSBB
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="MSBB-variables.html">Define Variables</a>
-<a href="MSBB-merge.html">Merge Data</a>
+<a href="MSBB-variables">Define Variables</a>
+<a href="MSBB-merge">Merge Data</a>
 <hr/>
-<a href="MSBB-microglia.html">Microglia Analysis</a>
+<a href="MSBB-microglia">Microglia Analysis</a>
 </div>
 </div>
-<a href="qPCR-analysis.html">qPCR</a>
+<a href="qPCR-analysis">qPCR</a>
 <a href="https://github.com/mindds/apoe-glia" aria-label="Link to source">
 <i class="fab fa-github" aria-hidden="true"></i>
 </a>
@@ -2281,10 +2281,10 @@ MSBB
 <pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span>list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='http://bioinf.wehi.edu.au/limma'>limma</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/jokergoo/ComplexHeatmap'>ComplexHeatmap</a></span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://Rdatatable.gitlab.io/data.table'>data.table</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'>data.table</span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/jokergoo/circlize'>circlize</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://ycphs.github.io/openxlsx/index.html'>openxlsx</a></span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='http://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'>SNFtool</span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'>pheatmap</span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'><a href='https://csdaw.github.io/ggprism/'>ggprism</a></span><span class='op'>)</span>
@@ -2313,17 +2313,17 @@ MSBB
 <span class='va'>genes</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='st'>"../Data/Microglia Genes.txt"</span><span class='op'>)</span>
 
 <span class='co'># select microglia genes that exist in MSBB</span>
-<span class='va'>annot</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='st'>"../Data/ENSEMBL GRCh38.p7.csv"</span><span class='op'>)</span>
-<span class='va'>annot</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>unique</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>[</span><span class='va'>GeneSymbol</span> <span class='op'>%in%</span> <span class='va'>genes</span>,<span class='op'>]</span><span class='op'>)</span>
-<span class='va'>ensembl_ids</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span>, <span class='va'>annot</span><span class='op'>$</span><span class='va'>EnsemblID</span><span class='op'>)</span>
-<span class='va'>annot</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>unique</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>[</span><span class='va'>EnsemblID</span> <span class='op'>%in%</span> <span class='va'>ensembl_ids</span>,<span class='op'>]</span><span class='op'>)</span>
+<span class='va'>annot</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='st'>"../Data/ENSEMBL GRCh38.p7.csv"</span><span class='op'>)</span>
+<span class='va'>annot</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>[</span><span class='va'>GeneSymbol</span> <span class='op'>%in%</span> <span class='va'>genes</span>,<span class='op'>]</span><span class='op'>)</span>
+<span class='va'>ensembl_ids</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span>, <span class='va'>annot</span><span class='op'>$</span><span class='va'>EnsemblID</span><span class='op'>)</span>
+<span class='va'>annot</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>annot</span><span class='op'>[</span><span class='va'>EnsemblID</span> <span class='op'>%in%</span> <span class='va'>ensembl_ids</span>,<span class='op'>]</span><span class='op'>)</span>
 
 <span class='co'># remove duplicated genes</span>
-<span class='va'>annot</span> <span class='op'>=</span> <span class='va'>annot</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>GeneSymbol</span><span class='op'>)</span>, <span class='op'>]</span>
+<span class='va'>annot</span> <span class='op'>=</span> <span class='va'>annot</span><span class='op'>[</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>GeneSymbol</span><span class='op'>)</span>, <span class='op'>]</span>
 <span class='va'>ensembl_ids</span> <span class='op'>=</span> <span class='va'>annot</span><span class='op'>$</span><span class='va'>EnsemblID</span>
 
 <span class='co'># check results</span>
-<span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>ensembl_ids</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># no duplicated ids</span>
+<span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/duplicated.html'>duplicated</a></span><span class='op'>(</span><span class='va'>ensembl_ids</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># no duplicated ids</span>
 <span class='fu'><a href='https://rdrr.io/r/base/any.html'>any</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>ensembl_ids</span><span class='op'>)</span><span class='op'>)</span>      <span class='co'># no NA</span>
 <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>ensembl_ids</span><span class='op'>)</span>
 </code></pre>
@@ -2369,7 +2369,7 @@ MSBB
 
 
 <span class='co'># Table S2</span>
-<span class='va'>TableS2</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='st'>"../results/TableS2.csv"</span><span class='op'>)</span>
+<span class='va'>TableS2</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='st'>"../results/TableS2.csv"</span><span class='op'>)</span>
 <span class='va'>TableS2</span><span class='op'>[</span><span class='va'>tT_CERAD</span>, on<span class='op'>=</span><span class='st'>"EnsemblID"</span>,  
         <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MSBB_E4vsE3_logFC"</span>, <span class='st'>"MSBB_E4vsE3_CI.L"</span>, <span class='st'>"MSBB_E4vsE3_CI.R"</span>, 
           <span class='st'>"MSBB_E4vsE3_P.Value"</span>, <span class='st'>"MSBB_E4vsE3_adj.P.Val"</span>, 
@@ -2379,8 +2379,8 @@ MSBB
            <span class='va'>i.E4vsE3_P.Value</span>, <span class='va'>i.E4vsE3_adj.P.Val</span>,  
            <span class='va'>i.E2vsE3_logFC</span>, <span class='va'>i.E2vsE3_CI.L</span>, <span class='va'>i.E2vsE3_CI.R</span>, 
            <span class='va'>i.E2vsE3_P.Value</span>, <span class='va'>i.E2vsE3_adj.P.Val</span><span class='op'>)</span><span class='op'>]</span>
-<span class='va'>TableS2</span> <span class='op'>=</span> <span class='va'>TableS2</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>GeneSymbol</span><span class='op'>)</span>, <span class='op'>]</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fwrite.html'>fwrite</a></span><span class='op'>(</span><span class='va'>TableS2</span>, <span class='st'>"../results/TableS2.csv"</span><span class='op'>)</span>
+<span class='va'>TableS2</span> <span class='op'>=</span> <span class='va'>TableS2</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>GeneSymbol</span><span class='op'>)</span>, <span class='op'>]</span>
+<span class='fu'>fwrite</span><span class='op'>(</span><span class='va'>TableS2</span>, <span class='st'>"../results/TableS2.csv"</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2391,17 +2391,17 @@ MSBB
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># run Model 1.5 with E4 and E2 copies as numeric</span>
 <span class='va'>tT_CERAD_ENum</span> <span class='op'>=</span> <span class='fu'>run_model1.5</span><span class='op'>(</span><span class='va'>mData</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>C</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>E4num</span>, <span class='va'>cov</span><span class='op'>$</span><span class='va'>E2num</span>, <span class='va'>annot</span><span class='op'>)</span>
 
-<span class='va'>e4_num_genes</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e4_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e4_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span>, <span class='va'>tT_CERAD</span><span class='op'>[</span><span class='va'>E4vsE3_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>E4vsE3_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>,<span class='va'>GeneSymbol</span><span class='op'>]</span><span class='op'>)</span>
+<span class='va'>e4_num_genes</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e4_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e4_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span>, <span class='va'>tT_CERAD</span><span class='op'>[</span><span class='va'>E4vsE3_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>E4vsE3_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>,<span class='va'>GeneSymbol</span><span class='op'>]</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>e4_num_genes</span><span class='op'>)</span>
 
-<span class='va'>e2_num_genes</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e2_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e2_logFC</span> <span class='op'>&lt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span>, <span class='va'>tT_CERAD</span><span class='op'>[</span><span class='va'>E4vsE3_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>E4vsE3_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span><span class='op'>)</span>
+<span class='va'>e2_num_genes</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e2_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e2_logFC</span> <span class='op'>&lt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span>, <span class='va'>tT_CERAD</span><span class='op'>[</span><span class='va'>E4vsE3_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>E4vsE3_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>e2_num_genes</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e4_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e4_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span>,
+<span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e4_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e4_logFC</span> <span class='op'>&gt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span>,
           <span class='va'>tT_CERAD_ENum</span><span class='op'>[</span><span class='va'>e2_P.Value</span> <span class='op'>&lt;</span> <span class='fl'>0.05</span> <span class='op'>&amp;</span> <span class='va'>e2_logFC</span> <span class='op'>&lt;</span> <span class='fl'>0</span>, <span class='va'>GeneSymbol</span><span class='op'>]</span><span class='op'>)</span>
 
 <span class='co'># Table S3</span>
-<span class='va'>TableS3</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='st'>"../results/TableS3.csv"</span><span class='op'>)</span>
+<span class='va'>TableS3</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='st'>"../results/TableS3.csv"</span><span class='op'>)</span>
 <span class='va'>TableS3</span> <span class='op'>=</span> <span class='va'>TableS3</span><span class='op'>[</span><span class='va'>tT_CERAD_ENum</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>EnsemblID</span>, <span class='va'>GeneSymbol</span>, <span class='va'>Description</span><span class='op'>)</span>,
           <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MSBB_e4_logFC"</span>, <span class='st'>"MSBB_e4_CI.L"</span>, <span class='st'>"MSBB_e4_CI.R"</span>, 
             <span class='st'>"MSBB_e4_P.Value"</span>, <span class='st'>"MSBB_e4_adj.P.Val"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span>
@@ -2410,7 +2410,7 @@ MSBB
           <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MSBB_e2_logFC"</span>, <span class='st'>"MSBB_e2_CI.L"</span>, <span class='st'>"MSBB_e2_CI.R"</span>,
             <span class='st'>"MSBB_e2_P.Value"</span>, <span class='st'>"MSBB_e2_adj.P.Val"</span><span class='op'>)</span> <span class='op'>:=</span> <span class='fu'>.</span><span class='op'>(</span>
             <span class='va'>i.e2_logFC</span>, <span class='va'>i.e2_CI.L</span>, <span class='va'>i.e2_CI.R</span>, <span class='va'>i.e2_P.Value</span>, <span class='va'>i.e2_adj.P.Val</span><span class='op'>)</span><span class='op'>]</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fwrite.html'>fwrite</a></span><span class='op'>(</span><span class='va'>TableS3</span>, <span class='st'>"../results/TableS3.csv"</span><span class='op'>)</span>
+<span class='fu'>fwrite</span><span class='op'>(</span><span class='va'>TableS3</span>, <span class='st'>"../results/TableS3.csv"</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2450,8 +2450,8 @@ MSBB
 <span class='co'># visualization</span>
 <span class='va'>annot_row</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>cluster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>annot_row</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
-         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
+<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
+         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C0</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
          cluster_rows <span class='op'>=</span> <span class='cn'>F</span>, cluster_cols <span class='op'>=</span> <span class='cn'>F</span>,
          show_rownames <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span>
 
@@ -2475,8 +2475,8 @@ MSBB
 <span class='co'># visualization</span>
 <span class='va'>annot_row</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>cluster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>annot_row</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
-         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
+<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
+         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.C3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
          cluster_rows <span class='op'>=</span> <span class='cn'>F</span>, cluster_cols <span class='op'>=</span> <span class='cn'>F</span>,
          show_rownames <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span>
 
@@ -2500,8 +2500,8 @@ MSBB
 <span class='co'># visualization</span>
 <span class='va'>annot_row</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>cluster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>annot_row</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
-         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
+<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
+         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B1</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
          cluster_rows <span class='op'>=</span> <span class='cn'>F</span>, cluster_cols <span class='op'>=</span> <span class='cn'>F</span>,
          show_rownames <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span>
 
@@ -2525,8 +2525,8 @@ MSBB
 <span class='co'># visualization</span>
 <span class='va'>annot_row</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>cluster <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>annot_row</span><span class='op'>)</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
-         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setorder.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
+<span class='fu'><a href='https://rdrr.io/pkg/ComplexHeatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>zMtx</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>,<span class='op'>]</span>,
+         annotation_row <span class='op'>=</span> <span class='va'>annot_row</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>clust.B3</span><span class='op'>$</span><span class='va'>clustA</span><span class='op'>)</span>, , drop <span class='op'>=</span> <span class='cn'>F</span><span class='op'>]</span>,
          cluster_rows <span class='op'>=</span> <span class='cn'>F</span>, cluster_cols <span class='op'>=</span> <span class='cn'>F</span>,
          show_rownames <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span>
 
@@ -2552,7 +2552,7 @@ MSBB
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># ROSMAP C0 genes</span>
-<span class='va'>TableS1</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='st'>"../results/TableS1.csv"</span><span class='op'>)</span>
+<span class='va'>TableS1</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='st'>"../results/TableS1.csv"</span><span class='op'>)</span>
 <span class='va'>rosmap.C0.genes</span> <span class='op'>=</span> <span class='va'>TableS1</span><span class='op'>$</span><span class='va'>GeneSymbol</span>
 
 <span class='co'># C0 test</span>
@@ -2561,19 +2561,19 @@ MSBB
 <span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='va'>C0.genes</span>, <span class='va'>cov_C0</span><span class='op'>)</span>
 
 <span class='co'># C0 test based on ROSMAP genes</span>
-<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span>, <span class='va'>rosmap.C0.genes</span><span class='op'>)</span>, <span class='va'>cov_C0</span><span class='op'>)</span>
+<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span>, <span class='va'>rosmap.C0.genes</span><span class='op'>)</span>, <span class='va'>cov_C0</span><span class='op'>)</span>
 
 <span class='co'># adjusted by donor</span>
-<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span>, <span class='va'>rosmap.C0.genes</span><span class='op'>)</span>, <span class='va'>cov_C0</span>, adj.donor <span class='op'>=</span> <span class='cn'>T</span>, donor <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span>, <span class='va'>rosmap.C0.genes</span><span class='op'>)</span>, <span class='va'>cov_C0</span>, adj.donor <span class='op'>=</span> <span class='cn'>T</span>, donor <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># add to Table S1</span>
-<span class='va'>MSBB_aveZ</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>avez.C0</span><span class='op'>)</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setattr.html'>setnames</a></span><span class='op'>(</span><span class='va'>MSBB_aveZ</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Genes"</span>, <span class='st'>"E2"</span>, <span class='st'>"E3"</span>, <span class='st'>"E4"</span><span class='op'>)</span>, 
+<span class='va'>MSBB_aveZ</span> <span class='op'>=</span> <span class='fu'><a href='http://fs.r-lib.org/reference/copy.html'>copy</a></span><span class='op'>(</span><span class='va'>avez.C0</span><span class='op'>)</span>
+<span class='fu'>setnames</span><span class='op'>(</span><span class='va'>MSBB_aveZ</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Genes"</span>, <span class='st'>"E2"</span>, <span class='st'>"E3"</span>, <span class='st'>"E4"</span><span class='op'>)</span>, 
          <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GeneSymbol"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"MSBB"</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"E2"</span>, <span class='st'>"E3"</span>, <span class='st'>"E4"</span><span class='op'>)</span>, sep <span class='op'>=</span> <span class='st'>"_"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>TableS1</span> <span class='op'>=</span> <span class='va'>MSBB_aveZ</span><span class='op'>[</span><span class='va'>GeneSymbol</span> <span class='op'>%in%</span> <span class='va'>rosmap.C0.genes</span>, <span class='op'>]</span><span class='op'>[</span><span class='va'>TableS1</span>, on <span class='op'>=</span> <span class='fu'>.</span><span class='op'>(</span><span class='va'>GeneSymbol</span><span class='op'>)</span><span class='op'>]</span>
 <span class='va'>TableS1</span> <span class='op'>=</span> <span class='va'>TableS1</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span><span class='va'>GeneSymbol</span>, <span class='va'>EnsemblID</span>, <span class='va'>Description</span>, <span class='va'>ROSMAP_E2</span>, <span class='va'>ROSMAP_E3</span>, <span class='va'>ROSMAP_E4</span>,
             <span class='va'>MSBB_E2</span>, <span class='va'>MSBB_E3</span>, <span class='va'>MSBB_E4</span><span class='op'>)</span><span class='op'>]</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fwrite.html'>fwrite</a></span><span class='op'>(</span><span class='va'>TableS1</span>, <span class='st'>"../results/TableS1.csv"</span><span class='op'>)</span>
+<span class='fu'>fwrite</span><span class='op'>(</span><span class='va'>TableS1</span>, <span class='st'>"../results/TableS1.csv"</span><span class='op'>)</span>
 
 <span class='co'># C3 test</span>
 <span class='va'>cov_C3</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='va'>C</span> <span class='op'>==</span> <span class='fl'>3</span>,<span class='op'>]</span>
@@ -2596,7 +2596,7 @@ MSBB
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># read ROSMAP C0 genes</span>
-<span class='va'>TableS3</span> <span class='op'>=</span> <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/fread.html'>fread</a></span><span class='op'>(</span><span class='st'>"../results/TableS3.csv"</span><span class='op'>)</span>
+<span class='va'>TableS3</span> <span class='op'>=</span> <span class='fu'>fread</span><span class='op'>(</span><span class='st'>"../results/TableS3.csv"</span><span class='op'>)</span>
 <span class='va'>rosmap_C0.genes</span> <span class='op'>=</span> <span class='va'>TableS3</span><span class='op'>$</span><span class='va'>GeneSymbol</span>
 <span class='va'>mDataZ.rosmap_C0.genes</span> <span class='op'>=</span> <span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>rosmap_C0.genes</span>,<span class='op'>]</span>
 <span class='va'>mDataZ.rosmap_C0.genes.e2</span> <span class='op'>=</span> <span class='va'>mDataZ.rosmap_C0.genes</span><span class='op'>[</span>,<span class='va'>z.C0</span><span class='op'>$</span><span class='va'>E</span> <span class='op'>==</span> <span class='st'>"E2"</span><span class='op'>]</span>
@@ -2610,7 +2610,7 @@ MSBB
   E4 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>ncol</a></span><span class='op'>(</span><span class='va'>mDataZ.rosmap_C0.genes.e4</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># compute intersection</span>
-<span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>rosmap_C0.genes</span>, <span class='va'>C0.genes</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>rosmap_C0.genes</span>, <span class='va'>C0.genes</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -2620,7 +2620,7 @@ MSBB
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># test on ROSMAP C0 genes</span>
 <span class='va'>cov_C0</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='va'>C</span> <span class='op'>==</span> <span class='fl'>0</span>,<span class='op'>]</span>
 <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>cov_C0</span><span class='op'>$</span><span class='va'>individualIdentifier</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>rosmap_C0.genes</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span><span class='op'>)</span>, <span class='va'>cov_C0</span><span class='op'>)</span>
+<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C0</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>rosmap_C0.genes</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span><span class='op'>)</span>, <span class='va'>cov_C0</span><span class='op'>)</span>
 
 <span class='co'># read ROSMAP C3 genes</span>
 <span class='va'>rosmap_C3.genes</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/openxlsx/man/read.xlsx.html'>read.xlsx</a></span><span class='op'>(</span><span class='st'>"../results/ROSMAP_miroglia_cluster_genes_remove.low.expressed.genes.xlsx"</span>, sheet <span class='op'>=</span> <span class='st'>"C3(k=3)"</span>, colNames <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span>
@@ -2629,7 +2629,7 @@ MSBB
 <span class='co'># test on ROSMAP C3 genes</span>
 <span class='va'>cov_C3</span> <span class='op'>=</span> <span class='va'>cov</span><span class='op'>[</span><span class='va'>C</span> <span class='op'>==</span> <span class='fl'>3</span>,<span class='op'>]</span>
 <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='va'>cov_C3</span><span class='op'>$</span><span class='va'>individualIdentifier</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>z.C3</span><span class='op'>$</span><span class='va'>z</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C3</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://Rdatatable.gitlab.io/data.table/reference/setops.html'>intersect</a></span><span class='op'>(</span><span class='va'>rosmap_C3.genes</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span><span class='op'>)</span>, <span class='va'>cov_C3</span><span class='op'>)</span>
+<span class='fu'>test_avez</span><span class='op'>(</span><span class='va'>z.C3</span><span class='op'>$</span><span class='va'>z</span>, <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>rosmap_C3.genes</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>mData</span><span class='op'>)</span><span class='op'>)</span>, <span class='va'>cov_C3</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>

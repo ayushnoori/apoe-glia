@@ -5,23 +5,26 @@
 # Setup
 Install [R](https://www.r-project.org/) to run our code.
 
-# Code Availability
-Our codebase is available on GitHub at [mindds.github.io/apoe-glia](https://mindds.github.io/apoe-glia/) and below.
+# Documentation
+To read our documented code, please visit [mindds.github.io/apoe-glia](https://mindds.github.io/apoe-glia) or see below.
 
 ### Functions
-* [Models](https://mindds.github.io/apoe-glia/models.html)
-* [Spectral Clustering](https://mindds.github.io/apoe-glia/spectral-clustering.html)
+* [Models](https://mindds.github.io/apoe-glia/models)
+* [Spectral Clustering](https://mindds.github.io/apoe-glia/spectral-clustering)
 
 ### ROSMAP
-* [Define Variables](https://mindds.github.io/apoe-glia/ROSMAP-variables.html)
-* [Pre-Process Data](https://mindds.github.io/apoe-glia/ROSMAP-preprocess.html)
-* [Microglia Analysis](https://mindds.github.io/apoe-glia/ROSMAP-microglia.html)
-* [Astrocyte Analysis](https://mindds.github.io/apoe-glia/ROSMAP-astrocyte.html)
+* [Define Variables](https://mindds.github.io/apoe-glia/ROSMAP-variables)
+* [Pre-Process Data](https://mindds.github.io/apoe-glia/ROSMAP-preprocess)
+* [Microglia Analysis](https://mindds.github.io/apoe-glia/ROSMAP-microglia)
+* [Astrocyte Analysis](https://mindds.github.io/apoe-glia/ROSMAP-astrocyte)
 
 ### MSBB
-* [Define Variables](https://mindds.github.io/apoe-glia/MSBB-variables.html)
-* [Merge Data](https://mindds.github.io/apoe-glia/MSBB-merge.html)
-* [Microglia Analysis](https://mindds.github.io/apoe-glia/MSBB-microglia.html)
+* [Define Variables](https://mindds.github.io/apoe-glia/MSBB-variables)
+* [Merge Data](https://mindds.github.io/apoe-glia/MSBB-merge)
+* [Microglia Analysis](https://mindds.github.io/apoe-glia/MSBB-microglia)
 
 ### qPCR Analysis
-* [qPCR Analysis](https://mindds.github.io/apoe-glia/qPCR-analysis.html)
+* [qPCR Analysis](https://mindds.github.io/apoe-glia/qPCR-analysis)
+
+# Code Availability
+Our full codebase is available for download on [GitHub](https://github.com/mindds/apoe-glia).
